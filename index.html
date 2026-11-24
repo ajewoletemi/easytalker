@@ -19,6 +19,7 @@
 .field:focus{border-color:#00a884;box-shadow:0 0 0 3px #d9fdd3}
 .btn{padding:13px;margin:6px 0;border-radius:12px;border:none;width:100%;font-weight:700;cursor:pointer;font-size:15px}
 .btn-green{background:#00a884;color:#fff} .btn-dark{background:#111b21;color:#fff}
+.linkBtn{background:none;border:none;color:#00a884;font-weight:700;cursor:pointer;font-size:14px;padding:8px}
 .logoutBtn{background:#ff3b30;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
 .user{padding:11px 14px;cursor:pointer;display:flex;gap:11px;align-items:center;border-bottom:1px solid #f5f5f5}
 .chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:64px}
@@ -62,6 +63,8 @@
 .viewerContent img{max-width:100%;max-height:70vh;border-radius:12px}
 .viewerFooter{display:flex;gap:10px;padding:14px}
 .viewerFooter input{flex:1;padding:12px;border-radius:20px;border:none;outline:none}
+.authPage{display:none;flex-direction:column;flex:1;overflow:hidden}
+.authPage.active{display:flex}
 @media(max-width:760px){.left{width:100%;min-width:0}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -73,11 +76,29 @@
 <div class="left">
 <div class="header-green">💬 Easy Talkers <button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
 
-<div id="authBox" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-<div style="flex:1;overflow-y:auto;padding:16px;text-align:center">
+<!-- ===== LOGIN PAGE - SEPARATE ===== -->
+<div id="loginPage" class="authPage active">
+<div style="flex:1;overflow-y:auto;padding:20px;text-align:center">
+<div class="avatar big" style="margin:auto">👋</div>
+<h2 style="margin:12px 0 2px">Welcome Back</h2>
+<p style="color:#667781;font-size:13px;margin:0 0 16px">Login to continue chatting</p>
+<input class="field" id="loginEmail" placeholder="✉️ Email e.g. kojo@gmail.com">
+<input class="field" id="loginPass" type="password" placeholder="🔒 Password">
+<button class="btn btn-dark" onclick="doLogin()">Login →</button>
+<p id="loginMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600"></p>
+<div style="margin-top:16px;border-top:1px solid #eee;padding-top:14px">
+<p style="color:#667781;font-size:13px;margin:0">Don't have an account?</p>
+<button class="linkBtn" onclick="showSignup()">Create Account →</button>
+</div>
+</div>
+</div>
+
+<!-- ===== SIGNUP PAGE - SEPARATE ===== -->
+<div id="signupPage" class="authPage">
+<div style="flex:1;overflow-y:auto;padding:20px;text-align:center">
 <div class="avatar big" id="authAvatar" style="margin:auto">✨</div>
-<h2 style="margin:10px 0 2px">Welcome to Easy Talkers</h2>
-<p style="color:#667781;font-size:13px;margin:0 0 10px">Chat, Status, Files & Voice — like WhatsApp</p>
+<h2 style="margin:12px 0 2px">Create Account</h2>
+<p style="color:#667781;font-size:13px;margin:0 0 16px">Join Easy Talkers in seconds</p>
 <input class="field" id="name" placeholder="👤 Your Name e.g. Kojo">
 <input class="field" id="email" placeholder="✉️ Email e.g. kojo@gmail.com">
 <input class="field" id="phone" placeholder="📞 Phone">
@@ -85,13 +106,16 @@
 <label class="uploadLabel" for="picInput">📸 Choose Profile Picture</label>
 <input type="file" id="picInput" accept="image/*" style="display:none" onchange="previewPic(this)">
 <div id="picName" style="font-size:12px;color:#008069"></div>
-<button class="btn btn-green" id="regBtn" onclick="doRegister()">Create Account →</button>
-<button class="btn btn-dark" id="loginBtn" onclick="doLogin()">Login</button>
+<button class="btn btn-green" onclick="doRegister()">Create Account →</button>
 <p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600"></p>
-<p id="testMsg" style="color:#008069;font-size:12px">Tap a button to test — it will respond instantly.</p>
+<div style="margin-top:10px;border-top:1px solid #eee;padding-top:12px">
+<p style="color:#667781;font-size:13px;margin:0">Already have an account?</p>
+<button class="linkBtn" onclick="showLogin()">← Back to Login</button>
+</div>
 </div>
 </div>
 
+<!-- ===== CHAT LIST ===== -->
 <div id="userBox" style="display:none;flex-direction:column;flex:1;overflow:hidden">
 <div class="sidebar-top">
 <div style="display:flex;align-items:center;gap:10px;flex:1" onclick="document.getElementById('changePic').click()">
@@ -156,16 +180,14 @@
 </div>
 
 <script>
-// ===== BLOCK BACK WHILE SIGNED IN =====
 let isSignedIn=false, inChatView=false;
 function lockBack(){ try{ history.pushState({p:'a'},'',location.href); history.pushState({p:'b'},'',location.href); }catch(e){} }
 window.addEventListener('popstate',()=>{ if(isSignedIn){ if(inChatView){ backToUsers(); lockBack(); } else { lockBack(); } } });
 lockBack();
 
-// ===== FIREBASE - OPTIONAL, LOGIN DOES NOT DEPEND ON IT =====
 const firebaseConfig = { apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM", authDomain: "easy-talkers.firebaseapp.com", projectId: "easy-talkers", storageBucket: "easy-talkers.firebasestorage.app", messagingSenderId: "533433245977", appId: "1:533433245977:web:82ffe12e9296d116a3e588", measurementId: "G-01GNZB6GKJ" };
 let auth=null, db=null;
-try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){ console.log("Firebase init fail", e); }
+try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){}
 
 let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false;
 let viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
@@ -176,16 +198,36 @@ function toggleAttach(e){ e.stopPropagation(); document.getElementById('emojiPop
 function toggleEmoji(e){ e.stopPropagation(); document.getElementById('attachPopup').style.display='none'; let p=document.getElementById('emojiPopup'); p.style.display=p.style.display==='block'?'none':'block'; }
 function closePopups(){ document.getElementById('attachPopup').style.display='none'; document.getElementById('emojiPopup').style.display='none'; }
 function pickFile(type){ closePopups(); let inp=document.getElementById('fileInput'); if(type==='image') inp.accept='image/*'; else if(type==='video') inp.accept='video/*'; else inp.accept='*/*'; inp.click(); }
-function showMsg(t,c){ let el=document.getElementById('authMsg'); el.innerText=t; el.style.color=c||'#e74c3c'; }
+function showMsg(t,c){ let el=document.getElementById('authMsg'); if(el){ el.innerText=t; el.style.color=c||'#e74c3c'; } }
+function showLoginMsg(t,c){ let el=document.getElementById('loginMsg'); if(el){ el.innerText=t; el.style.color=c||'#e74c3c'; } }
 function fileToBase64(f){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(f); }); }
 function previewPic(el){ if(el.files[0]){ document.getElementById('picName').innerText="✅ "+el.files[0].name; fileToBase64(el.files[0]).then(b=>{ document.getElementById('authAvatar').innerHTML=`<img src="${b}">`; }); } }
 
-// ===== LOCAL LOGIN - WORKS 100% WITHOUT FIREBASE =====
+// ===== PAGE SWITCHING =====
+function showLogin(){
+  document.getElementById('loginPage').classList.add('active');
+  document.getElementById('signupPage').classList.remove('active');
+  document.getElementById('userBox').style.display='none';
+}
+function showSignup(){
+  document.getElementById('signupPage').classList.add('active');
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('userBox').style.display='none';
+}
+function showApp(){
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('signupPage').classList.remove('active');
+  document.getElementById('userBox').style.display='flex';
+  document.getElementById('logoutTopBtn').style.display='block';
+  document.getElementById('meName').innerText=me.name;
+  document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase();
+  renderUsers(''); renderGroups(); renderStatusOvals(); lockBack();
+}
+
 function getLocalUsers(){ try{ return JSON.parse(localStorage.getItem('et_users')||'[]'); }catch(e){ return []; } }
 function saveLocalUsers(u){ localStorage.setItem('et_users', JSON.stringify(u)); }
 
 async function doRegister(){
-  alert("Register button clicked - working!");
   const name=document.getElementById('name').value.trim();
   const email=document.getElementById('email').value.trim().toLowerCase();
   const phone=document.getElementById('phone').value.trim();
@@ -195,80 +237,58 @@ async function doRegister(){
   if(!pass) return showMsg("Enter Password");
   if(pass.length<6) return showMsg("Password must be 6+ characters");
   let users=getLocalUsers();
-  if(users.find(u=>u.email===email)) return showMsg("This email already exists. Tap LOGIN below.");
+  if(users.find(u=>u.email===email)) return showMsg("This email already exists. Go to Login.");
   let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f);
   let newUser={name,email,phone,pass,photoURL,uid:'local-'+Date.now(),isOnline:true};
   users.push(newUser); saveLocalUsers(users);
   localStorage.setItem('et_current', JSON.stringify(newUser));
-  // Also try Firebase in background, don't block
   if(auth){ auth.createUserWithEmailAndPassword(email,pass).then(cred=>{ db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{}); }).catch(()=>{}); }
   showMsg("✅ Account created! Opening chats...","#00a884");
   setTimeout(()=>{ loginSuccess(newUser); }, 500);
 }
 
 async function doLogin(){
-  alert("Login button clicked - working!");
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const pass=document.getElementById('pass').value;
-  if(!email) return showMsg("Enter your Email to login");
-  if(!pass) return showMsg("Enter your Password to login");
-  showMsg("Logging in...","#008069");
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  if(!email) return showLoginMsg("Enter your Email");
+  if(!pass) return showLoginMsg("Enter your Password");
+  showLoginMsg("Logging in...","#008069");
   let users=getLocalUsers();
   let found=users.find(u=>u.email===email);
   if(!found){
-    // If no local user, try Firebase login as fallback
     if(auth){
-      try{ let cred=await auth.signInWithEmailAndPassword(email,pass); let nm=document.getElementById('name').value.trim()||email.split('@')[0]; let u={name:nm,email,phone:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true}; users.push(u); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(u)); loginSuccess(u); return; }catch(e){}
+      try{ let cred=await auth.signInWithEmailAndPassword(email,pass); let u={name:email.split('@')[0],email,phone:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true}; users.push(u); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(u)); loginSuccess(u); return; }catch(e){}
     }
-    return showMsg("No account found for this email. Tap CREATE ACCOUNT first.");
+    return showLoginMsg("No account found for this email. Tap 'Create Account' below.");
   }
-  if(found.pass!==pass) return showMsg("Wrong password. Try again.");
+  if(found.pass!==pass) return showLoginMsg("Wrong password. Try again.");
   localStorage.setItem('et_current', JSON.stringify(found));
-  showMsg("✅ Login successful! Opening chats...","#00a884");
+  showLoginMsg("✅ Login successful! Opening chats...","#00a884");
   setTimeout(()=>{ loginSuccess(found); }, 400);
 }
 
 function loginSuccess(user){
   me=user; isSignedIn=true;
-  // Merge local users + Firebase users later
   allUsers=getLocalUsers();
-  // Add demo users if only 1 user so you can test chat
-  if(allUsers.length===1){
-    // Keep list as is, user can register 2nd account in another browser to chat
-  }
   showApp();
-  // Try to sync with Firebase in background
   if(db){
     db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{});
-    db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); // Merge local + firebase without duplicates
-      let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); }); allUsers=merged; renderUsers(''); }, ()=>{});
+    db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); }); allUsers=merged; renderUsers(''); }, ()=>{});
     db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); }, ()=>{});
     db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); }, ()=>{});
   }
-  // Load local statuses
   try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); statuses=[...ls, ...statuses]; renderStatusOvals(); }catch(e){}
 }
-
-// Auto-login if already logged in before
 window.addEventListener('load', ()=>{
   let cur=localStorage.getItem('et_current');
-  if(cur){ try{ let u=JSON.parse(cur); showMsg("Welcome back "+u.name+"...","#00a884"); setTimeout(()=>loginSuccess(u), 300); }catch(e){} }
+  if(cur){ try{ let u=JSON.parse(cur); loginSuccess(u); }catch(e){} }
 });
-
 async function doLogout(){
   if(!confirm("Logout from Easy Talkers?")) return;
   localStorage.removeItem('et_current');
   if(db && me) db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{});
   if(auth) auth.signOut().catch(()=>{});
   isSignedIn=false; location.reload();
-}
-function showApp(){
-  document.getElementById('authBox').style.display='none';
-  document.getElementById('userBox').style.display='flex';
-  document.getElementById('logoutTopBtn').style.display='block';
-  document.getElementById('meName').innerText=me.name;
-  document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase();
-  renderUsers(''); renderGroups(); renderStatusOvals(); lockBack();
 }
 async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await fileToBase64(el.files[0]); me.photoURL=b; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].photoURL=b; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({photoURL:b}).catch(()=>{}); document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; alert("✅ Profile pic updated!"); }
 function avatarHTML(u){ if(u?.photoURL) return `<div class="avatar"><img src="${u.photoURL}"></div>`; return `<div class="avatar">${u?.name?u.name[0].toUpperCase():'👤'}</div>`; }
@@ -278,7 +298,7 @@ function showTab(t){ document.getElementById('tabChats').style.display=t==='chat
 function updateHeader(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'🟢 Online':('Last seen '+formatDate(new Date())); }
 function renderUsers(q=''){ if(!me) return; let html=''; allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase())).forEach(u=>{ html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:#00a884">🟢 Tap to chat</small></div><span>💬</span></div>`; }); document.getElementById('users').innerHTML=html||'<p style="padding:16px;color:#667781;font-size:13px">No other users yet.<br><br>To test chat:<br>1. Logout<br>2. Register a 2nd user with different email<br>3. You will see both users.</p>'; }
 function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet.</p>'; }
-async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); if(db){ await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}).catch(()=>alert("Group needs Firebase Rules")); } else { groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); } document.getElementById('groupName').value=''; }
+async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); if(db){ await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}).catch(()=>alert("Group needs Firebase")); } else { groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); } document.getElementById('groupName').value=''; }
 async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); let s={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text',id:'s'+Date.now()}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(s); localStorage.setItem('et_statuses', JSON.stringify(ls)); statuses.unshift(s); renderStatusOvals(); document.getElementById('statusText').value=''; if(db) db.collection("statuses").add({...s,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); }
 async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); let s={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image',id:'s'+Date.now()}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(s); localStorage.setItem('et_statuses', JSON.stringify(ls)); statuses.unshift(s); renderStatusOvals(); el.value=''; alert("✅ Status posted! Expires in 24h"); }
 function renderStatusOvals(){ let valid=statuses.filter(s=>{ let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); return (Date.now()-d.getTime())<=24*60*60*1000; }); let byUser={}; valid.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); }); let html=''; Object.keys(byUser).forEach(uid=>{ let latest=byUser[uid][0]; let viewed=viewedStatuses.has(latest.id); html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div></div>`; }); document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px">No status yet — post one!</div>'; }
@@ -292,12 +312,7 @@ function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=nu
 function getLocalMsgs(){ try{ return JSON.parse(localStorage.getItem('et_msgs')||'[]'); }catch(e){ return []; } }
 function saveLocalMsgs(m){ localStorage.setItem('et_msgs', JSON.stringify(m)); }
 function renderMessages(list){ let html=''; let lastDate=''; list.forEach(m=>{ let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt?new Date(m.createdAt):new Date()); let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋</div>'; document.getElementById('msgs').scrollTop=99999; }
-function listenMsgs(){
-  let local=getLocalMsgs().filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; });
-  renderMessages(local);
-  if(db && !unsub){ unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); let filtered=list.filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); // Merge local + firebase
-    let merged=[...local, ...filtered.filter(f=>!local.find(l=>l.text===f.text && l.from===f.from))]; renderMessages(merged); }, ()=>{}); }
-}
+function listenMsgs(){ let local=getLocalMsgs().filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); renderMessages(local); if(db && !unsub){ unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); let filtered=list.filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); let merged=[...local, ...filtered.filter(f=>!local.find(l=>l.text===f.text && l.from===f.from))]; renderMessages(merged); }, ()=>{}); } }
 async function setTyping(){ if(!chattingWith) return; }
 async function sendMsg(){ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:new Date().toISOString()}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); inp.value=''; listenMsgs(); }
 async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:new Date().toISOString()}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); el.value=''; alert("✅ Sent: "+f.name); listenMsgs(); }
