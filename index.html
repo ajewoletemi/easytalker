@@ -115,7 +115,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div class="app" id="app">
 <div class="left">
 <div class="header-green"><span style="overflow:hidden;text-overflow:ellipsis">💬 Easy Talkers</span><button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
-
 <div id="loginPage" class="authPage active">
 <div class="authScroll">
 <div class="avatar big" style="margin:auto">👋</div>
@@ -131,7 +130,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-
 <div id="signupPage" class="authPage">
 <div class="authScroll">
 <div class="avatar big" id="authAvatar" style="margin:auto">✨</div>
@@ -153,7 +151,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-
 <div id="userBox" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0">
 <div class="sidebar-top" onclick="openEditProfile()" style="cursor:pointer">
 <div class="avatar" id="myAvatar">K</div>
@@ -207,7 +204,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-
 <div class="right">
 <div class="chat-header">
 <button class="backBtn" onclick="backToUsers()">←</button>
@@ -230,7 +226,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-
 <div id="editProfileModal">
 <div class="editSheet">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">✏️ Edit Profile</h3><button onclick="closeEditProfile()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button></div>
@@ -255,7 +250,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <button class="btn" style="background:#f0f2f5" onclick="closeEditProfile()">Cancel</button>
 </div>
 </div>
-
 <div id="profileViewModal">
 <div class="editSheet profileSheet">
 <div style="background:linear-gradient(135deg,#00a884,#008069);padding:14px 20px 36px;color:#fff;position:relative;flex-shrink:0">
@@ -287,7 +281,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div id="profileChatHint" style="text-align:center;font-size:11px;color:#888;padding:0 12px 10px;background:#f0f2f5">💬 Send a message to <b id="profileChatName">this user</b> directly from here — no need to open chat</div>
 </div>
 </div>
-
 <div id="groupProfileModal">
 <div class="editSheet" style="text-align:center;padding:0;overflow:hidden">
 <div style="background:linear-gradient(135deg,#00a884,#008069,#00c896);padding:14px 20px 36px;color:#fff;position:relative">
@@ -315,7 +308,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-
 <div id="groupEditModal">
 <div class="editSheet">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">✏️ Edit Group</h3><button onclick="closeGroupEdit()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button></div>
@@ -335,7 +327,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <button class="btn" style="background:#f0f2f5" onclick="closeGroupEdit()">Cancel</button>
 </div>
 </div>
-
 <div id="viewersDrawer" class="viewerDrawer" onclick="if(event.target.id==='viewersDrawer') closeViewersDrawer()">
 <div class="viewerSheet">
 <div style="padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;gap:8px">
@@ -346,7 +337,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div id="viewersListContent" style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:16px"></div>
 </div>
 </div>
-
 <div id="statusViewer">
 <div class="viewerTop" id="viewerProgress"></div>
 <div class="viewerHeader"><button onclick="closeStatusViewer()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;flex-shrink:0">✕</button><div class="avatar small" id="viewerAvatar">K</div><div style="min-width:0"><b id="viewerName" style="word-break:break-word">User</b><div id="viewerTime" style="font-size:12px;color:#ccc;word-break:break-word"></div></div><button onclick="openViewersFromViewer()" style="margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:12px;flex-shrink:0;white-space:nowrap" id="viewerViews">👁️ 0 views ↑</button></div>
@@ -354,7 +344,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div style="text-align:center;color:#aaa;font-size:12px;padding:0 12px">Tap → Next • Tap 👁️ to see viewers • Tap ✕ to close</div>
 <div class="viewerFooter"><input id="statusReply" placeholder="Reply to status..."><button onclick="replyStatus()" style="padding:12px 18px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;flex-shrink:0">➤</button></div>
 </div>
-
 <script>
 let isSignedIn=false, inChatView=false;
 function lockBack(){ try{ history.pushState({p:'a'},'',location.href); history.pushState({p:'b'},'',location.href); }catch(e){} }
@@ -368,6 +357,21 @@ let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGro
 let msgCache=[]; let lastRenderKey=''; let unreadMap={}; let viewingProfileUid=null; let viewingGroupId=null; let lastInboxUid=null; let lastInboxText='';
 try{ unreadMap=JSON.parse(localStorage.getItem('et_unread')||'{}'); }catch(e){ unreadMap={}; }
 let viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
+// ===== STOP REPEATED AUTO PROFILE POPUP - SHOW ONCE ONLY =====
+let _autoProfileShown={}; try{ _autoProfileShown=JSON.parse(localStorage.getItem('et_auto_profile_shown')||'{}'); }catch(e){ _autoProfileShown={}; }
+let _profileManuallyOpened=false;
+let _initialUsersLoaded=false;
+function hasAutoShownProfile(uid){ return !!_autoProfileShown[uid]; }
+function markAutoShownProfile(uid){ _autoProfileShown[uid]=1; try{ localStorage.setItem('et_auto_profile_shown', JSON.stringify(_autoProfileShown)); }catch(e){} }
+function showNewUserProfileOnce(uid){
+  if(!uid || uid===me?.uid) return false;
+  if(hasAutoShownProfile(uid)) return false;
+  if(document.getElementById('profileViewModal').style.display==='flex') return false;
+  if(_profileManuallyOpened) return false;
+  markAutoShownProfile(uid);
+  setTimeout(()=>{ if(document.getElementById('profileViewModal').style.display!=='flex') viewProfile(uid, true); }, 600);
+  return true;
+}
 const emojis=["😀","😂","❤️","🔥","👍","🙏","😍","😢","😡","🎉","👏","😎","🤔","😅","💪","🙌","😭","😘","🥰","😇","🤣","😋","😴","🤝","💯","✨","🌹","⚽","🎶","🚀"];
 document.getElementById('emojiGrid').innerHTML=emojis.map(e=>`<span onclick="addEmoji('${e}')">${e}</span>`).join('');
 function addEmoji(e){ document.getElementById('msgInput').value+=e; document.getElementById('msgInput').focus(); closePopups(); }
@@ -392,8 +396,35 @@ async function changeProfilePic(el){ if(!me||!el.files[0]) return; let b=await c
 async function saveProfile(){ let newName=document.getElementById('editName').value.trim(); let newPhone=document.getElementById('editPhone').value.trim(); let newBio=document.getElementById('editBio').value.trim(); let newWebsite=document.getElementById('editWebsite').value.trim(); if(!newName) return showToast("Enter name"); me.name=newName; me.phone=newPhone; me.bio=newBio; me.website=newWebsite; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].name=newName; users[idx].phone=newPhone; users[idx].photoURL=me.photoURL; users[idx].bio=newBio; users[idx].website=newWebsite; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({name:newName,phone:newPhone,photoURL:me.photoURL||'',bio:newBio,website:newWebsite}).catch(()=>{}); document.getElementById('meName').innerText=newName; document.getElementById('meBioSmall').innerText=newBio; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:newName[0].toUpperCase(); renderChats(''); renderContacts(''); closeEditProfile(); showToast("✅ Profile + Bio + Website saved"); }
 function getUserShareLink(uid){ return location.origin+location.pathname+"?user="+encodeURIComponent(uid); }
 function getGroupJoinLink(gid){ return location.origin+location.pathname+"?join="+encodeURIComponent(gid); }
-function viewProfile(uid){ viewingGroupId=null; let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u){ let fromMsg=getLocalMsgs().find(m=>m.from===uid); u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true}; if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName; if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u); } viewingProfileUid=uid; document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); document.getElementById('viewName').innerText=u.name; document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently'; document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!'; document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website'; document.getElementById('viewPhone').innerText=u.phone||'No phone'; document.getElementById('viewEmail').innerText=u.email||''; let last=getLastMessageWith(uid); document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — send a message below 👇'; let isMe=uid===me.uid; document.getElementById('viewChatBtn').style.display=isMe?'none':'block'; document.getElementById('viewEditBtn').style.display=isMe?'block':'none'; document.getElementById('profileChatBar').style.display=isMe?'none':'flex'; document.getElementById('profileChatHint').style.display=isMe?'none':'block'; document.getElementById('profileChatName').innerText=u.name; document.getElementById('profileMsgInput').placeholder='Type a message to '+u.name+'...'; document.getElementById('profileMsgInput').value=''; document.getElementById('profileViewModal').style.display='flex'; setTimeout(()=>{ if(!isMe) document.getElementById('profileMsgInput').focus(); }, 300); }
-function closeProfileView(){ document.getElementById('profileViewModal').style.display='none'; }
+function viewProfile(uid, isAuto=false){
+  // If auto-popup, respect once-only rule. Manual taps always work.
+  if(isAuto && hasAutoShownProfile(uid)) return;
+  if(!isAuto) _profileManuallyOpened=true;
+  viewingGroupId=null;
+  let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null);
+  if(!u){ let fromMsg=getLocalMsgs().find(m=>m.from===uid); u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true}; if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName; if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u); }
+  viewingProfileUid=uid;
+  document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase();
+  document.getElementById('viewName').innerText=u.name;
+  document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently';
+  document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!';
+  document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website';
+  document.getElementById('viewPhone').innerText=u.phone||'No phone';
+  document.getElementById('viewEmail').innerText=u.email||'';
+  let last=getLastMessageWith(uid);
+  document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — send a message below 👇';
+  let isMe=uid===me.uid;
+  document.getElementById('viewChatBtn').style.display=isMe?'none':'block';
+  document.getElementById('viewEditBtn').style.display=isMe?'block':'none';
+  document.getElementById('profileChatBar').style.display=isMe?'none':'flex';
+  document.getElementById('profileChatHint').style.display=isMe?'none':'block';
+  document.getElementById('profileChatName').innerText=u.name;
+  document.getElementById('profileMsgInput').placeholder='Type a message to '+u.name+'...';
+  document.getElementById('profileMsgInput').value='';
+  document.getElementById('profileViewModal').style.display='flex';
+  if(!isAuto) setTimeout(()=>{ if(!isMe) document.getElementById('profileMsgInput').focus(); }, 300);
+}
+function closeProfileView(){ document.getElementById('profileViewModal').style.display='none'; _profileManuallyOpened=false; }
 function chatFromProfile(){ if(!viewingProfileUid) return; closeProfileView(); openChat(viewingProfileUid); }
 function editFromProfile(){ closeProfileView(); openEditProfile(); }
 function sendMsgFromProfile(){ let inp=document.getElementById('profileMsgInput'); let text=inp.value.trim(); if(!text) return; if(!viewingProfileUid) return; if(viewingProfileUid===me.uid){ showToast("This is your own profile"); return; } let now=new Date(); let msg={localId:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), from:me.uid, to:viewingProfileUid, groupId:null, text:text, type:'text', read:false, createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name, senderPhoto:me.photoURL||''}; inp.value=''; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); saveChatToDisplay(viewingProfileUid, now); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db){ let fb={...msg}; delete fb.localId; db.collection("messages").add({...fb, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); } renderChats(''); renderContacts(''); showToast("✅ Sent to "+(allUsers.find(u=>u.uid===viewingProfileUid)?.name||'user')); document.getElementById('viewChatInfo').innerText='Last message: '+formatDate(now)+' • '+formatTime(now)+' — '+text; }
@@ -406,7 +437,13 @@ function getLocalGroups(){ try{ return JSON.parse(localStorage.getItem('et_group
 function saveLocalGroups(g){ localStorage.setItem('et_groups', JSON.stringify(g)); }
 function getGroupLastMsg(gid){ let msgs=getLocalMsgs().filter(m=>m.groupId===gid); if(!msgs.length) return null; msgs.sort((a,b)=>parseTime(a.createdAt)-parseTime(b.createdAt)); return msgs[msgs.length-1]; }
 function getGroupTime(gid){ let last=getGroupLastMsg(gid); if(last) return parseTime(last.createdAt); let g=groups.find(x=>x.id===gid); if(g && g.createdAt) return parseTime(g.createdAt); return new Date(0); }
-function checkJoinLink(){ let params=new URLSearchParams(location.search); let joinId=params.get('join'); let userId=params.get('user'); if(joinId && me){ setTimeout(()=>{ let g=groups.find(x=>x.id===joinId) || getLocalGroups().find(x=>x.id===joinId); if(g){ autoJoinGroup(joinId); } else { showToast("Group link: "+joinId+" — Ask admin to share again"); } }, 800); } if(userId && me && userId!==me.uid){ setTimeout(()=>{ viewProfile(userId); }, 800); } }
+function checkJoinLink(){
+  let params=new URLSearchParams(location.search);
+  let joinId=params.get('join'); let userId=params.get('user');
+  if(joinId && me){ setTimeout(()=>{ let g=groups.find(x=>x.id===joinId) || getLocalGroups().find(x=>x.id===joinId); if(g){ autoJoinGroup(joinId); } else { showToast("Group link: "+joinId+" — Ask admin to share again"); } }, 800); }
+  // ?user= pops profile ONCE ONLY - not on every reload / every user load
+  if(userId && me && userId!==me.uid){ setTimeout(()=>{ showNewUserProfileOnce(userId); }, 800); }
+}
 function autoJoinGroup(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; if(!g.members) g.members=[]; if(g.members.includes(me.uid)){ showToast("You are already in "+g.name); openGroup(gid); return; } g.members.push(me.uid); let local=getLocalGroups(); let idx=local.findIndex(x=>x.id===gid); if(idx>=0){ local[idx].members=g.members; } else { local.push(g); } saveLocalGroups(local); if(db) db.collection("groups").doc(gid).update({members:firebase.firestore.FieldValue.arrayUnion(me.uid)}).catch(()=>{}); showToast("✅ Joined "+g.name+" automatically!"); renderChats(''); renderGroups(); openGroup(gid); }
 function joinGroupFromProfile(){ if(viewingGroupId) autoJoinGroup(viewingGroupId); }
 function copyGroupLink(){ if(!viewingGroupId) return; let link=getGroupJoinLink(viewingGroupId); let g=groups.find(x=>x.id===viewingGroupId); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(g?.name||'Group')+" join link copied")).catch(()=>prompt("Copy group link:", link)); }
@@ -420,105 +457,10 @@ function openGroupEdit(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; vi
 function closeGroupEdit(){ document.getElementById('groupEditModal').style.display='none'; }
 function saveGroupEdit(){ let g=groups.find(x=>x.id===viewingGroupId); if(!g) return; g.name=document.getElementById('editGroupName').value.trim()||g.name; g.description=document.getElementById('editGroupDesc').value.trim(); g.bio=document.getElementById('editGroupBio').value.trim(); g.website=document.getElementById('editGroupWebsite').value.trim(); let rulesText=document.getElementById('editGroupRules').value.trim(); g.rules=rulesText?rulesText.split('\n').map(s=>s.trim()).filter(Boolean):[]; let local=getLocalGroups(); let idx=local.findIndex(x=>x.id===g.id); if(idx>=0) local[idx]=g; else local.push(g); saveLocalGroups(local); if(db) db.collection("groups").doc(g.id).update({name:g.name, description:g.description, bio:g.bio, website:g.website, rules:g.rules}).catch(()=>{}); closeGroupEdit(); renderChats(''); renderGroups(); showToast("✅ Group updated"); if(chattingGroup && chattingGroup.id===g.id){ document.getElementById('chatHeader').innerText=g.name; updateHeader(); } }
 function addMemberToGroup(gid, uid){ let g=groups.find(x=>x.id===gid); if(!g) return; if(!g.members) g.members=[]; if(g.members.includes(uid)){ showToast("Already in group"); return; } g.members.push(uid); let local=getLocalGroups(); let idx=local.findIndex(x=>x.id===gid); if(idx>=0) local[idx]=g; else local.push(g); saveLocalGroups(local); if(db) db.collection("groups").doc(gid).update({members:firebase.firestore.FieldValue.arrayUnion(uid)}).catch(()=>{}); let u=allUsers.find(x=>x.uid===uid); showToast("✅ "+(u?.name||'User')+" added to "+g.name); viewGroupProfile(gid); renderChats(''); renderGroups(); }
-
-// ===== LOGIN / SIGNUP - FIXED, WORKS OFFLINE TOO =====
-async function doRegister(){
-  const name=document.getElementById('name').value.trim();
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const phone=document.getElementById('phone').value.trim();
-  const pass=document.getElementById('pass').value;
-  const bio=document.getElementById('bio').value.trim();
-  if(!name) return showMsg("Enter your Name");
-  if(!email) return showMsg("Enter your Email");
-  if(!email.includes('@')) return showMsg("Enter a valid Email");
-  if(!pass) return showMsg("Enter Password");
-  if(pass.length<6) return showMsg("Password must be 6+ characters");
-  let btn=document.getElementById('signupBtn'); btn.innerText="Creating... ⏳"; btn.disabled=true;
-  let users=getLocalUsers();
-  if(users.find(u=>u.email===email)){ btn.innerText="Create Account →"; btn.disabled=false; return showMsg("This email already exists. Go to Login."); }
-  let photoURL=window._signupPic||'';
-  if(!photoURL){ const f=document.getElementById('picInput').files[0]; if(f) photoURL=await compressImage(f); }
-  let newUser={name,email,phone,pass,bio,website:'',photoURL,uid:'local-'+Date.now(),isOnline:true};
-  users.push(newUser); saveLocalUsers(users);
-  localStorage.setItem('et_current', JSON.stringify(newUser));
-  // Try Firebase in background - do NOT wait for it, do NOT block login
-  if(auth && db){
-    auth.createUserWithEmailAndPassword(email,pass).then(cred=>{
-      db.collection("users").doc(cred.user.uid).set({name,email,phone,bio,website:'',photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{});
-      newUser.uid=cred.user.uid; localStorage.setItem('et_current', JSON.stringify(newUser));
-    }).catch(()=>{});
-  }
-  showMsg("✅ Account created! Opening chats...","#00a884");
-  btn.innerText="Create Account →"; btn.disabled=false;
-  loginSuccess(newUser);
-}
-async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass=document.getElementById('loginPass').value;
-  if(!email) return showLoginMsg("Enter your Email");
-  if(!pass) return showLoginMsg("Enter your Password");
-  let btn=document.getElementById('loginBtn'); btn.innerText="Logging in... ⏳"; btn.disabled=true;
-  showLoginMsg("Logging in...","#008069");
-  // 1) LOCAL FIRST - instant, works even if Firebase is down
-  let users=getLocalUsers();
-  let found=users.find(u=>u.email===email);
-  if(found){
-    if(found.pass && found.pass!==pass){ btn.innerText="Login →"; btn.disabled=false; return showLoginMsg("Wrong password. Try again."); }
-    // If local user has no pass stored (from Firebase), accept any pass and save it
-    if(!found.pass) { found.pass=pass; saveLocalUsers(users); }
-    localStorage.setItem('et_current', JSON.stringify(found));
-    showLoginMsg("✅ Login successful! Opening chats...","#00a884");
-    btn.innerText="Login →"; btn.disabled=false;
-    loginSuccess(found);
-    return;
-  }
-  // 2) FIREBASE FALLBACK - for accounts created on another phone
-  if(auth){
-    try{
-      let cred=await auth.signInWithEmailAndPassword(email,pass);
-      let u={name:email.split('@')[0],email,phone:'',bio:'',website:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true};
-      // Try to get real profile from Firestore
-      if(db){ try{ let doc=await db.collection("users").doc(cred.user.uid).get(); if(doc.exists){ let d=doc.data(); u={...u, name:d.name||u.name, phone:d.phone||'', bio:d.bio||'', website:d.website||'', photoURL:d.photoURL||''}; } }catch(e){} }
-      users.push(u); saveLocalUsers(users);
-      localStorage.setItem('et_current', JSON.stringify(u));
-      showLoginMsg("✅ Login successful! Opening chats...","#00a884");
-      btn.innerText="Login →"; btn.disabled=false;
-      loginSuccess(u);
-      return;
-    }catch(e){
-      console.log("Firebase login failed:", e.code);
-      btn.innerText="Login →"; btn.disabled=false;
-      if(e.code==='auth/user-not-found') return showLoginMsg("No account found for this email. Tap 'Create Account' below.");
-      if(e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') return showLoginMsg("Wrong password. Try again.");
-      if(e.code==='auth/invalid-email') return showLoginMsg("Enter a valid Email.");
-      return showLoginMsg("No account found for this email on this phone. Tap 'Create Account' below — or check email spelling.");
-    }
-  }
-  btn.innerText="Login →"; btn.disabled=false;
-  return showLoginMsg("No account found for this email. Tap 'Create Account' below.");
-}
-function loginSuccess(user){
-  me=user; isSignedIn=true; allUsers=getLocalUsers();
-  showApp(); startGlobalListener();
-  if(db){
-    db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',bio:me.bio||'',website:me.website||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{});
-    db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); else { let ex=merged.find(m=>m.email===f.email); Object.assign(ex, f); } }); allUsers=merged; renderChats(''); renderContacts(''); renderStatusDots(); }, ()=>{});
-    db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); let local=getLocalGroups(); local.forEach(lg=>{ if(!groups.find(g=>g.id===lg.id)) groups.push(lg); }); renderGroups(); renderChats(''); }, ()=>{});
-    if(unsubStatus) unsubStatus();
-    unsubStatus=db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusDots(); }, ()=>{});
-  }
-  try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); if(!statuses.length) statuses=ls; renderStatusDots(); }catch(e){}
-  let lg=getLocalGroups(); lg.forEach(g=>{ if(!groups.find(x=>x.id===g.id)) groups.push(g); }); renderGroups(); renderChats('');
-}
-window.addEventListener('load', ()=>{
-  // Auto-login: if you were logged in before, open chats instantly - no need to login again
-  let cur=null;
-  try{ cur=localStorage.getItem('et_current'); }catch(e){}
-  if(cur){
-    try{ let u=JSON.parse(cur); if(u && u.email){ loginSuccess(u); return; } }catch(e){}
-  }
-  showLogin();
-});
+async function doRegister(){ const name=document.getElementById('name').value.trim(); const email=document.getElementById('email').value.trim().toLowerCase(); const phone=document.getElementById('phone').value.trim(); const pass=document.getElementById('pass').value; const bio=document.getElementById('bio').value.trim(); if(!name) return showMsg("Enter your Name"); if(!email) return showMsg("Enter your Email"); if(!email.includes('@')) return showMsg("Enter a valid Email"); if(!pass) return showMsg("Enter Password"); if(pass.length<6) return showMsg("Password must be 6+ characters"); let btn=document.getElementById('signupBtn'); btn.innerText="Creating... ⏳"; btn.disabled=true; let users=getLocalUsers(); if(users.find(u=>u.email===email)){ btn.innerText="Create Account →"; btn.disabled=false; return showMsg("This email already exists. Go to Login."); } let photoURL=window._signupPic||''; if(!photoURL){ const f=document.getElementById('picInput').files[0]; if(f) photoURL=await compressImage(f); } let newUser={name,email,phone,pass,bio,website:'',photoURL,uid:'local-'+Date.now(),isOnline:true}; users.push(newUser); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(newUser)); if(auth && db){ auth.createUserWithEmailAndPassword(email,pass).then(cred=>{ db.collection("users").doc(cred.user.uid).set({name,email,phone,bio,website:'',photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{}); newUser.uid=cred.user.uid; localStorage.setItem('et_current', JSON.stringify(newUser)); }).catch(()=>{}); } showMsg("✅ Account created! Opening chats...","#00a884"); btn.innerText="Create Account →"; btn.disabled=false; loginSuccess(newUser); }
+async function doLogin(){ const email=document.getElementById('loginEmail').value.trim().toLowerCase(); const pass=document.getElementById('loginPass').value; if(!email) return showLoginMsg("Enter your Email"); if(!pass) return showLoginMsg("Enter your Password"); let btn=document.getElementById('loginBtn'); btn.innerText="Logging in... ⏳"; btn.disabled=true; showLoginMsg("Logging in...","#008069"); let users=getLocalUsers(); let found=users.find(u=>u.email===email); if(found){ if(found.pass && found.pass!==pass){ btn.innerText="Login →"; btn.disabled=false; return showLoginMsg("Wrong password. Try again."); } if(!found.pass) { found.pass=pass; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(found)); showLoginMsg("✅ Login successful! Opening chats...","#00a884"); btn.innerText="Login →"; btn.disabled=false; loginSuccess(found); return; } if(auth){ try{ let cred=await auth.signInWithEmailAndPassword(email,pass); let u={name:email.split('@')[0],email,phone:'',bio:'',website:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true}; if(db){ try{ let doc=await db.collection("users").doc(cred.user.uid).get(); if(doc.exists){ let d=doc.data(); u={...u, name:d.name||u.name, phone:d.phone||'', bio:d.bio||'', website:d.website||'', photoURL:d.photoURL||''}; } }catch(e){} } users.push(u); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(u)); showLoginMsg("✅ Login successful! Opening chats...","#00a884"); btn.innerText="Login →"; btn.disabled=false; loginSuccess(u); return; }catch(e){ console.log("Firebase login failed:", e.code); btn.innerText="Login →"; btn.disabled=false; if(e.code==='auth/user-not-found') return showLoginMsg("No account found for this email. Tap 'Create Account' below."); if(e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') return showLoginMsg("Wrong password. Try again."); if(e.code==='auth/invalid-email') return showLoginMsg("Enter a valid Email."); return showLoginMsg("No account found for this email on this phone. Tap 'Create Account' below — or check email spelling."); } } btn.innerText="Login →"; btn.disabled=false; return showLoginMsg("No account found for this email. Tap 'Create Account' below."); }
+function loginSuccess(user){ me=user; isSignedIn=true; allUsers=getLocalUsers(); _initialUsersLoaded=false; showApp(); startGlobalListener(); if(db){ db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',bio:me.bio||'',website:me.website||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{}); db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let beforeIds=new Set(allUsers.map(u=>u.uid)); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); else { let ex=merged.find(m=>m.email===f.email); Object.assign(ex, f); } }); allUsers=merged; renderChats(''); renderContacts(''); renderStatusDots(); if(!_initialUsersLoaded){ _initialUsersLoaded=true; return; } }, ()=>{}); db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); let local=getLocalGroups(); local.forEach(lg=>{ if(!groups.find(g=>g.id===lg.id)) groups.push(lg); }); renderGroups(); renderChats(''); }, ()=>{}); if(unsubStatus) unsubStatus(); unsubStatus=db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusDots(); }, ()=>{}); } try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); if(!statuses.length) statuses=ls; renderStatusDots(); }catch(e){} let lg=getLocalGroups(); lg.forEach(g=>{ if(!groups.find(x=>x.id===g.id)) groups.push(g); }); renderGroups(); renderChats(''); }
+window.addEventListener('load', ()=>{ let cur=null; try{ cur=localStorage.getItem('et_current'); }catch(e){} if(cur){ try{ let u=JSON.parse(cur); if(u && u.email){ loginSuccess(u); return; } }catch(e){} } showLogin(); });
 async function doLogout(){ if(!confirm("Logout from Easy Talkers?")) return; localStorage.removeItem('et_current'); if(db && me) db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(auth) auth.signOut().catch(()=>{}); isSignedIn=false; me=null; if(unsubGlobal) unsubGlobal(); if(unsub) unsub(); location.reload(); }
 function avatarHTML(u, clickableUid){ let pic=u?.photoURL?`<img src="${u.photoURL}">`:(u?.name?u.name[0].toUpperCase():'👤'); if(clickableUid) return `<div class="avatar" onclick="event.stopPropagation(); viewProfile('${clickableUid}')" title="Tap pic to view ${u?.name||'profile'} — Everyone can view each other">${pic}</div>`; return `<div class="avatar">${pic}</div>`; }
 function parseTime(v){ if(!v) return new Date(0); if(v.toDate) return v.toDate(); return new Date(v); }
@@ -562,7 +504,7 @@ function closeStatusViewer(){ document.getElementById('statusViewer').style.disp
 function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; showToast("Reply sent"); document.getElementById('statusReply').value=''; closeStatusViewer(); }
 function openChat(uid){ let u=allUsers.find(x=>x.uid===uid); if(!u){ u={uid:uid, name:'User', email:'', bio:'', photoURL:'', isOnline:true}; allUsers.push(u); } chattingWith=u; chattingGroup=null; unreadMap[uid]=0; saveUnread(); updateTotalUnread(); if(lastInboxUid===uid){ lastInboxUid=null; lastInboxText=''; } updateInboxBanner(); let now=new Date(); saveChatToDisplay(uid, now); document.getElementById('chatHeader').innerText=u.name; document.getElementById('chatAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); updateHeader(); document.getElementById('typing').innerText=''; let last=getLastMessageWith(uid); if(last){ let d=parseTime(last.createdAt); document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); } else { document.getElementById('chatLastTime').innerText='No messages yet — Tap pic to view profile'; } document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); startLiveChat(); renderChats(''); renderContacts(''); renderStatusDots(); }
 function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; if(!chattingGroup) return; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; updateHeader(); document.getElementById('chatLastTime').innerText=''; document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); startLiveChat(); }
-function handleIncomingMessage(f){ let created = f.createdAt?.toDate ? f.createdAt.toDate().toISOString() : (typeof f.createdAt==='string'?f.createdAt:new Date().toISOString()); let local=getLocalMsgs(); if(local.find(m=>m.fbId===f.id || (m.text===f.text && m.from===f.from && Math.abs(parseTime(m.createdAt)-parseTime(created))<3000))) return; if(f.from!==me.uid && !allUsers.find(u=>u.uid===f.from)){ let newU={uid:f.from, name:f.senderName||f.fromName||'New User', email:'', phone:'', bio:'New user 👋 Tap pic to view profile', website:'', photoURL:f.senderPhoto||f.photoURL||'', isOnline:true}; allUsers.push(newU); let users=getLocalUsers(); if(!users.find(u=>u.uid===f.from)) { users.push({...newU, pass:''}); saveLocalUsers(users); } } let msg={fbId:f.id, from:f.from,to:f.to,groupId:f.groupId||null,text:f.text,type:f.type||'text',fileName:f.fileName||'',createdAt:created,timestamp:parseTime(created).getTime(), senderName:f.senderName||f.fromName||''}; local.push(msg); saveLocalMsgs(local); if(f.to===me.uid || f.groupId){ let sender=allUsers.find(u=>u.uid===f.from); let senderName=sender?.name||f.senderName||'Someone'; let isCurrentChat = (chattingWith && f.from===chattingWith.uid) || (chattingGroup && f.groupId===chattingGroup.id); if(isCurrentChat){ appendSingleMessage(msg); } else { if(f.from!==me.uid && !f.groupId){ unreadMap[f.from]=(unreadMap[f.from]||0)+1; saveUnread(); lastInboxUid=f.from; lastInboxText=(f.type==='image'?'📷 Photo':f.type==='audio'?'🎤 Voice':(f.text||'New message')).slice(0,50); saveChatToDisplay(f.from, parseTime(created)); updateTotalUnread(); updateInboxBanner(); showToast("📩 New message from "+senderName+": "+lastInboxText); try{ navigator.vibrate && navigator.vibrate(200); }catch(e){} document.title='📩 ('+Object.values(unreadMap).reduce((a,b)=>a+b,0)+') Easy Talkers'; setTimeout(()=>{ document.title='Easy Talkers ✨'; }, 3000); } } renderChats(''); renderContacts(''); } }
+function handleIncomingMessage(f){ let created = f.createdAt?.toDate ? f.createdAt.toDate().toISOString() : (typeof f.createdAt==='string'?f.createdAt:new Date().toISOString()); let local=getLocalMsgs(); if(local.find(m=>m.fbId===f.id || (m.text===f.text && m.from===f.from && Math.abs(parseTime(m.createdAt)-parseTime(created))<3000))) return; if(f.from!==me.uid && !allUsers.find(u=>u.uid===f.from)){ let newU={uid:f.from, name:f.senderName||f.fromName||'New User', email:'', phone:'', bio:'New user 👋 Tap pic to view profile', website:'', photoURL:f.senderPhoto||f.photoURL||'', isOnline:true}; allUsers.push(newU); let users=getLocalUsers(); if(!users.find(u=>u.uid===f.from)) { users.push({...newU, pass:''}); saveLocalUsers(users); } /* NO AUTO PROFILE HERE - just inbox badge */ } let msg={fbId:f.id, from:f.from,to:f.to,groupId:f.groupId||null,text:f.text,type:f.type||'text',fileName:f.fileName||'',createdAt:created,timestamp:parseTime(created).getTime(), senderName:f.senderName||f.fromName||''}; local.push(msg); saveLocalMsgs(local); if(f.to===me.uid || f.groupId){ let sender=allUsers.find(u=>u.uid===f.from); let senderName=sender?.name||f.senderName||'Someone'; let isCurrentChat = (chattingWith && f.from===chattingWith.uid) || (chattingGroup && f.groupId===chattingGroup.id); if(isCurrentChat){ appendSingleMessage(msg); } else { if(f.from!==me.uid && !f.groupId){ unreadMap[f.from]=(unreadMap[f.from]||0)+1; saveUnread(); lastInboxUid=f.from; lastInboxText=(f.type==='image'?'📷 Photo':f.type==='audio'?'🎤 Voice':(f.text||'New message')).slice(0,50); saveChatToDisplay(f.from, parseTime(created)); updateTotalUnread(); updateInboxBanner(); showToast("📩 New message from "+senderName+": "+lastInboxText); try{ navigator.vibrate && navigator.vibrate(200); }catch(e){} document.title='📩 ('+Object.values(unreadMap).reduce((a,b)=>a+b,0)+') Easy Talkers'; setTimeout(()=>{ document.title='Easy Talkers ✨'; }, 3000); } } renderChats(''); renderContacts(''); } }
 function startGlobalListener(){ if(!db) return; if(unsubGlobal) unsubGlobal(); unsubGlobal=db.collection("messages").orderBy("createdAt","desc").limit(100).onSnapshot(snap=>{ snap.docChanges().forEach(change=>{ if(change.type==='added'){ let d=change.doc.data(); let f={id:change.doc.id, ...d}; if(f.from===me.uid) return; if(f.to===me.uid || f.groupId){ handleIncomingMessage(f); } } }); }, ()=>{}); db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let changed=false; fb.forEach(f=>{ if(!allUsers.find(m=>m.email===f.email && f.email)){ allUsers.push({...f, pass:''}); changed=true; } else { let ex=allUsers.find(m=>m.email===f.email); if(ex) Object.assign(ex, f); } if(!allUsers.find(m=>m.uid===f.uid)){ allUsers.push({...f, pass:''}); changed=true; } }); if(changed){ renderChats(''); renderContacts(''); } }, ()=>{}); }
 function getCurrentChatMsgs(){ let local=getLocalMsgs().filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); let all=[...local]; msgCache.forEach(c=>{ if(!all.find(m=>m.fbId===c.id || (m.text===c.text && m.from===c.from && Math.abs(parseTime(m.createdAt)-parseTime(c.createdAt))<2000))) all.push(c); }); all.sort((a,b)=>parseTime(a.createdAt)-parseTime(b.createdAt)); return all; }
 function appendSingleMessage(m){ let msgsEl=document.getElementById('msgs'); if(!msgsEl) return; if(msgsEl.innerHTML.includes('No messages yet')) msgsEl.innerHTML=''; let d=parseTime(m.createdAt); let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:260px;width:100%;border-radius:10px;display:block;object-fit:cover">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div style="min-width:0"><b style="word-break:break-word">${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; let div=document.createElement('div'); div.className=(m.from===me.uid?'me':'them')+(m._sending?' sending':''); div.setAttribute('data-msg-date', dateLabel(d)); div.innerHTML=`${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatTime(d)} ${tick} ${m._sending?'• Sending...':''}</div>`; msgsEl.appendChild(div); msgsEl.scrollTop=99999; document.getElementById('stickyDatePill').innerText='📅 '+dateLabel(d); document.getElementById('stickyDatePill').style.display='block'; if(chattingWith) document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); }
