@@ -189,4 +189,62 @@ async function sendFile(el){let f=el.files[0];if(!f)return;if(!chattingWith&&!ch
 ;showToast("Sent");renderChats('');renderStatusDots()}
 async function toggleVoice(){if(!isRecording){try{let stream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(stream);audioChunks=[];mediaRecorder.ondataavailable=function(e){audioChunks.push(e.data)};mediaRecorder.start();isRecording=true;let b=document.getElementById('micBtn');b.classList.add('recording');b.innerText='🔴';showToast("🎤 Recording... Tap 🔴 to send")}catch(e){showToast("Mic permission needed")}}else{mediaRecorder.onstop=async function(){let blob=new Blob(audioChunks,{type:'audio/webm'}),b64=await new Promise(function(r){let rd=new FileReader();rd.onload=function(){r(rd.result)};rd.readAsDataURL(blob)});let now=new Date(),msg={localId:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:now.toISOString(),timestamp:now.getTime(),senderName:me.name,senderPhoto:me.photoURL||''};if(isDupMsg(msg))return;appendSingleMessage(msg);let all=getLocalMsgs();all.push(msg);saveLocalMsgs(all);if(chattingWith)saveChatToDisplay(chattingWith.uid,now);try{localStorage.setItem('et_last_msg',JSON.stringify({msg:msg,at:Date.now()}))}catch(e){}if(db)db.collection("messages").add(Object.assign({},msg,{createdAt:firebase.firestore.FieldValue.serverTimestamp()})).catch(function(){});showToast("Voice sent");renderChats('')};mediaRecorder.stop();isRecording=false;let b=document.getElementById('micBtn');b.classList.remove('recording');b.innerText='🎤'}}
 function backToUsers(){document.getElementById('app').classList.remove('show-chat');inChatView=false;if(window._pollTimer)clearInterval(window._pollTimer);if(unsubChat)unsubChat();if(isSignedIn)lockBack();renderChats('');renderContacts('');renderStatusDots();updateInboxBanner()}
+<script>
+// === EMERGENCY FIX: Replace broken renderChats ===
+function renderChats(q){
+  if(!me) return;
+  q = q || '';
+  var ids = getChatUserIds();
+  var chatUsers = [];
+  var myGroups = [];
+  allUsers.forEach(function(u){
+    if(u.uid!==me.uid && u.email!==me.email && ids.has(u.uid) && u.name && u.name!=='New User' && u.name.toLowerCase().indexOf(q.toLowerCase())>=0){ chatUsers.push(u); }
+  });
+  groups.forEach(function(g){
+    var isM = (g.members||[]).indexOf(me.uid)>=0 || g.createdBy===me.uid;
+    if(isM && g.name.toLowerCase().indexOf(q.toLowerCase())>=0){ myGroups.push(g); }
+  });
+  var comb = [];
+  chatUsers.forEach(function(u){ comb.push({type:'user', data:u, time:getChatTime(u.uid), unread:getUnread(u.uid)}); });
+  myGroups.forEach(function(g){ comb.push({type:'group', data:g, time:getGroupTime(g.id), unread:0}); });
+  comb.sort(function(a,b){
+    var ua = a.unread>0?1:0, ub = b.unread>0?1:0;
+    if(ub!==ua) return ub-ua;
+    return b.time.getTime() - a.time.getTime();
+  });
+  document.getElementById('chatCount').innerText = comb.length || '';
+  updateTotalUnread();
+  var html = '';
+  comb.forEach(function(item){
+    if(item.type==='user'){
+      var u = item.data;
+      var last = getLastMessageWith(u.uid);
+      var lt = last ? (last.type==='image'?'📷 Photo':last.text||'') : 'Tap to open chat';
+      html += '<div class="user '+(item.unread?'unreadRow':'')+'" onclick="openChat(\''+u.uid+'\')">'+avatarHTML(u,u.uid)+'<div style="flex:1;min-width:0"><b>'+u.name+'</b><br><small style="color:#667781">'+lt+'</small></div><div style="text-align:right">'+(item.unread?'<span class="unreadBadge">'+item.unread+'</span>':'💬')+'</div></div>';
+    } else {
+      var g = item.data;
+      html += '<div class="user" onclick="openGroup(\''+g.id+'\')"><div class="avatar" onclick="event.stopPropagation();viewGroupProfile(\''+g.id+'\')">👥</div><div style="flex:1;min-width:0"><b>'+g.name+' <span class="groupBadge">GROUP • '+((g.members||[]).length)+'</span></b><br><small style="color:#667781">'+(g.description||'')+'</small></div></div>';
+    }
+  });
+  document.getElementById('chatsList').innerHTML = html || '<div style="padding:20px;text-align:center;color:#667781">No chats yet.<br>Go to Contacts → Tap someone → Send.</div>';
+  document.getElementById('contactCount').innerText = allUsers.filter(function(u){return u.uid!==me.uid && u.email!==me.email && u.name!=='New User'}).length || '';
+  document.getElementById('groupCount').innerText = myGroups.length || '';
+}
+// === Force Login to open chat center even if something else fails ===
+var _oldLoginSuccess = loginSuccess;
+loginSuccess = function(user){
+  try{ _oldLoginSuccess(user); }catch(e){ console.log(e); }
+  // backup open:
+  try{
+    me = user; isSignedIn = true;
+    document.getElementById('loginPage').classList.remove('active');
+    document.getElementById('signupPage').classList.remove('active');
+    document.getElementById('userBox').style.display='flex';
+    document.getElementById('logoutTopBtn').style.display='block';
+    document.getElementById('meName').innerText = me.name;
+    document.getElementById('meEmailSmall').innerText = me.email;
+    renderChats(''); renderContacts(''); renderGroups(); renderStatusDots();
+  }catch(e2){ console.log(e2); }
+};
+</script>
 </script></body></html>
