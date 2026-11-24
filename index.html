@@ -16,11 +16,13 @@
 .avatar.small{width:32px;height:32px;font-size:14px}
 .header-green{background:linear-gradient(135deg,#00a884,#008069);color:#fff;padding:14px 16px;font-weight:800;font-size:19px;display:flex;justify-content:space-between;align-items:center}
 .field{padding:13px 14px;margin:6px 0;border-radius:12px;border:1px solid #e9edef;width:100%;outline:none;font-size:15px}
+.field:focus{border-color:#00a884;box-shadow:0 0 0 3px #d9fdd3}
 .btn{padding:13px;margin:6px 0;border-radius:12px;border:none;width:100%;font-weight:700;cursor:pointer;font-size:15px}
-.btn-green{background:#00a884;color:#fff} .btn-dark{background:#111b21;color:#fff} .btn-outline{background:#fff;color:#008069;border:2px solid #00a884}
+.btn-green{background:#00a884;color:#fff} .btn-dark{background:#111b21;color:#fff}
+.logoutBtn{background:#ff3b30;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
+.logoutBtn:hover{background:#d32f2f}
 .user{padding:11px 14px;cursor:pointer;display:flex;gap:11px;align-items:center;border-bottom:1px solid #f5f5f5}
 .user:hover{background:#f0f2f5}
-/* CHAT HEADER - BACK BUTTON ALWAYS VISIBLE */
 .chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:64px}
 .backBtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:#111;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 #msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:#fff;min-height:200px}
@@ -43,7 +45,6 @@
 .tabBtn{flex:1;padding:11px 4px;border:none;background:transparent;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;font-size:13px}
 .tabBtn.active{color:#00a884;border-bottom-color:#00a884}
 .uploadLabel{display:inline-block;background:#e7f8f3;color:#008069;padding:10px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer;margin:6px 0}
-/* WHATSAPP STATUS - HORIZONTAL OVALS */
 .statusRow{display:flex;gap:12px;overflow-x:auto;padding:12px 12px 6px;scrollbar-width:none}
 .statusRow::-webkit-scrollbar{display:none}
 .statusOval{flex-shrink:0;width:68px;text-align:center;cursor:pointer}
@@ -54,7 +55,6 @@
 .statusName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .statusAdd{width:62px;height:62px;border-radius:50%;background:#f0f2f5;border:2px dashed #00a884;display:flex;align-items:center;justify-content:center;font-size:26px;margin:auto;position:relative}
 .statusAdd span{position:absolute;bottom:0;right:0;background:#00a884;color:#fff;width:20px;height:20px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
-/* STATUS VIEWER FULLSCREEN */
 #statusViewer{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;color:#fff}
 .viewerTop{display:flex;gap:4px;padding:10px}
 .progressBar{flex:1;height:3px;background:#555;border-radius:10px;overflow:hidden}
@@ -73,25 +73,26 @@
 <body>
 <div class="app" id="app">
 <div class="left">
-<div class="header-green">💬 Easy Talkers <span style="font-size:11px;background:#fff;color:#008069;padding:5px 10px;border-radius:20px">LIVE ✨</span></div>
+<div class="header-green">💬 Easy Talkers <button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
 
+<!-- LOGIN / REGISTER - NO TEST BUTTON -->
 <div id="authBox" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
 <div style="flex:1;overflow-y:auto;padding:16px;text-align:center">
 <div class="avatar big" id="authAvatar" style="margin:auto">✨</div>
-<h2 style="margin:10px 0 2px">Welcome Back</h2>
+<h2 style="margin:10px 0 2px">Welcome to Easy Talkers</h2>
 <p style="color:#667781;font-size:13px;margin:0 0 10px">Chat, Status, Files & Voice — like WhatsApp</p>
 <input class="field" id="name" placeholder="👤 Your Name e.g. Kojo">
-<input class="field" id="email" placeholder="✉️ Email">
+<input class="field" id="email" placeholder="✉️ Email e.g. kojo@gmail.com">
 <input class="field" id="phone" placeholder="📞 Phone">
 <input class="field" id="pass" type="password" placeholder="🔒 Password (6+ chars)">
 <label class="uploadLabel" for="picInput">📸 Choose Profile Picture</label>
 <input type="file" id="picInput" accept="image/*" style="display:none" onchange="previewPic(this)">
 <div id="picName" style="font-size:12px;color:#008069"></div>
-<button class="btn btn-green" id="regBtn">Create Account →</button>
-<button class="btn btn-dark" id="loginBtn">Login</button>
-<button class="btn btn-outline" onclick="guestLogin()">👤 Continue as Guest (Test Without Firebase)</button>
-<p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px"></p>
+<button class="btn btn-green" id="regBtn" onclick="doRegister()">Create Account →</button>
+<button class="btn btn-dark" id="loginBtn" onclick="doLogin()">Login</button>
+<p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600"></p>
 <p id="debug" style="color:#00a884;font-size:12px"></p>
+<div style="background:#fff3cd;padding:10px;border-radius:10px;font-size:12px;text-align:left">⚠️ If you see <b>Missing Permissions</b>: Firebase → Firestore → Rules → Paste this → Publish:<br><b>allow read, write: if true;</b><br>Then use a NEW email to Register.</div>
 </div>
 </div>
 
@@ -102,10 +103,8 @@
 <div style="min-width:0"><b id="meName" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Me</b><div style="font-size:12px;color:#00a884">🟢 Online • Tap pic to change</div></div>
 </div>
 <input type="file" id="changePic" accept="image/*" style="display:none" onchange="changeProfilePic(this)">
-<span style="font-size:20px;cursor:pointer" onclick="doLogout()">↪️</span>
+<button class="logoutBtn" onclick="doLogout()">Logout</button>
 </div>
-
-<!-- STATUS OVALS - ALWAYS VISIBLE ON TOP LIKE WHATSAPP -->
 <div style="border-bottom:1px solid #f0f2f5">
 <div class="statusRow" id="statusRow">
 <div class="statusOval" onclick="document.getElementById('statusPicInput').click()">
@@ -113,12 +112,10 @@
 <div class="statusName">My Status</div>
 </div>
 <input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
-<!-- Other statuses injected here -->
 <div id="statusOvals" style="display:flex;gap:12px"></div>
 </div>
 <div style="padding:0 12px 8px;display:flex;gap:6px"><input id="statusText" placeholder="Type status text..." style="flex:1;padding:10px;border-radius:20px;border:1px solid #e9edef;outline:none"><button onclick="postStatus()" style="padding:10px 14px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer">Post</button></div>
 </div>
-
 <div style="display:flex;border-bottom:1px solid #e9edef"><button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats</button><button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups</button></div>
 <div id="tabChats" style="flex:1;overflow-y:auto">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search chats" oninput="renderUsers(this.value)"></div>
@@ -132,13 +129,12 @@
 </div>
 </div>
 
-<!-- RIGHT CHAT - ALWAYS HAS BACK BUTTON + CHAT BOX -->
 <div class="right">
 <div class="chat-header">
 <button class="backBtn" onclick="backToUsers()">←</button>
 <div class="avatar" id="chatAvatar">💬</div>
 <div style="flex:1;min-width:0"><b id="chatHeader" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Select a chat</b><div id="chatStatus" style="font-size:12px;color:#667781"></div><div id="typing" style="font-size:12px;color:#00a884;font-weight:600"></div></div>
-<span style="font-size:20px">📹</span><span style="font-size:20px">📞</span>
+<button class="logoutBtn" onclick="doLogout()">Logout</button>
 </div>
 <div id="msgs"><div style="text-align:center;color:#667781;background:#f0f2f5;padding:10px 16px;border-radius:12px;align-self:center;font-size:12px;margin-top:30px">🔒 Messages are end-to-end encrypted<br>Tap a user on the left to open chat here</div></div>
 <div class="chat-input">
@@ -156,21 +152,36 @@
 </div>
 </div>
 
-<!-- STATUS VIEWER -->
 <div id="statusViewer">
 <div class="viewerTop" id="viewerProgress"></div>
 <div class="viewerHeader"><button onclick="closeStatusViewer()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer">✕</button><div class="avatar small" id="viewerAvatar">K</div><div><b id="viewerName">User</b><div id="viewerTime" style="font-size:12px;color:#ccc"></div></div><span style="margin-left:auto;font-size:12px">Expires in 24h ⏳</span></div>
 <div class="viewerContent" id="viewerContent" onclick="nextStatus()"></div>
-<div style="text-align:center;color:#aaa;font-size:12px">Tap right → Next • Tap left ← Prev • Tap ✕ to close</div>
+<div style="text-align:center;color:#aaa;font-size:12px">Tap → Next • Tap ✕ to close</div>
 <div class="viewerFooter"><input id="statusReply" placeholder="Reply to status..."><button onclick="replyStatus()" style="padding:12px 18px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700">➤</button></div>
 </div>
 
 <script>
+// ===== BLOCK BROWSER BACK WHILE SIGNED IN =====
+let isSignedIn = false;
+let inChatView = false;
+function lockBack(){
+  history.pushState({page:'app'}, '', location.href);
+  history.pushState({page:'app2'}, '', location.href);
+}
+window.addEventListener('popstate', function(e){
+  if(isSignedIn){
+    // If in chat, go back to list. If in list, STAY - don't leave site
+    if(inChatView){ backToUsers(); lockBack(); }
+    else { lockBack(); alert("You are signed in. Use Logout button to exit Easy Talkers."); }
+  }
+});
+lockBack();
+
 const firebaseConfig = { apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM", authDomain: "easy-talkers.firebaseapp.com", projectId: "easy-talkers", storageBucket: "easy-talkers.firebasestorage.app", messagingSenderId: "533433245977", appId: "1:533433245977:web:82ffe12e9296d116a3e588", measurementId: "G-01GNZB6GKJ" };
-let auth=null, db=null, firebaseOK=false;
-try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); firebaseOK=true; document.getElementById('debug').innerText="✅ Firebase Connected"; }catch(e){ document.getElementById('debug').innerText="⚠️ Use Guest Mode"; }
-let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false, guestMode=false, localMsgs=[];
-let currentStatusIndex=0, statusTimer=null, viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
+let auth=null, db=null;
+try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); document.getElementById('debug').innerText="✅ Firebase Connected - Ready to Login"; }catch(e){ document.getElementById('debug').innerText="Firebase Error: "+e.message; }
+let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false;
+let currentStatusIndex=0, viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
 const emojis=["😀","😂","❤️","🔥","👍","🙏","😍","😢","😡","🎉","👏","😎","🤔","😅","💪","🙌","😭","😘","🥰","😇","🤣","😋","😴","🤝","💯","✨","🌹","⚽","🎶","🚀"];
 document.getElementById('emojiGrid').innerHTML=emojis.map(e=>`<span onclick="addEmoji('${e}')">${e}</span>`).join('');
 function addEmoji(e){ document.getElementById('msgInput').value+=e; document.getElementById('msgInput').focus(); closePopups(); }
@@ -182,50 +193,97 @@ document.addEventListener('click',()=>closePopups());
 function showMsg(t,c){ let el=document.getElementById('authMsg'); el.innerText=t; el.style.color=c||'#e74c3c'; }
 function fileToBase64(f){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(f); }); }
 function previewPic(el){ if(el.files[0]){ document.getElementById('picName').innerText="✅ "+el.files[0].name; fileToBase64(el.files[0]).then(b=>{ document.getElementById('authAvatar').innerHTML=`<img src="${b}">`; }); } }
-async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await fileToBase64(el.files[0]); if(guestMode){ me.photoURL=b; } else { await db.collection("users").doc(me.uid).update({photoURL:b}); } document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; alert("✅ Profile pic updated!"); }
+async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await fileToBase64(el.files[0]); await db.collection("users").doc(me.uid).update({photoURL:b}); document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; alert("✅ Profile pic updated!"); }
 function avatarHTML(u){ if(u?.photoURL) return `<div class="avatar"><img src="${u.photoURL}"></div>`; return `<div class="avatar">${u?.name?u.name[0].toUpperCase():'👤'}</div>`; }
 function formatDate(d){ if(!d) return ''; const today=new Date(); const yesterday=new Date(); yesterday.setDate(today.getDate()-1); if(d.toDateString()===today.toDateString()) return 'Today'; if(d.toDateString()===yesterday.toDateString()) return 'Yesterday'; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function formatTime(d){ return d?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''; }
 function isExpired(s){ let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); return (Date.now()-d.getTime())>24*60*60*1000; }
-function filterValidStatuses(){ return statuses.filter(s=>!isExpired(s)); }
-function guestLogin(){ const name=document.getElementById('name').value.trim()||'Guest '+Math.floor(Math.random()*100); guestMode=true; me={name, email:'guest@test.com', uid:'guest-'+Date.now(), photoURL:'', isOnline:true}; allUsers=[me,{name:'Demo Kojo',uid:'demo1',photoURL:'',isOnline:true},{name:'Demo Test',uid:'demo2',photoURL:'',isOnline:false}]; statuses=[{id:'s1',text:'Hello from Demo Kojo! 👋 My status expires in 24h',fromName:'Demo Kojo',from:'demo1',createdAt:new Date(),photoURL:''}]; document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex'; document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.name[0].toUpperCase(); renderUsers(''); renderStatusOvals(); alert("✅ Guest Mode ON"); }
-document.getElementById('regBtn').addEventListener('click', async ()=>{ const btn=document.getElementById('regBtn'); btn.disabled=true; btn.innerText='Creating...'; const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(), phone=document.getElementById('phone').value.trim(), pass=document.getElementById('pass').value; if(!name||!email||!pass){ showMsg("Fill Name, Email, Password"); btn.disabled=false; btn.innerText='Create Account →'; return; } if(pass.length<6){ showMsg("Password must be 6+ chars"); btn.disabled=false; btn.innerText='Create Account →'; return; } showMsg("Creating account...","#008069"); try{ const cred=await auth.createUserWithEmailAndPassword(email,pass); let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f); try{ await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}); }catch(fsErr){ alert("⚠️ Fix Firestore Rules: Firebase > Firestore > Rules > allow read,write: if true > Publish. Error: "+fsErr.message); } showMsg("✅ Registered! Opening chats...","#00a884"); }catch(e){ if(e.code==='auth/email-already-in-use') showMsg("Email already used! Click Login."); else { showMsg("ERROR: "+e.message); alert(e.message); } } btn.disabled=false; btn.innerText='Create Account →'; });
-document.getElementById('loginBtn').addEventListener('click', async ()=>{ const btn=document.getElementById('loginBtn'); btn.disabled=true; btn.innerText='Logging in...'; const email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value; if(!email||!pass){ showMsg("Fill Email + Password"); btn.disabled=false; btn.innerText='Login'; return; } showMsg("Logging in...","#008069"); try{ await auth.signInWithEmailAndPassword(email,pass); showMsg("✅ Logged in!","#00a884"); }catch(e){ showMsg("LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message); } btn.disabled=false; btn.innerText='Login'; });
-if(firebaseOK){ auth.onAuthStateChanged(async (user)=>{ if(!user||guestMode) return; try{ const docSnap=await db.collection("users").doc(user.uid).get(); if(!docSnap.exists){ const name=document.getElementById('name').value.trim()||user.email.split('@')[0]; await db.collection("users").doc(user.uid).set({name,email:user.email,phone:'',photoURL:'',uid:user.uid,isOnline:true}); } const snap=await db.collection("users").get(); allUsers=snap.docs.map(d=>d.data()); me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid}; document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex'; document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase(); db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); updateHeader(); }); db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); }); db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); }); }catch(e){ alert("Firestore error (Fix Rules): "+e.message); } }); }
+
+// ===== LOGIN / REGISTER - FIXED WITH onclick =====
+async function doRegister(){
+  const btn=document.getElementById('regBtn'); btn.disabled=true; btn.innerText='Creating... Please wait';
+  const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(), phone=document.getElementById('phone').value.trim(), pass=document.getElementById('pass').value;
+  console.log("Register clicked", email);
+  if(!name||!email||!pass){ showMsg("❌ Fill Name, Email, Password"); btn.disabled=false; btn.innerText='Create Account →'; return; }
+  if(pass.length<6){ showMsg("❌ Password must be 6+ chars"); btn.disabled=false; btn.innerText='Create Account →'; return; }
+  showMsg("Creating account...","#008069");
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    console.log("Auth created", cred.user.uid);
+    let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f);
+    try{ await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}); console.log("Firestore saved"); }
+    catch(fsErr){ console.error(fsErr); alert("⚠️ Firestore Rules blocked! Go to Firebase > Firestore > Rules > Paste: allow read, write: if true; > Publish. Then click Login with same email/password. Error: "+fsErr.message); }
+    showMsg("✅ Registered! Opening chats...","#00a884");
+  }catch(e){ console.error(e); if(e.code==='auth/email-already-in-use') showMsg("❌ Email already used! Click Login button below."); else if(e.code==='auth/operation-not-allowed') showMsg("❌ Enable Email/Password in Firebase > Authentication > Sign-in method"); else if(e.code==='auth/invalid-email') showMsg("❌ Invalid email format"); else { showMsg("❌ ERROR: "+e.message); alert(e.message); } }
+  btn.disabled=false; btn.innerText='Create Account →';
+}
+async function doLogin(){
+  const btn=document.getElementById('loginBtn'); btn.disabled=true; btn.innerText='Logging in...';
+  const email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value;
+  console.log("Login clicked", email);
+  if(!email||!pass){ showMsg("❌ Fill Email + Password"); btn.disabled=false; btn.innerText='Login'; return; }
+  showMsg("Logging in...","#008069");
+  try{ const cred=await auth.signInWithEmailAndPassword(email,pass); console.log("Login success", cred.user.uid); showMsg("✅ Logged in! Opening chats...","#00a884"); }
+  catch(e){ console.error(e); if(e.code==='auth/user-not-found') showMsg("❌ No account with this email. Click Create Account first."); else if(e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') showMsg("❌ Wrong password. Try again."); else if(e.code==='auth/too-many-requests') showMsg("❌ Too many tries. Wait 1 min."); else { showMsg("❌ LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message); } }
+  btn.disabled=false; btn.innerText='Login';
+}
+async function doLogout(){
+  if(!confirm("Logout from Easy Talkers?")) return;
+  try{ if(me) await db.collection("users").doc(me.uid).update({isOnline:false,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); await auth.signOut(); }catch(e){ console.log(e); }
+  isSignedIn=false; inChatView=false; location.reload();
+}
+
+// Auth state - SHOW APP IMMEDIATELY EVEN IF FIRESTORE FAILS
+auth.onAuthStateChanged(async (user)=>{
+  if(!user) { isSignedIn=false; document.getElementById('logoutTopBtn').style.display='none'; return; }
+  console.log("Auth state: logged in", user.email);
+  isSignedIn=true;
+  document.getElementById('logoutTopBtn').style.display='block';
+  try{
+    const docSnap=await db.collection("users").doc(user.uid).get();
+    if(!docSnap.exists){ const name=document.getElementById('name').value.trim()||user.email.split('@')[0]; await db.collection("users").doc(user.uid).set({name,email:user.email,phone:'',photoURL:'',uid:user.uid,isOnline:true}); }
+    const snap=await db.collection("users").get(); allUsers=snap.docs.map(d=>d.data());
+    me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid};
+    showApp();
+    db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); updateHeader(); });
+    db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); });
+    db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); });
+  }catch(e){
+    console.error("Firestore error", e);
+    // FALLBACK: Still show app even if Firestore fails
+    me={name:document.getElementById('name').value.trim()||user.email, email:user.email, uid:user.uid, photoURL:''};
+    allUsers=[me]; showApp(); alert("Firestore still blocked. Fix Rules and refresh. Error: "+e.message);
+  }
+});
+function showApp(){
+  document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex'; document.getElementById('logoutTopBtn').style.display='block';
+  document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase();
+  renderUsers(''); renderGroups(); renderStatusOvals(); lockBack();
+}
 function showTab(t){ document.getElementById('tabChats').style.display=t==='chats'?'block':'none'; document.getElementById('tabGroups').style.display=t==='groups'?'block':'none'; document.getElementById('tabChatBtn').classList.toggle('active',t==='chats'); document.getElementById('tabGroupBtn').classList.toggle('active',t==='groups'); }
 function updateHeader(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'🟢 Online':('Last seen '+formatDate(u.lastSeen?.toDate?u.lastSeen.toDate():new Date())+' • '+formatTime(u.lastSeen?.toDate?u.lastSeen.toDate():new Date())); }
-function renderUsers(q=''){ if(!me) return; let html=''; allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes((q||'').toLowerCase())).forEach(u=>{ html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:${u.isOnline?'#00a884':'#667781'}">${u.isOnline?'🟢 Online':'⚪ Last seen'}</small></div><span>💬</span></div>`; }); document.getElementById('users').innerHTML=html||'<p style="padding:16px;color:#667781;font-size:13px">No users yet. Register 2nd user or use Guest Mode.</p>'; }
+function renderUsers(q=''){ if(!me) return; let html=''; allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes((q||'').toLowerCase())).forEach(u=>{ html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:${u.isOnline?'#00a884':'#667781'}">${u.isOnline?'🟢 Online':'⚪ Last seen'}</small></div><span>💬</span></div>`; }); document.getElementById('users').innerHTML=html||'<p style="padding:16px;color:#667781;font-size:13px">No other users yet. Ask a friend to Register with a different email.</p>'; }
 function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet.</p>'; }
-async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); if(guestMode){ groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); return; } await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}); document.getElementById('groupName').value=''; }
-
-// --- STATUS: 24H EXPIRY + OVAL + VIEWER ---
-async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); const data={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text'}; if(guestMode){ statuses.unshift({...data,id:'s'+Date.now()}); renderStatusOvals(); document.getElementById('statusText').value=''; return; } await db.collection("statuses").add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById('statusText').value=''; }
-async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); const data={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image'}; if(guestMode){ statuses.unshift({...data,id:'s'+Date.now()}); renderStatusOvals(); } else { await db.collection("statuses").add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } el.value=''; alert("✅ Status posted! Expires in 24h"); }
-function renderStatusOvals(){ let valid=filterValidStatuses(); // Group by user, show latest per user like WhatsApp
-  let byUser={}; valid.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); });
-  let html=''; Object.keys(byUser).forEach(uid=>{ let latest=byUser[uid][0]; let viewed=viewedStatuses.has(latest.id); html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div><div style="font-size:10px;color:#888">${byUser[uid].length} update${byUser[uid].length>1?'s':''}</div></div>`; });
-  document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px">No status yet — post one!</div>';
-}
-function openStatusViewer(uid){ let valid=filterValidStatuses().filter(s=>s.from===uid); if(!valid.length) return; currentStatusIndex=0; window._viewerList=valid; showStatusAt(0); document.getElementById('statusViewer').style.display='flex'; }
-function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ closeStatusViewer(); return; } currentStatusIndex=i; let s=list[i]; viewedStatuses.add(s.id); localStorage.setItem('viewedStatus',JSON.stringify([...viewedStatuses])); renderStatusOvals(); let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); let hoursLeft=Math.max(0,24-Math.floor((Date.now()-d.getTime())/(1000*60*60))); document.getElementById('viewerProgress').innerHTML=list.map((_,idx)=>`<div class="progressBar"><div style="width:${idx<i?100:idx===i?0:0}%"></div></div>`).join(''); document.getElementById('viewerAvatar').innerHTML=s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase(); document.getElementById('viewerName').innerText=s.fromName; document.getElementById('viewerTime').innerText=formatDate(d)+' • '+formatTime(d)+' • Expires in '+hoursLeft+'h'; document.getElementById('viewerContent').innerHTML=s.image?`<img src="${s.image}">`:`<div>${s.text}</div>`; // Auto progress 5 sec
-  clearTimeout(statusTimer); let bar=document.querySelectorAll('.progressBar div')[i]; let w=0; let interval=setInterval(()=>{ w+=2; if(bar) bar.style.width=w+'%'; if(w>=100){ clearInterval(interval); nextStatus(); } },100); statusTimer=setTimeout(()=>{},6000); window._progressInterval=interval;
-}
-function nextStatus(){ clearInterval(window._progressInterval); showStatusAt(currentStatusIndex+1); }
-function prevStatus(){ clearInterval(window._progressInterval); if(currentStatusIndex>0) showStatusAt(currentStatusIndex-1); else closeStatusViewer(); }
-function closeStatusViewer(){ clearInterval(window._progressInterval); document.getElementById('statusViewer').style.display='none'; }
+async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}); document.getElementById('groupName').value=''; }
+async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); await db.collection("statuses").add({text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'text'}); document.getElementById('statusText').value=''; }
+async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); await db.collection("statuses").add({text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'image'}); el.value=''; alert("✅ Status posted! Expires in 24h"); }
+function renderStatusOvals(){ let valid=statuses.filter(s=>{ let d=s.createdAt?.toDate?s.createdAt.toDate():new Date(); return (Date.now()-d.getTime())<=24*60*60*1000; }); let byUser={}; valid.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); }); let html=''; Object.keys(byUser).forEach(uid=>{ let latest=byUser[uid][0]; let viewed=viewedStatuses.has(latest.id); html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div><div style="font-size:10px;color:#888">${byUser[uid].length} update${byUser[uid].length>1?'s':''}</div></div>`; }); document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px">No status yet — post one!</div>'; }
+function openStatusViewer(uid){ let valid=statuses.filter(s=>s.from===uid && (Date.now()-(s.createdAt?.toDate?s.createdAt.toDate():new Date()).getTime())<=24*60*60*1000); if(!valid.length) return; window._viewerList=valid; showStatusAt(0); document.getElementById('statusViewer').style.display='flex'; }
+function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ closeStatusViewer(); return; } let s=list[i]; viewedStatuses.add(s.id); localStorage.setItem('viewedStatus',JSON.stringify([...viewedStatuses])); renderStatusOvals(); let d=s.createdAt?.toDate?s.createdAt.toDate():new Date(); let hoursLeft=Math.max(0,24-Math.floor((Date.now()-d.getTime())/(1000*60*60))); document.getElementById('viewerProgress').innerHTML=list.map((_,idx)=>`<div class="progressBar"><div style="width:${idx<i?100:0}%"></div></div>`).join(''); document.getElementById('viewerAvatar').innerHTML=s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase(); document.getElementById('viewerName').innerText=s.fromName; document.getElementById('viewerTime').innerText=formatDate(d)+' • '+formatTime(d)+' • Expires in '+hoursLeft+'h'; document.getElementById('viewerContent').innerHTML=s.image?`<img src="${s.image}">`:`<div>${s.text}</div>`; window._viewerIndex=i; }
+function nextStatus(){ showStatusAt((window._viewerIndex||0)+1); }
+function closeStatusViewer(){ document.getElementById('statusViewer').style.display='none'; }
 function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; alert("Reply sent to "+document.getElementById('viewerName').innerText+": "+txt); document.getElementById('statusReply').value=''; }
-
-function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText=chattingWith.name; document.getElementById('chatAvatar').innerHTML=chattingWith.photoURL?`<img src="${chattingWith.photoURL}">`:chattingWith.name[0].toUpperCase(); updateHeader(); document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
-function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; document.getElementById('chatStatus').innerText=(chattingGroup.members?.length||0)+' members'; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
-function renderMessages(list){ let html=''; let lastDate=''; list.forEach(m=>{ let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt instanceof Date?m.createdAt:new Date()); let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?(m.read?'<span class="tick blue">✓✓</span>':'<span class="tick">✓✓</span>'):''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋<br>Chat box is below 👇</div>'; document.getElementById('msgs').scrollTop=99999; }
-function listenMsgs(){ if(guestMode){ let list=localMsgs.filter(m=>(m.from===me.uid && m.to===chattingWith?.uid)||(m.from===chattingWith?.uid && m.to===me.uid)); renderMessages(list); return; } if(unsub) unsub(); unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id); else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid)); else return; list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}).catch(()=>{}); }); renderMessages(list); }); }
-async function setTyping(){ if(!chattingWith||guestMode) return; await db.collection("users").doc(me.uid).update({typingTo:chattingWith.uid}).catch(()=>{}); clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>db.collection("users").doc(me.uid).update({typingTo:''}).catch(()=>{}),2000); }
-setInterval(()=>{ if(chattingWith && !guestMode){ const u=allUsers.find(x=>x.uid===chattingWith.uid); document.getElementById('typing').innerText=u?.typingTo===me.uid?'typing...':''; } },1000);
-async function sendMsg(){ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); renderMessages(localMsgs.filter(m=>(m.from===me.uid && m.to===chattingWith?.uid)||(m.from===chattingWith?.uid && m.to===me.uid))); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } inp.value=''; }
-async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); listenMsgs(); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } el.value=''; alert("✅ Sent: "+f.name); }
-async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; alert("🎤 Recording... Tap 🔴 again to STOP & SEND"); }catch(e){ alert('Mic permission needed'); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); listenMsgs(); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } alert("✅ Voice note sent!"); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
-async function doLogout(){ if(me && !guestMode) await db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(!guestMode) await auth.signOut(); location.reload(); }
-function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); }
+function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText=chattingWith.name; document.getElementById('chatAvatar').innerHTML=chattingWith.photoURL?`<img src="${chattingWith.photoURL}">`:chattingWith.name[0].toUpperCase(); updateHeader(); document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); listenMsgs(); }
+function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; document.getElementById('chatStatus').innerText=(chattingGroup.members?.length||0)+' members'; document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); listenMsgs(); }
+function renderMessages(list){ let html=''; let lastDate=''; list.forEach(m=>{ let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt instanceof Date?m.createdAt:new Date()); let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?(m.read?'<span class="tick blue">✓✓</span>':'<span class="tick">✓✓</span>'):''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋</div>'; document.getElementById('msgs').scrollTop=99999; }
+function listenMsgs(){ if(unsub) unsub(); unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id); else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid)); else return; list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}).catch(()=>{}); }); renderMessages(list); }); }
+async function setTyping(){ if(!chattingWith) return; await db.collection("users").doc(me.uid).update({typingTo:chattingWith.uid}).catch(()=>{}); clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>db.collection("users").doc(me.uid).update({typingTo:''}).catch(()=>{}),2000); }
+setInterval(()=>{ if(chattingWith){ const u=allUsers.find(x=>x.uid===chattingWith.uid); document.getElementById('typing').innerText=u?.typingTo===me.uid?'typing...':''; } },1000);
+async function sendMsg(){ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); await db.collection("messages").add({from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); inp.value=''; }
+async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; await db.collection("messages").add({from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); el.value=''; alert("✅ Sent: "+f.name); }
+async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; alert("🎤 Recording... Tap 🔴 again to STOP & SEND"); }catch(e){ alert('Mic permission needed'); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); await db.collection("messages").add({from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); alert("✅ Voice note sent!"); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
+function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); inChatView=false; if(isSignedIn) lockBack(); }
 </script>
 </body>
-                                                                                                         </html>
+                            </html>
