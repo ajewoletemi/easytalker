@@ -1,92 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Easy Talkers ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;font-family:'Inter',Arial} html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#fff}
-.app{width:100%;height:100dvh;display:flex;background:#fff;overflow:hidden}
-.left{width:360px;min-width:300px;background:#fff;border-right:1px solid #e9edef;display:flex;flex-direction:column;height:100%;overflow:hidden}
-.right{flex:1;display:flex;flex-direction:column;background:#fff;height:100%;min-width:0}
-.sidebar-top{background:#f0f2f5;padding:10px 14px;display:flex;align-items:center;gap:10px}
+*{box-sizing:border-box;font-family:'Inter',Arial;max-width:100%}
+html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#fff;overscroll-behavior:none}
+.app{width:100%;height:100dvh;max-height:100dvh;display:flex;background:#fff;overflow:hidden}
+.left{width:360px;min-width:0;max-width:100vw;background:#fff;border-right:1px solid #e9edef;display:flex;flex-direction:column;height:100dvh;max-height:100dvh;overflow:hidden;flex-shrink:0}
+.right{flex:1;display:flex;flex-direction:column;background:#fff;height:100dvh;max-height:100dvh;min-width:0;overflow:hidden}
+.sidebar-top{background:#f0f2f5;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00a884,#008069);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;overflow:hidden;flex-shrink:0;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
 .avatar img{width:100%;height:100%;object-fit:cover}
-.avatar.big{width:80px;height:80px;font-size:30px}
-.avatar.huge{width:110px;height:110px;font-size:40px}
+.avatar.big{width:72px;height:72px;font-size:28px}
+.avatar.huge{width:96px;height:96px;font-size:36px}
 .avatar.small{width:32px;height:32px;font-size:14px}
-.header-green{background:linear-gradient(135deg,#00a884,#008069);color:#fff;padding:14px 16px;font-weight:800;font-size:19px;display:flex;justify-content:space-between;align-items:center}
-.field{padding:13px 14px;margin:6px 0;border-radius:12px;border:1px solid #e9edef;width:100%;outline:none;font-size:15px}
+.header-green{background:linear-gradient(135deg,#00a884,#008069);color:#fff;padding:12px 14px;font-weight:800;font-size:18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px;white-space:nowrap;overflow:hidden}
+.field{padding:12px 13px;margin:6px 0;border-radius:12px;border:1px solid #e9edef;width:100%;outline:none;font-size:15px}
 .field:focus{border-color:#00a884;box-shadow:0 0 0 3px #d9fdd3}
 .field:disabled{background:#f5f5f5;color:#888}
-.btn{padding:13px;margin:6px 0;border-radius:12px;border:none;width:100%;font-weight:700;cursor:pointer;font-size:15px}
+.btn{padding:12px;margin:6px 0;border-radius:12px;border:none;width:100%;font-weight:700;cursor:pointer;font-size:15px}
 .btn-green{background:#00a884;color:#fff} .btn-dark{background:#111b21;color:#fff}
 .linkBtn{background:none;border:none;color:#00a884;font-weight:700;cursor:pointer;font-size:14px;padding:8px}
-.logoutBtn{background:#ff3b30;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
-.user{padding:11px 14px;cursor:pointer;display:flex;gap:11px;align-items:center;border-bottom:1px solid #f5f5f5;background:#fff}
+.logoutBtn{background:#ff3b30;color:#fff;border:none;padding:7px 12px;border-radius:20px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0}
+.user{padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:center;border-bottom:1px solid #f5f5f5;background:#fff;min-width:0}
 .user.unreadRow{background:#e7f8f3;border-left:4px solid #00a884}
-.unreadBadge{background:#25d366;color:#fff;min-width:20px;height:20px;border-radius:10px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px}
-.inboxBanner{background:#ff3b30;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:13px;font-weight:700;animation:slideDown .2s ease}
+.unreadBadge{background:#25d366;color:#fff;min-width:20px;height:20px;border-radius:10px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
+.inboxBanner{background:#ff3b30;color:#fff;padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:13px;font-weight:700;animation:slideDown .2s ease;flex-shrink:0;word-break:break-word}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:64px}
-.backBtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:#111;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-#msgs{flex:1;padding:14px;padding-top:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:#efeae2;min-height:200px;position:relative}
-.dateSep{align-self:center;background:#fff;padding:6px 12px;border-radius:12px;font-size:11px;color:#667781;box-shadow:0 1px 3px rgba(0,0,0,.12);margin:10px 0 4px}
-.stickyDate{position:sticky;top:8px;z-index:10;align-self:center;background:#fff;padding:6px 14px;border-radius:12px;font-size:11px;font-weight:700;color:#111;box-shadow:0 2px 8px rgba(0,0,0,.18);margin:0}
-.chatGroupLabel{position:sticky;top:0;z-index:5;background:#f0f2f5;padding:8px 14px;font-size:11px;font-weight:800;color:#00a884;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #e9edef}
-.me{align-self:flex-end;background:#d9fdd3;padding:8px 11px;border-radius:12px 12px 2px 12px;max-width:82%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word;animation:pop .15s ease}
-.them{align-self:flex-start;background:#fff;padding:8px 11px;border-radius:12px 12px 12px 2px;max-width:82%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word;animation:pop .15s ease}
+.chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:60px;flex-shrink:0;overflow:hidden}
+.backBtn{width:38px;height:38px;border-radius:50%;border:none;background:#fff;color:#111;font-size:20px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#msgs{flex:1;padding:12px;padding-top:8px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;background:#efeae2;min-height:0;position:relative;width:100%}
+.dateSep{align-self:center;background:#fff;padding:6px 12px;border-radius:12px;font-size:11px;color:#667781;box-shadow:0 1px 3px rgba(0,0,0,.12);margin:10px 0 4px;max-width:90%;text-align:center}
+.stickyDate{position:sticky;top:6px;z-index:10;align-self:center;background:#fff;padding:6px 12px;border-radius:12px;font-size:11px;font-weight:700;color:#111;box-shadow:0 2px 8px rgba(0,0,0,.18);margin:0;max-width:90%;text-align:center}
+.chatGroupLabel{position:sticky;top:0;z-index:5;background:#f0f2f5;padding:8px 12px;font-size:11px;font-weight:800;color:#00a884;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid #e9edef;word-break:break-word}
+.me{align-self:flex-end;background:#d9fdd3;padding:8px 11px;border-radius:12px 12px 2px 12px;max-width:85%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word;overflow-wrap:break-word;animation:pop .15s ease}
+.them{align-self:flex-start;background:#fff;padding:8px 11px;border-radius:12px 12px 12px 2px;max-width:85%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word;overflow-wrap:break-word;animation:pop .15s ease}
+.me img,.them img{max-width:100%;height:auto}
+.me video,.them video{max-width:100%;height:auto}
+.me audio,.them audio{max-width:100%}
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.time{font-size:10px;color:#667781;text-align:right;margin-top:3px;display:flex;gap:4px;justify-content:flex-end}
+.time{font-size:10px;color:#667781;text-align:right;margin-top:3px;display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
 .sending{opacity:.6}
-.chat-input{background:#f0f2f5;padding:8px;display:flex;align-items:center;gap:6px;position:relative}
+.chat-input{background:#f0f2f5;padding:8px;display:flex;align-items:center;gap:6px;position:relative;flex-shrink:0;width:100%}
 .pill{background:#fff;border-radius:24px;padding:8px 12px;flex:1;display:flex;align-items:center;gap:6px;min-width:0}
 .pill input{border:none;outline:none;flex:1;font-size:15px;min-width:0}
-.iconBtn{width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#54656f;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iconBtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:#54656f;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .iconBtn.recording{background:#ff4444!important;color:#fff!important}
-.sendBtn{width:46px;height:46px;border-radius:50%;border:none;background:#00a884;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0}
+.sendBtn{width:44px;height:44px;border-radius:50%;border:none;background:#00a884;color:#fff;font-size:19px;cursor:pointer;flex-shrink:0}
 .sendBtn:active{transform:scale(.92)}
-.popup{position:absolute;bottom:70px;left:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:10px;z-index:99;display:none;width:260px}
+.popup{position:absolute;bottom:68px;left:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:10px;z-index:99;display:none;width:min(260px,calc(100vw - 16px))}
 .popup button{width:100%;text-align:left;padding:11px;border:none;background:#f8f9fa;border-radius:10px;margin:4px 0;cursor:pointer;font-size:14px;font-weight:600}
-.emojiPopup{position:absolute;bottom:70px;right:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:12px;z-index:99;display:none;width:280px}
+.emojiPopup{position:absolute;bottom:68px;right:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:12px;z-index:99;display:none;width:min(280px,calc(100vw - 16px))}
 .emojiPopup span{font-size:26px;cursor:pointer;padding:4px;display:inline-block}
-.fileCard{background:#fff;border:1px solid #e9edef;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;max-width:260px}
-.tabBtn{flex:1;padding:11px 2px;border:none;background:transparent;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;font-size:12px}
+.fileCard{background:#fff;border:1px solid #e9edef;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;max-width:100%;word-break:break-word}
+.tabBtn{flex:1;padding:11px 2px;border:none;background:transparent;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tabBtn.active{color:#00a884;border-bottom-color:#00a884}
-.uploadLabel{display:inline-block;background:#e7f8f3;color:#008069;padding:10px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer;margin:6px 0}
-.statusBar{padding:12px 14px 12px;border-bottom:1px solid #f0f2f5;background:#fff}
-.statusLineWrap{display:flex;align-items:center;gap:10px}
-.statusLine{position:relative;height:62px;display:flex;align-items:center;gap:10px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex:1;scroll-behavior:smooth;padding:4px 2px}
+.uploadLabel{display:inline-block;background:#e7f8f3;color:#008069;padding:10px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer;margin:6px 0;max-width:100%}
+
+/* ===== STATUS CIRCLE - BIG & VISIBLE ===== */
+.statusBar{padding:10px 12px 10px;border-bottom:1px solid #f0f2f5;background:#fff;flex-shrink:0;overflow:hidden}
+.statusLineWrap{display:flex;align-items:center;gap:8px;width:100%;min-width:0}
+.statusLine{position:relative;height:88px;display:flex;align-items:center;gap:12px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;flex:1;scroll-behavior:smooth;padding:6px 4px;min-width:0}
 .statusLine::-webkit-scrollbar{display:none}
-.statusLine:before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;background:#e9edef;z-index:0}
-.statusDotWrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 2px;background:#fff;cursor:pointer;flex-shrink:0;min-width:58px}
-.statusDot{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:700;font-size:16px;color:#fff;background:#00a884;border:3px solid #fff;box-shadow:0 0 0 3px #00a884}
-.statusDot.viewed{box-shadow:0 0 0 3px #d1d1d1}
+.statusLine:before{content:'';position:absolute;left:0;right:0;top:50%;height:3px;background:#e9edef;z-index:0}
+.statusDotWrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 2px;background:#fff;cursor:pointer;flex-shrink:0;min-width:68px;max-width:72px}
+.statusDot{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;font-size:20px;color:#fff;background:linear-gradient(135deg,#00a884,#008069);border:4px solid #fff;box-shadow:0 0 0 5px #00a884,0 4px 12px rgba(0,168,132,.45)}
+.statusDot.viewed{box-shadow:0 0 0 4px #cbd5d1,0 2px 8px rgba(0,0,0,.15);background:#9aa8a3}
 .statusDot img{width:100%;height:100%;object-fit:cover}
-.statusDot.mine{box-shadow:0 0 0 3px #00a884;background:#f0f2f5;color:#008069}
-.statusDot.empty{border:2px dashed #00a884;background:#fff;color:#00a884;box-shadow:none}
-.statusDotLabel{font-size:11px;color:#667781;max-width:56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.statusDotPlus{position:absolute;bottom:14px;right:2px;background:#00a884;color:#fff;width:16px;height:16px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;font-weight:800}
-.circleFlowBtn{width:32px;height:32px;border-radius:50%;background:#f0f2f5;border:none;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.groupBadge{background:#e7f8f3;color:#008069;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111b21;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:1000;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.statusDot.mine{box-shadow:0 0 0 5px #00a884,0 4px 12px rgba(0,168,132,.45);background:#d9fdd3;color:#008069}
+.statusDot.empty{border:3px dashed #00a884;background:#fff;color:#00a884;box-shadow:0 0 0 4px #e7f8f3,0 2px 8px rgba(0,0,0,.1)}
+.statusDotLabel{font-size:12px;font-weight:700;color:#111;max-width:68px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;line-height:1.2}
+.statusDotSub{font-size:10px;color:#00a884;font-weight:700;line-height:1}
+.statusDotPlus{position:absolute;bottom:18px;right:0px;background:#00a884;color:#fff;width:20px;height:20px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.25);z-index:2}
+.circleFlowBtn{width:36px;height:36px;border-radius:50%;background:#00a884;color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,168,132,.4)}
+.groupBadge{background:#e7f8f3;color:#008069;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;white-space:nowrap}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111b21;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;z-index:1000;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3);max-width:calc(100vw - 32px);text-align:center;word-break:break-word}
 #editProfileModal,#profileViewModal,#groupProfileModal,#groupEditModal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
-.editSheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px;max-height:90vh;overflow-y:auto}
+.editSheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px;max-height:92dvh;overflow-y:auto;overflow-x:hidden}
 .viewerDrawer{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1001;display:none;align-items:flex-end;justify-content:center}
-.viewerSheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;max-height:75vh;display:flex;flex-direction:column;overflow:hidden}
-.viewerRow{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid #f5f5f5}
-#statusViewer{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;color:#fff}
-.viewerTop{display:flex;gap:4px;padding:10px}
+.viewerSheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;max-height:78dvh;display:flex;flex-direction:column;overflow:hidden}
+.viewerRow{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid #f5f5f5;min-width:0}
+#statusViewer{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;color:#fff;height:100dvh;overflow:hidden}
+.viewerTop{display:flex;gap:4px;padding:10px;flex-shrink:0}
 .progressBar{flex:1;height:3px;background:#555;border-radius:10px;overflow:hidden}
 .progressBar div{height:100%;background:#fff;width:0%}
-.viewerHeader{display:flex;align-items:center;gap:10px;padding:0 14px}
-.viewerContent{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-size:22px;font-weight:600;line-height:1.4;overflow:hidden}
-.viewerContent img{max-width:100%;max-height:75vh;border-radius:12px;object-fit:contain}
-.viewerFooter{display:flex;gap:10px;padding:14px}
-.viewerFooter input{flex:1;padding:12px;border-radius:20px;border:none;outline:none}
-.authPage{display:none;flex-direction:column;flex:1;overflow:hidden}
+.viewerHeader{display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;overflow:hidden}
+.viewerContent{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;text-align:center;font-size:20px;font-weight:600;line-height:1.4;overflow:hidden;min-height:0;word-break:break-word}
+.viewerContent img{max-width:100%;max-height:68dvh;border-radius:12px;object-fit:contain}
+.viewerFooter{display:flex;gap:10px;padding:12px;flex-shrink:0}
+.viewerFooter input{flex:1;padding:12px;border-radius:20px;border:none;outline:none;min-width:0}
+.authPage{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
 .authPage.active{display:flex}
-@media(max-width:760px){.left{width:100%;min-width:0}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}}
+.authScroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px;text-align:center;min-height:0}
+@media(max-width:760px){.left{width:100%;min-width:0;max-width:100vw}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex;width:100vw;max-width:100vw}.header-green{font-size:16px}.statusDot{width:60px;height:60px}.statusLine{height:84px}.statusDotWrap{min-width:64px}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -96,17 +104,17 @@
 <div id="toast"></div>
 <div class="app" id="app">
 <div class="left">
-<div class="header-green">💬 Easy Talkers <button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
+<div class="header-green"><span style="overflow:hidden;text-overflow:ellipsis">💬 Easy Talkers</span><button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
 
 <div id="loginPage" class="authPage active">
-<div style="flex:1;overflow-y:auto;padding:20px;text-align:center">
+<div class="authScroll">
 <div class="avatar big" style="margin:auto">👋</div>
 <h2 style="margin:12px 0 2px">Welcome Back</h2>
 <p style="color:#667781;font-size:13px;margin:0 0 16px">Login to continue chatting</p>
 <input class="field" id="loginEmail" placeholder="✉️ Email e.g. kojo@gmail.com">
 <input class="field" id="loginPass" type="password" placeholder="🔒 Password">
 <button class="btn btn-dark" onclick="doLogin()">Login →</button>
-<p id="loginMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600"></p>
+<p id="loginMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600;word-break:break-word"></p>
 <div style="margin-top:16px;border-top:1px solid #eee;padding-top:14px">
 <p style="color:#667781;font-size:13px;margin:0">Don't have an account?</p>
 <button class="linkBtn" onclick="showSignup()">Create Account →</button>
@@ -115,7 +123,7 @@
 </div>
 
 <div id="signupPage" class="authPage">
-<div style="flex:1;overflow-y:auto;padding:20px;text-align:center">
+<div class="authScroll">
 <div class="avatar big" id="authAvatar" style="margin:auto">✨</div>
 <h2 style="margin:12px 0 2px">Create Account</h2>
 <p style="color:#667781;font-size:13px;margin:0 0 16px">Join Easy Talkers in seconds</p>
@@ -126,9 +134,9 @@
 <input class="field" id="bio" placeholder="📝 Bio e.g. KOJOPAY founder 💰 (optional)">
 <label class="uploadLabel" for="picInput">📸 Choose Profile Picture</label>
 <input type="file" id="picInput" accept="image/*" style="display:none" onchange="previewPic(this)">
-<div id="picName" style="font-size:12px;color:#008069"></div>
+<div id="picName" style="font-size:12px;color:#008069;word-break:break-word"></div>
 <button class="btn btn-green" onclick="doRegister()">Create Account →</button>
-<p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600"></p>
+<p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600;word-break:break-word"></p>
 <div style="margin-top:10px;border-top:1px solid #eee;padding-top:12px">
 <p style="color:#667781;font-size:13px;margin:0">Already have an account?</p>
 <button class="linkBtn" onclick="showLogin()">← Back to Login</button>
@@ -136,20 +144,19 @@
 </div>
 </div>
 
-<div id="userBox" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+<div id="userBox" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0">
 <div class="sidebar-top" onclick="openEditProfile()" style="cursor:pointer">
 <div class="avatar" id="myAvatar">K</div>
 <div style="flex:1;min-width:0"><b id="meName" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Me</b><div style="font-size:12px;color:#00a884">🟢 Online • Tap to Edit Profile ✏️</div><div id="meEmailSmall" style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="meBioSmall" style="font-size:11px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>
-<span style="font-size:18px">✏️</span>
+<span style="font-size:18px;flex-shrink:0">✏️</span>
 </div>
 
-<!-- INBOX NOTIFICATION ON TOP OF CONTACTS / CHATS -->
 <div id="inboxBanner" class="inboxBanner" style="display:none" onclick="openInboxSender()"></div>
 
 <div class="statusBar">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-<span style="font-size:11px;color:#999;font-weight:700;letter-spacing:.5px">STATUS</span>
-<span id="statusBarRight" style="font-size:11px;color:#00a884;font-weight:700;cursor:pointer" onclick="openViewersDrawer('my')">👁️ 0 views</span>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px">
+<span style="font-size:12px;color:#111;font-weight:800;letter-spacing:.5px">● STATUS • Tap circle to view</span>
+<span id="statusBarRight" style="font-size:11px;color:#00a884;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0" onclick="openViewersDrawer('my')">👁️ 0 views</span>
 </div>
 <div class="statusLineWrap">
 <div id="myStatusFront" style="flex-shrink:0"></div>
@@ -157,34 +164,34 @@
 <button class="circleFlowBtn" onclick="flowStatusCircle()" title="Flow in circle">↻</button>
 </div>
 <div style="display:flex;gap:6px;margin-top:8px">
-<input id="statusText" placeholder="Add status..." style="flex:1;padding:10px 12px;border-radius:16px;border:1px solid #e9edef;outline:none;font-size:13px">
-<button onclick="postStatus()" style="padding:10px 14px;border-radius:16px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer;font-size:12px">Post</button>
-<button onclick="document.getElementById('statusPicInput').click()" style="padding:10px 12px;border-radius:16px;border:none;background:#f0f2f5;cursor:pointer;font-size:13px">📸</button>
+<input id="statusText" placeholder="Add status..." style="flex:1;padding:10px 12px;border-radius:16px;border:1px solid #e9edef;outline:none;font-size:13px;min-width:0">
+<button onclick="postStatus()" style="padding:10px 14px;border-radius:16px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer;font-size:12px;flex-shrink:0">Post</button>
+<button onclick="document.getElementById('statusPicInput').click()" style="padding:10px 12px;border-radius:16px;border:none;background:#f0f2f5;cursor:pointer;font-size:13px;flex-shrink:0">📸</button>
 </div>
 <input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
 <div id="lastStatusPreview" style="font-size:12px;color:#667781;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" onclick="openMyStatus()"></div>
 </div>
 
-<div style="display:flex;border-bottom:1px solid #e9edef">
+<div style="display:flex;border-bottom:1px solid #e9edef;flex-shrink:0">
 <button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats <span id="chatCount" style="background:#00a884;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px"></span> <span id="totalUnread" style="background:#ff3b30;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;display:none"></span></button>
 <button class="tabBtn" id="tabContactBtn" onclick="showTab('contacts')">Contacts <span id="contactCount" style="background:#e9edef;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 <button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups <span id="groupCount" style="background:#e7f8f3;color:#008069;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 </div>
 
-<div id="tabChats" style="flex:1;overflow-y:auto">
-<div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search chats + groups" oninput="renderChats(this.value)"></div>
+<div id="tabChats" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0">
+<div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1;min-width:0" placeholder="Search chats + groups" oninput="renderChats(this.value)"></div>
 <div style="padding:6px 14px;font-size:11px;color:#888">Chats + Groups together • Unread on top • Newest first</div>
 <div id="chatsList"></div>
 <div style="padding:12px;text-align:center"><button class="linkBtn" onclick="showTab('contacts')">+ New Chat — Go to Contacts →</button></div>
 </div>
 
-<div id="tabContacts" style="display:none;flex:1;overflow-y:auto">
-<div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search all contacts" oninput="renderContacts(this.value)"></div>
+<div id="tabContacts" style="display:none;flex:1;overflow-y:auto;overflow-x:hidden;min-height:0">
+<div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1;min-width:0" placeholder="Search all contacts" oninput="renderContacts(this.value)"></div>
 <div style="padding:8px 14px;font-size:12px;color:#667781;font-weight:700">👥 ALL PEOPLE — Tap pic to view profile • Tap name to chat • Everyone can view each other</div>
 <div id="contactsList"></div>
 </div>
 
-<div id="tabGroups" style="display:none;flex:1;overflow-y:auto;padding:10px">
+<div id="tabGroups" style="display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;min-height:0">
 <div style="font-size:12px;color:#667781;font-weight:700;margin-bottom:8px">👥 CREATE GROUP — Visible to all members in Chats</div>
 <input class="field" id="groupName" placeholder="Group name e.g. KOJOPAY Team">
 <input class="field" id="groupDesc" placeholder="Description e.g. Official KOJOPAY traders group">
@@ -201,17 +208,17 @@
 <div class="chat-header">
 <button class="backBtn" onclick="backToUsers()">←</button>
 <div class="avatar" id="chatAvatar" onclick="viewChatUserProfile()" title="Tap to view profile">💬</div>
-<div style="flex:1;min-width:0" onclick="viewChatUserProfile()" title="Tap to view profile"><b id="chatHeader" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Select a chat</b><div id="chatStatus" style="font-size:12px;color:#667781"></div><div id="chatBio" style="font-size:11px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="chatLastTime" style="font-size:11px;color:#00a884;font-weight:600"></div><div id="typing" style="font-size:12px;color:#00a884;font-weight:600"></div></div>
-<button onclick="viewChatUserProfile()" style="background:#e7f8f3;border:none;padding:8px 12px;border-radius:20px;color:#008069;font-weight:700;cursor:pointer;font-size:12px">👤 Profile</button>
+<div style="flex:1;min-width:0" onclick="viewChatUserProfile()" title="Tap to view profile"><b id="chatHeader" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Select a chat</b><div id="chatStatus" style="font-size:12px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="chatBio" style="font-size:11px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="chatLastTime" style="font-size:11px;color:#00a884;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="typing" style="font-size:12px;color:#00a884;font-weight:600"></div></div>
+<button onclick="viewChatUserProfile()" style="background:#e7f8f3;border:none;padding:8px 12px;border-radius:20px;color:#008069;font-weight:700;cursor:pointer;font-size:12px;flex-shrink:0">👤 Profile</button>
 </div>
 <div id="stickyDatePill" class="stickyDate" style="display:none;margin:8px auto 0">📅 TODAY</div>
-<div id="msgs"><div style="text-align:center;color:#667781;background:#fff;padding:10px 16px;border-radius:12px;align-self:center;font-size:12px;margin-top:30px">🔒 Messages are end-to-end encrypted<br>Tap a chat or go to Contacts to start new chat</div></div>
+<div id="msgs"><div style="text-align:center;color:#667781;background:#fff;padding:10px 16px;border-radius:12px;align-self:center;font-size:12px;margin-top:30px;max-width:90%">🔒 Messages are end-to-end encrypted<br>Tap a chat or go to Contacts to start new chat</div></div>
 <div class="chat-input">
 <button class="iconBtn" onclick="toggleAttach(event)">📎</button>
 <button class="iconBtn" onclick="document.getElementById('imgInput').click()">📷</button>
 <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="sendFile(this)">
 <input type="file" id="fileInput" style="display:none" onchange="sendFile(this)">
-<div class="pill"><input id="msgInput" placeholder="Type a message" oninput="setTyping()" onkeydown="if(event.key==='Enter')sendMsg()"><span style="cursor:pointer;font-size:20px" onclick="toggleEmoji(event)">😊</span></div>
+<div class="pill"><input id="msgInput" placeholder="Type a message" oninput="setTyping()" onkeydown="if(event.key==='Enter')sendMsg()"><span style="cursor:pointer;font-size:20px;flex-shrink:0" onclick="toggleEmoji(event)">😊</span></div>
 <button class="iconBtn" id="micBtn" onclick="toggleVoice()">🎤</button>
 <button class="sendBtn" onclick="sendMsg()">➤</button>
 <div class="popup" id="attachPopup"><div style="font-weight:700;margin-bottom:6px">Attach</div><button onclick="pickFile('image')">🖼️ Photo / Image</button><button onclick="pickFile('video')">🎥 Video</button><button onclick="pickFile('file')">📄 Document / PDF / Any File</button><button onclick="closePopups()" style="background:#fff;text-align:center;color:#888">✕ Close</button></div>
@@ -222,7 +229,7 @@
 
 <div id="editProfileModal">
 <div class="editSheet">
-<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">✏️ Edit Profile</h3><button onclick="closeEditProfile()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">✏️ Edit Profile</h3><button onclick="closeEditProfile()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button></div>
 <div style="text-align:center;margin:14px 0">
 <div class="avatar big" id="editAvatar" style="margin:auto">K</div>
 <label class="uploadLabel" for="editPicInput">📸 Change Profile Picture</label>
@@ -253,15 +260,15 @@
 </div>
 <div style="margin-top:-30px">
 <div class="avatar huge" id="viewAvatar" style="margin:auto;border:4px solid #fff">K</div>
-<h2 id="viewName" style="margin:10px 0 2px">Name</h2>
+<h2 id="viewName" style="margin:10px 0 2px;word-break:break-word;padding:0 12px">Name</h2>
 <div id="viewOnline" style="font-size:12px;color:#00a884;font-weight:700">🟢 Online</div>
-<div id="viewBio" style="margin:10px 20px;padding:12px;background:#f0fdf4;border-radius:12px;color:#333;font-size:14px;line-height:1.5"></div>
+<div id="viewBio" style="margin:10px 20px;padding:12px;background:#f0fdf4;border-radius:12px;color:#333;font-size:14px;line-height:1.5;word-break:break-word"></div>
 <div style="text-align:left;padding:0 20px 10px">
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>🌐 Website</b><div id="viewWebsite" style="color:#008069"></div></div>
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>📞 Phone</b><div id="viewPhone" style="color:#667781"></div></div>
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>✉️ Email</b><div id="viewEmail" style="color:#667781"></div></div>
-<div style="padding:10px 0"><b>💬 Chats</b><div id="viewChatInfo" style="color:#667781"></div></div>
-<div style="padding:12px;background:#e7f8f3;border-radius:12px;margin-top:6px"><b>🔗 <span id="viewLinkLabel">My Profile Link</span></b><div id="viewShareLink" style="font-size:12px;color:#008069;word-break:break-all;margin:6px 0"></div><div id="viewLinkOwner" style="font-size:11px;color:#667781;margin-bottom:6px"></div><button onclick="copyProfileLink()" style="background:#00a884;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">📋 Copy My Link</button> <button onclick="shareProfileLink()" style="background:#111b21;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">↗️ Share My Link</button><div style="font-size:11px;color:#888;margin-top:4px">This is this person's own link — not a group link. Anyone who taps it opens THIS profile.</div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>🌐 Website</b><div id="viewWebsite" style="color:#008069"></div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>📞 Phone</b><div id="viewPhone" style="color:#667781"></div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>✉️ Email</b><div id="viewEmail" style="color:#667781"></div></div>
+<div style="padding:10px 0;word-break:break-word"><b>💬 Chats</b><div id="viewChatInfo" style="color:#667781"></div></div>
+<div style="padding:12px;background:#e7f8f3;border-radius:12px;margin-top:6px"><b>🔗 <span id="viewLinkLabel">My Profile Link</span></b><div id="viewShareLink" style="font-size:12px;color:#008069;word-break:break-all;margin:6px 0"></div><div id="viewLinkOwner" style="font-size:11px;color:#667781;margin-bottom:6px;word-break:break-word"></div><button onclick="copyProfileLink()" style="background:#00a884;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">📋 Copy My Link</button> <button onclick="shareProfileLink()" style="background:#111b21;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">↗️ Share My Link</button><div style="font-size:11px;color:#888;margin-top:4px">This is this person's own link — not a group link. Anyone who taps it opens THIS profile.</div></div>
 </div>
 <div style="padding:0 20px 20px;display:flex;gap:8px">
 <button class="btn btn-green" id="viewChatBtn" onclick="chatFromProfile()" style="flex:1;margin:0">💬 Message</button>
@@ -279,14 +286,14 @@
 </div>
 <div style="margin-top:-30px">
 <div class="avatar huge" id="groupViewAvatar" style="margin:auto;border:4px solid #fff">👥</div>
-<h2 id="groupViewName" style="margin:10px 0 2px">Group Name</h2>
+<h2 id="groupViewName" style="margin:10px 0 2px;word-break:break-word;padding:0 12px">Group Name</h2>
 <div id="groupViewCount" style="font-size:12px;color:#00a884;font-weight:700">👥 0 members</div>
-<div id="groupViewDesc" style="margin:10px 20px;padding:12px;background:#f0fdf4;border-radius:12px;color:#333;font-size:14px;line-height:1.5"></div>
-<div id="groupViewBio" style="margin:0 20px 10px;padding:12px;background:#fff;border:1px solid #eee;border-radius:12px;color:#333;font-size:13px"></div>
+<div id="groupViewDesc" style="margin:10px 20px;padding:12px;background:#f0fdf4;border-radius:12px;color:#333;font-size:14px;line-height:1.5;word-break:break-word"></div>
+<div id="groupViewBio" style="margin:0 20px 10px;padding:12px;background:#fff;border:1px solid #eee;border-radius:12px;color:#333;font-size:13px;word-break:break-word"></div>
 <div style="text-align:left;padding:0 20px 10px">
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>🌐 Website</b><div id="groupViewWebsite" style="color:#008069"></div></div>
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>👑 Admin</b><div id="groupViewAdmin" style="color:#667781"></div></div>
-<div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>📜 Rules</b><div id="groupViewRules" style="color:#667781;font-size:13px;line-height:1.6"></div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>🌐 Website</b><div id="groupViewWebsite" style="color:#008069"></div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>👑 Admin</b><div id="groupViewAdmin" style="color:#667781"></div></div>
+<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;word-break:break-word"><b>📜 Rules</b><div id="groupViewRules" style="color:#667781;font-size:13px;line-height:1.6"></div></div>
 <div style="padding:10px 0"><b>👥 Members (<span id="groupViewMembersCount">0</span>)</b><div id="groupViewMembers" style="margin-top:6px"></div></div>
 <div style="padding:10px;background:#fff3cd;border-radius:12px;margin-top:6px"><b>🔗 Group Join Link — For This Group Only</b><div id="groupViewLink" style="font-size:12px;color:#008069;word-break:break-all;margin:6px 0"></div><button onclick="copyGroupLink()" style="background:#00a884;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">📋 Copy Group Link</button> <button onclick="shareGroupLink()" style="background:#111b21;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">↗️ Share Group Link</button><div style="font-size:11px;color:#888;margin-top:4px">Anyone who taps this joins THIS group automatically</div></div>
 <div style="padding:10px;background:#e7f8f3;border-radius:12px;margin-top:8px"><b>➕ Add Members</b><div id="groupAddMembers" style="margin-top:6px"></div></div>
@@ -302,7 +309,7 @@
 
 <div id="groupEditModal">
 <div class="editSheet">
-<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">✏️ Edit Group</h3><button onclick="closeGroupEdit()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">✏️ Edit Group</h3><button onclick="closeGroupEdit()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button></div>
 <label style="font-size:12px;font-weight:700;color:#667781">👥 GROUP NAME</label>
 <input class="field" id="editGroupName" placeholder="Group Name">
 <label style="font-size:12px;font-weight:700;color:#667781">📝 DESCRIPTION</label>
@@ -322,21 +329,21 @@
 
 <div id="viewersDrawer" class="viewerDrawer" onclick="if(event.target.id==='viewersDrawer') closeViewersDrawer()">
 <div class="viewerSheet">
-<div style="padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee">
-<div><h3 style="margin:0" id="viewersTitle">👁️ Viewers</h3><div id="viewersSubtitle" style="font-size:12px;color:#888"></div></div>
-<button onclick="closeViewersDrawer()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+<div style="padding:14px 16px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;gap:8px">
+<div style="min-width:0"><h3 style="margin:0" id="viewersTitle">👁️ Viewers</h3><div id="viewersSubtitle" style="font-size:12px;color:#888;word-break:break-word"></div></div>
+<button onclick="closeViewersDrawer()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button>
 </div>
 <div style="padding:8px 16px;font-size:11px;color:#888">1 view per person — WhatsApp style • Tapping 10x still = 1 view</div>
-<div id="viewersListContent" style="flex:1;overflow-y:auto;padding-bottom:16px"></div>
+<div id="viewersListContent" style="flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:16px"></div>
 </div>
 </div>
 
 <div id="statusViewer">
 <div class="viewerTop" id="viewerProgress"></div>
-<div class="viewerHeader"><button onclick="closeStatusViewer()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer">✕</button><div class="avatar small" id="viewerAvatar">K</div><div><b id="viewerName">User</b><div id="viewerTime" style="font-size:12px;color:#ccc"></div></div><button onclick="openViewersFromViewer()" style="margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:12px" id="viewerViews">👁️ 0 views ↑</button></div>
+<div class="viewerHeader"><button onclick="closeStatusViewer()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;flex-shrink:0">✕</button><div class="avatar small" id="viewerAvatar">K</div><div style="min-width:0"><b id="viewerName" style="word-break:break-word">User</b><div id="viewerTime" style="font-size:12px;color:#ccc;word-break:break-word"></div></div><button onclick="openViewersFromViewer()" style="margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:12px;flex-shrink:0;white-space:nowrap" id="viewerViews">👁️ 0 views ↑</button></div>
 <div class="viewerContent" id="viewerContent" onclick="nextStatus()"></div>
-<div style="text-align:center;color:#aaa;font-size:12px">Tap → Next • Tap 👁️ to see viewers • Tap ✕ to close</div>
-<div class="viewerFooter"><input id="statusReply" placeholder="Reply to status..."><button onclick="replyStatus()" style="padding:12px 18px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700">➤</button></div>
+<div style="text-align:center;color:#aaa;font-size:12px;padding:0 12px">Tap → Next • Tap 👁️ to see viewers • Tap ✕ to close</div>
+<div class="viewerFooter"><input id="statusReply" placeholder="Reply to status..."><button onclick="replyStatus()" style="padding:12px 18px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;flex-shrink:0">➤</button></div>
 </div>
 
 <script>
@@ -376,63 +383,14 @@ async function changeProfilePic(el){ if(!me||!el.files[0]) return; let b=await c
 async function saveProfile(){ let newName=document.getElementById('editName').value.trim(); let newPhone=document.getElementById('editPhone').value.trim(); let newBio=document.getElementById('editBio').value.trim(); let newWebsite=document.getElementById('editWebsite').value.trim(); if(!newName) return showToast("Enter name"); me.name=newName; me.phone=newPhone; me.bio=newBio; me.website=newWebsite; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].name=newName; users[idx].phone=newPhone; users[idx].photoURL=me.photoURL; users[idx].bio=newBio; users[idx].website=newWebsite; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({name:newName,phone:newPhone,photoURL:me.photoURL||'',bio:newBio,website:newWebsite}).catch(()=>{}); document.getElementById('meName').innerText=newName; document.getElementById('meBioSmall').innerText=newBio; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:newName[0].toUpperCase(); renderChats(''); renderContacts(''); closeEditProfile(); showToast("✅ Profile + Bio + Website saved"); }
 function getUserShareLink(uid){ return location.origin+location.pathname+"?user="+encodeURIComponent(uid); }
 function getGroupJoinLink(gid){ return location.origin+location.pathname+"?join="+encodeURIComponent(gid); }
-
-// ===== PROFILE VIEWABLE TO EACH OTHER - NO BLOCK =====
-function viewProfile(uid){
-  viewingGroupId=null;
-  // Find user even if new / never chatted / not in allUsers yet - try local + fallback
-  let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null);
-  if(!u){
-    // Try to create placeholder from saved msgs / groups so profile still opens
-    let fromMsg=getLocalMsgs().find(m=>m.from===uid);
-    u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true};
-    if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName;
-    if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u);
-  }
-  viewingProfileUid=uid;
-  document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase();
-  document.getElementById('viewName').innerText=u.name;
-  document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently';
-  document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!';
-  document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website';
-  document.getElementById('viewPhone').innerText=u.phone||'No phone';
-  document.getElementById('viewEmail').innerText=u.email||'';
-  let myLink=getUserShareLink(uid);
-  document.getElementById('viewShareLink').innerText=myLink;
-  document.getElementById('viewLinkLabel').innerText=(uid===me.uid?'My Profile Link':u.name+"'s Profile Link");
-  document.getElementById('viewLinkOwner').innerText='Owner: '+u.name+' • UID: '+uid;
-  let last=getLastMessageWith(uid);
-  document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — tap Message to start. You can view each other\'s profile anytime.';
-  let isMe=uid===me.uid;
-  document.getElementById('viewChatBtn').style.display=isMe?'none':'block';
-  document.getElementById('viewEditBtn').style.display=isMe?'block':'none';
-  document.getElementById('profileViewModal').style.display='flex';
-}
+function viewProfile(uid){ viewingGroupId=null; let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u){ let fromMsg=getLocalMsgs().find(m=>m.from===uid); u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true}; if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName; if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u); } viewingProfileUid=uid; document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); document.getElementById('viewName').innerText=u.name; document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently'; document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!'; document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website'; document.getElementById('viewPhone').innerText=u.phone||'No phone'; document.getElementById('viewEmail').innerText=u.email||''; let myLink=getUserShareLink(uid); document.getElementById('viewShareLink').innerText=myLink; document.getElementById('viewLinkLabel').innerText=(uid===me.uid?'My Profile Link':u.name+"'s Profile Link"); document.getElementById('viewLinkOwner').innerText='Owner: '+u.name+' • UID: '+uid; let last=getLastMessageWith(uid); document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — tap Message to start. You can view each other\'s profile anytime.'; let isMe=uid===me.uid; document.getElementById('viewChatBtn').style.display=isMe?'none':'block'; document.getElementById('viewEditBtn').style.display=isMe?'block':'none'; document.getElementById('profileViewModal').style.display='flex'; }
 function closeProfileView(){ document.getElementById('profileViewModal').style.display='none'; }
 function chatFromProfile(){ if(!viewingProfileUid) return; closeProfileView(); openChat(viewingProfileUid); }
 function editFromProfile(){ closeProfileView(); openEditProfile(); }
 function copyProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); let u=allUsers.find(x=>x.uid===viewingProfileUid); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(u?.name||'User')+"'s profile link copied")).catch(()=>{ prompt("Copy "+(u?.name||'User')+"'s profile link:", link); }); }
 function shareProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); let u=allUsers.find(x=>x.uid===viewingProfileUid); if(navigator.share){ navigator.share({title:u.name+" on Easy Talkers", text:"Chat with "+u.name+" on Easy Talkers — Tap to open their profile", url:link}).catch(()=>{}); } else { copyProfileLink(); } }
 function viewChatUserProfile(){ if(chattingGroup) viewGroupProfile(chattingGroup.id); else if(chattingWith) viewProfile(chattingWith.uid); }
-
-// ===== INBOX NOTIFICATION ON TOP =====
-function updateInboxBanner(){
-  let el=document.getElementById('inboxBanner'); if(!el) return;
-  let total=Object.values(unreadMap).reduce((a,b)=>a+b,0);
-  if(total>0 && lastInboxUid){
-    let sender=allUsers.find(u=>u.uid===lastInboxUid);
-    let name=sender?.name||'Someone';
-    el.style.display='flex';
-    el.innerHTML=`<span style="background:#fff;color:#ff3b30;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${total}</span><span style="flex:1">📩 Inbox: New message from <b>${name}</b> — ${lastInboxText||'Tap to open'} • ${total} unread</span><span>Tap to Open →</span>`;
-  } else if(total>0){
-    // Find first unread user
-    let firstUid=Object.keys(unreadMap).find(k=>unreadMap[k]>0);
-    if(firstUid){ lastInboxUid=firstUid; let sender=allUsers.find(u=>u.uid===firstUid); el.style.display='flex'; el.innerHTML=`<span style="background:#fff;color:#ff3b30;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">${total}</span><span style="flex:1">📩 Inbox: ${total} unread message${total>1?'s':''} from ${sender?.name||'Someone'} — Tap to open</span><span>Tap →</span>`; }
-    else el.style.display='none';
-  } else {
-    el.style.display='none';
-  }
-}
+function updateInboxBanner(){ let el=document.getElementById('inboxBanner'); if(!el) return; let total=Object.values(unreadMap).reduce((a,b)=>a+b,0); if(total>0 && lastInboxUid){ let sender=allUsers.find(u=>u.uid===lastInboxUid); let name=sender?.name||'Someone'; el.style.display='flex'; el.innerHTML=`<span style="background:#fff;color:#ff3b30;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${total}</span><span style="flex:1;min-width:0">📩 Inbox: New message from <b>${name}</b> — ${lastInboxText||'Tap to open'} • ${total} unread</span><span style="flex-shrink:0">Tap to Open →</span>`; } else if(total>0){ let firstUid=Object.keys(unreadMap).find(k=>unreadMap[k]>0); if(firstUid){ lastInboxUid=firstUid; let sender=allUsers.find(u=>u.uid===firstUid); el.style.display='flex'; el.innerHTML=`<span style="background:#fff;color:#ff3b30;min-width:22px;height:22px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${total}</span><span style="flex:1;min-width:0">📩 Inbox: ${total} unread message${total>1?'s':''} from ${sender?.name||'Someone'} — Tap to open</span><span style="flex-shrink:0">Tap →</span>`; } else el.style.display='none'; } else { el.style.display='none'; } }
 function openInboxSender(){ if(!lastInboxUid){ let first=Object.keys(unreadMap).find(k=>unreadMap[k]>0); if(first) lastInboxUid=first; } if(lastInboxUid) openChat(lastInboxUid); }
 function getLocalGroups(){ try{ return JSON.parse(localStorage.getItem('et_groups')||'[]'); }catch(e){ return []; } }
 function saveLocalGroups(g){ localStorage.setItem('et_groups', JSON.stringify(g)); }
@@ -443,7 +401,7 @@ function autoJoinGroup(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; if
 function joinGroupFromProfile(){ if(viewingGroupId) autoJoinGroup(viewingGroupId); }
 function copyGroupLink(){ if(!viewingGroupId) return; let link=getGroupJoinLink(viewingGroupId); let g=groups.find(x=>x.id===viewingGroupId); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(g?.name||'Group')+" join link copied")).catch(()=>prompt("Copy group link:", link)); }
 function shareGroupLink(){ if(!viewingGroupId) return; let g=groups.find(x=>x.id===viewingGroupId); let link=getGroupJoinLink(viewingGroupId); if(navigator.share){ navigator.share({title:"Join "+g.name+" on Easy Talkers", text:"Join "+g.name+" — "+(g.description||''), url:link}).catch(()=>{}); } else { copyGroupLink(); } }
-function viewGroupProfile(gid){ viewingProfileUid=null; let g=groups.find(x=>x.id===gid); if(!g) return; viewingGroupId=gid; document.getElementById('groupViewAvatar').innerHTML='👥'; document.getElementById('groupViewName').innerText=g.name; let members=g.members||[]; document.getElementById('groupViewCount').innerText='👥 '+members.length+' member'+(members.length!==1?'s':'')+' • Tap to view members'; document.getElementById('groupViewMembersCount').innerText=members.length; document.getElementById('groupViewDesc').innerText=g.description||'No description yet.'; document.getElementById('groupViewBio').innerText='📝 Bio: '+(g.bio||'No bio yet.'); document.getElementById('groupViewWebsite').innerHTML=g.website?`<a href="${g.website}" target="_blank">${g.website}</a>`:'No website'; let admin=allUsers.find(u=>u.uid===g.createdBy) || allUsers.find(u=>u.uid===g.admin) || {name:'Admin'}; document.getElementById('groupViewAdmin').innerText='👑 '+(admin.name||'Admin')+' • '+(admin.email||''); let rules=g.rules||['1. Be respectful to everyone','2. No spam or scam','3. No hate speech','4. Keep chats clean']; if(typeof rules==='string') rules=rules.split('\n'); document.getElementById('groupViewRules').innerHTML=rules.map(r=>'• '+r).join('<br>'); document.getElementById('groupViewLink').innerText=getGroupJoinLink(gid); let mHtml=''; members.forEach(uid=>{ let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return; let isAdmin=uid===g.createdBy; mHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name} ${isAdmin?'👑':''}</b><br><small style="color:#888">${u.bio||''}</small><br><small style="color:#008069">🔗 ${getUserShareLink(uid)}</small></div><button onclick="viewProfile('${uid}')" style="background:#f0f2f5;border:none;padding:5px 10px;border-radius:14px;font-size:11px;cursor:pointer">View Profile</button></div>`; }); document.getElementById('groupViewMembers').innerHTML=mHtml||'No members yet'; let notIn=allUsers.filter(u=>u.uid!==me.uid && !members.includes(u.uid)); let addHtml=''; notIn.slice(0,20).forEach(u=>{ addHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name}</b><br><small style="color:#888">${u.email||''}</small></div><button onclick="addMemberToGroup('${gid}','${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:11px">+ Add</button></div>`; }); document.getElementById('groupAddMembers').innerHTML=addHtml||'Everyone is already in group'; document.getElementById('groupProfileModal').style.display='flex'; }
+function viewGroupProfile(gid){ viewingProfileUid=null; let g=groups.find(x=>x.id===gid); if(!g) return; viewingGroupId=gid; document.getElementById('groupViewAvatar').innerHTML='👥'; document.getElementById('groupViewName').innerText=g.name; let members=g.members||[]; document.getElementById('groupViewCount').innerText='👥 '+members.length+' member'+(members.length!==1?'s':'')+' • Tap to view members'; document.getElementById('groupViewMembersCount').innerText=members.length; document.getElementById('groupViewDesc').innerText=g.description||'No description yet.'; document.getElementById('groupViewBio').innerText='📝 Bio: '+(g.bio||'No bio yet.'); document.getElementById('groupViewWebsite').innerHTML=g.website?`<a href="${g.website}" target="_blank">${g.website}</a>`:'No website'; let admin=allUsers.find(u=>u.uid===g.createdBy) || allUsers.find(u=>u.uid===g.admin) || {name:'Admin'}; document.getElementById('groupViewAdmin').innerText='👑 '+(admin.name||'Admin')+' • '+(admin.email||''); let rules=g.rules||['1. Be respectful to everyone','2. No spam or scam','3. No hate speech','4. Keep chats clean']; if(typeof rules==='string') rules=rules.split('\n'); document.getElementById('groupViewRules').innerHTML=rules.map(r=>'• '+r).join('<br>'); document.getElementById('groupViewLink').innerText=getGroupJoinLink(gid); let mHtml=''; members.forEach(uid=>{ let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return; let isAdmin=uid===g.createdBy; mHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;min-width:0"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><b style="font-size:13px">${u.name} ${isAdmin?'👑':''}</b><br><small style="color:#888">${u.bio||''}</small><br><small style="color:#008069;word-break:break-all">🔗 ${getUserShareLink(uid)}</small></div><button onclick="viewProfile('${uid}')" style="background:#f0f2f5;border:none;padding:5px 10px;border-radius:14px;font-size:11px;cursor:pointer;flex-shrink:0">View Profile</button></div>`; }); document.getElementById('groupViewMembers').innerHTML=mHtml||'No members yet'; let notIn=allUsers.filter(u=>u.uid!==me.uid && !members.includes(u.uid)); let addHtml=''; notIn.slice(0,20).forEach(u=>{ addHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;min-width:0"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><b style="font-size:13px">${u.name}</b><br><small style="color:#888">${u.email||''}</small></div><button onclick="addMemberToGroup('${gid}','${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:11px;flex-shrink:0">+ Add</button></div>`; }); document.getElementById('groupAddMembers').innerHTML=addHtml||'Everyone is already in group'; document.getElementById('groupProfileModal').style.display='flex'; }
 function closeGroupProfile(){ document.getElementById('groupProfileModal').style.display='none'; }
 function chatFromGroupProfile(){ if(!viewingGroupId) return; closeGroupProfile(); openGroup(viewingGroupId); }
 function editGroupFromProfile(){ closeGroupProfile(); openGroupEdit(viewingGroupId); }
@@ -468,81 +426,14 @@ function getLocalMsgs(){ try{ return JSON.parse(localStorage.getItem('et_msgs')|
 function saveLocalMsgs(m){ localStorage.setItem('et_msgs', JSON.stringify(m)); }
 function getSavedChats(){ try{ return JSON.parse(localStorage.getItem('et_saved_chats')||'[]'); }catch(e){ return []; } }
 function saveChatToDisplay(uid, time){ if(!me) return; let saved=getSavedChats(); let entry={me:me.uid, other:uid, lastAt:(time||new Date()).toISOString(), timestamp:(time||new Date()).getTime()}; saved=saved.filter(s=>!(s.me===me.uid && s.other===uid)); saved.unshift(entry); localStorage.setItem('et_saved_chats', JSON.stringify(saved)); }
-function getChatUserIds(){
-  // INCLUDES new users who sent you a message even if you never opened them - they appear in Chats with unread
-  let ids=new Set();
-  let msgs=getLocalMsgs();
-  msgs.forEach(m=>{ if(m.from===me.uid && m.to) ids.add(m.to); if(m.to===me.uid) ids.add(m.from); });
-  getSavedChats().filter(s=>s.me===me.uid).forEach(s=>ids.add(s.other));
-  Object.keys(unreadMap).forEach(uid=>{ if(unreadMap[uid]>0) ids.add(uid); });
-  return ids;
-}
+function getChatUserIds(){ let ids=new Set(); let msgs=getLocalMsgs(); msgs.forEach(m=>{ if(m.from===me.uid && m.to) ids.add(m.to); if(m.to===me.uid) ids.add(m.from); }); getSavedChats().filter(s=>s.me===me.uid).forEach(s=>ids.add(s.other)); Object.keys(unreadMap).forEach(uid=>{ if(unreadMap[uid]>0) ids.add(uid); }); return ids; }
 function getLastMessageWith(uid){ let msgs=getLocalMsgs().filter(m=>(m.from===me.uid && m.to===uid)||(m.from===uid && m.to===me.uid)); if(!msgs.length) return null; msgs.sort((a,b)=>parseTime(a.createdAt)-parseTime(b.createdAt)); return msgs[msgs.length-1]; }
 function getChatTime(uid){ let last=getLastMessageWith(uid); if(last) return parseTime(last.createdAt); let saved=getSavedChats().find(s=>s.me===me.uid && s.other===uid); if(saved) return new Date(saved.timestamp||saved.lastAt); return new Date(0); }
 function getUnread(uid){ return unreadMap[uid]||0; }
 function updateTotalUnread(){ let total=Object.values(unreadMap).reduce((a,b)=>a+b,0); let el=document.getElementById('totalUnread'); if(total>0){ el.innerText=total; el.style.display='inline-block'; } else { el.style.display='none'; } updateInboxBanner(); }
-function renderChats(q=''){
-  if(!me) return;
-  let chatIds=getChatUserIds();
-  // Show ALL users who ever messaged you, even new / never opened - plus allUsers fallback for unread
-  let chatUsers=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && chatIds.has(u.uid) && u.name.toLowerCase().includes((q||'').toLowerCase()));
-  // If sender is new and not in allUsers yet, create temp entry from msgs so they still show
-  chatIds.forEach(uid=>{
-    if(!allUsers.find(u=>u.uid===uid) && uid!==me.uid){
-      let m=getLocalMsgs().find(x=>x.from===uid || x.to===uid);
-      let temp={uid:uid, name:m?.senderName||'New User', email:'', bio:'New user 👋 Tap to view profile', photoURL:'', isOnline:true};
-      if(!allUsers.find(u=>u.uid===uid)) allUsers.push(temp);
-      if(temp.name.toLowerCase().includes((q||'').toLowerCase())) chatUsers.push(temp);
-    }
-  });
-  let myGroups=groups.filter(g=>{ let isMember=(g.members||[]).includes(me.uid) || g.createdBy===me.uid; return (isMember || (q && g.name.toLowerCase().includes(q.toLowerCase()))) && g.name.toLowerCase().includes((q||'').toLowerCase()); });
-  let combined=[];
-  chatUsers.forEach(u=>combined.push({type:'user', data:u, time:getChatTime(u.uid), unread:getUnread(u.uid)}));
-  myGroups.forEach(g=>combined.push({type:'group', data:g, time:getGroupTime(g.id), unread:0}));
-  // FAST SORT: Unread first, then newest - so new sender jumps to top
-  combined.sort((a,b)=>{
-    if((b.unread>0)!==(a.unread>0)) return (b.unread>0?1:0)-(a.unread>0?1:0);
-    return b.time.getTime()-a.time.getTime();
-  });
-  document.getElementById('chatCount').innerText=combined.length||'';
-  updateTotalUnread();
-  let grouped={};
-  combined.forEach(item=>{ let lbl=item.unread>0?'📩 UNREAD — NEW MESSAGES':dateLabel(item.time); if(!grouped[lbl]) grouped[lbl]=[]; grouped[lbl].push(item); });
-  let html='';
-  Object.keys(grouped).forEach(lbl=>{
-    let isUnreadGroup=lbl.includes('UNREAD');
-    html+=`<div class="chatGroupLabel" style="${isUnreadGroup?'background:#ff3b30;color:#fff':''}">${lbl} • ${grouped[lbl].length}</div>`;
-    grouped[lbl].forEach(item=>{
-      if(item.type==='user'){
-        let u=item.data; let last=getLastMessageWith(u.uid); let chatTime=item.time;
-        let lastText=last?(last.type==='image'?'📷 Photo':last.type==='audio'?'🎤 Voice note':last.type==='file'?'📄 '+(last.fileName||'File'):last.text):'Tap to open chat • Tap pic to view profile';
-        let exactTime=formatExactChatTime(chatTime); let unread=item.unread;
-        html+=`<div class="user ${unread?'unreadRow':''}" onclick="openChat('${u.uid}')">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="event.stopPropagation(); openChat('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?'• 📩 NEW':''}</b><br><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${u.bio||''}</small><small style="color:${unread?'#008069':'#667781'};font-weight:${unread?'700':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br>${unread?`<span class="unreadBadge">${unread}</span>`:'<span>💬</span>'}<br><small style="color:#008069;font-size:10px;cursor:pointer" onclick="event.stopPropagation(); viewProfile('${u.uid}')">👤 View Profile</small></div></div>`;
-      } else {
-        let g=item.data; let last=getGroupLastMsg(g.id); let chatTime=item.time; let lastText=last?(last.type==='image'?'📷 Photo':(allUsers.find(u=>u.uid===last.from)?.name||'Someone')+': '+(last.text||'')):(g.description||'Tap to open group'); let exactTime=formatExactChatTime(chatTime); let memberCount=(g.members||[]).length;
-        html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar" onclick="event.stopPropagation(); viewGroupProfile('${g.id}')" title="View group profile">👥</div><div style="flex:1;min-width:0" onclick="event.stopPropagation(); openGroup('${g.id}')"><b style="font-size:14px">${g.name} <span class="groupBadge">GROUP • ${memberCount}</span></b><br><small style="color:#008069;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${g.description||g.bio||''}</small><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br><span>👥 ${memberCount}</span></div></div>`;
-      }
-    });
-  });
-  document.getElementById('chatsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No chats yet.<br>Go to <b>Contacts</b> → Tap someone → Send a message.<br>Or go to <b>Groups</b> → Create Group.<br>Groups will show here too.</div>';
-  let allContacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email);
-  document.getElementById('contactCount').innerText=allContacts.length||'';
-  document.getElementById('groupCount').innerText=myGroups.length||'';
-}
-function renderContacts(q=''){
-  if(!me) return;
-  let contacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase()));
-  // Unread contacts on top in Contacts too
-  contacts.sort((a,b)=>{ let ua=getUnread(a.uid), ub=getUnread(b.uid); if((ub>0)!==(ua>0)) return (ub>0?1:0)-(ua>0?1:0); return a.name.localeCompare(b.name); });
-  document.getElementById('contactCount').innerText=contacts.length||'';
-  let html='';
-  contacts.forEach(u=>{
-    let unread=getUnread(u.uid);
-    html+=`<div class="user ${unread?'unreadRow':''}">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="openChat('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?`• <span style="color:#ff3b30">📩 ${unread} unread</span>`:''}</b><br><small style="color:#008069">${u.bio||''}</small><br><small style="color:#667781">${u.email||''} • ${u.phone||''}</small><br><small style="color:#008069">🔗 ${getUserShareLink(u.uid)} — ${u.name}'s own link</small><br><small style="color:#008069;font-weight:700;cursor:pointer" onclick="viewProfile('${u.uid}')">👤 Tap to View ${u.name}'s Profile</small></div><div style="text-align:center">${unread?`<span class="unreadBadge">${unread}</span><br>`:''}<button onclick="viewProfile('${u.uid}')" style="background:#e7f8f3;border:none;padding:8px 10px;border-radius:20px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👤 View</button><br><button onclick="openChat('${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:8px 10px;border-radius:20px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">💬 Chat</button></div></div>`;
-  });
-  document.getElementById('contactsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No contacts yet.<br>Ask friends to Create Account.</div>';
-}
-function renderGroups(){ let html=''; groups.forEach(g=>{ let memberCount=(g.members||[]).length; let isMember=(g.members||[]).includes(me.uid); html+=`<div class="user"><div class="avatar" onclick="viewGroupProfile('${g.id}')">👥</div><div style="flex:1;min-width:0" onclick="openGroup('${g.id}')"><b>${g.name} <span class="groupBadge">${memberCount} members</span></b><br><small style="color:#008069">${g.description||''}</small><br><small style="color:#667781">${g.bio||''} • ${g.website||''}</small><br><small style="color:#008069">🔗 ${getGroupJoinLink(g.id)} — Group link only</small></div><div style="text-align:right"><button onclick="viewGroupProfile('${g.id}')" style="background:#e7f8f3;border:none;padding:6px 10px;border-radius:14px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👥 Profile</button><br><button onclick="${isMember?`openGroup('${g.id}')`:`autoJoinGroup('${g.id}')`}" style="background:${isMember?'#00a884':'#111b21'};color:#fff;border:none;padding:6px 10px;border-radius:14px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">${isMember?'💬 Open':'✅ Join'}</button></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet. Create one above.</p>'; document.getElementById('groupCount').innerText=groups.filter(g=>(g.members||[]).includes(me.uid)).length||''; }
+function renderChats(q=''){ if(!me) return; let chatIds=getChatUserIds(); let chatUsers=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && chatIds.has(u.uid) && u.name.toLowerCase().includes((q||'').toLowerCase())); chatIds.forEach(uid=>{ if(!allUsers.find(u=>u.uid===uid) && uid!==me.uid){ let m=getLocalMsgs().find(x=>x.from===uid || x.to===uid); let temp={uid:uid, name:m?.senderName||'New User', email:'', bio:'New user 👋 Tap to view profile', photoURL:'', isOnline:true}; if(!allUsers.find(u=>u.uid===uid)) allUsers.push(temp); if(temp.name.toLowerCase().includes((q||'').toLowerCase())) chatUsers.push(temp); } }); let myGroups=groups.filter(g=>{ let isMember=(g.members||[]).includes(me.uid) || g.createdBy===me.uid; return (isMember || (q && g.name.toLowerCase().includes(q.toLowerCase()))) && g.name.toLowerCase().includes((q||'').toLowerCase()); }); let combined=[]; chatUsers.forEach(u=>combined.push({type:'user', data:u, time:getChatTime(u.uid), unread:getUnread(u.uid)})); myGroups.forEach(g=>combined.push({type:'group', data:g, time:getGroupTime(g.id), unread:0})); combined.sort((a,b)=>{ if((b.unread>0)!==(a.unread>0)) return (b.unread>0?1:0)-(a.unread>0?1:0); return b.time.getTime()-a.time.getTime(); }); document.getElementById('chatCount').innerText=combined.length||''; updateTotalUnread(); let grouped={}; combined.forEach(item=>{ let lbl=item.unread>0?'📩 UNREAD — NEW MESSAGES':dateLabel(item.time); if(!grouped[lbl]) grouped[lbl]=[]; grouped[lbl].push(item); }); let html=''; Object.keys(grouped).forEach(lbl=>{ let isUnreadGroup=lbl.includes('UNREAD'); html+=`<div class="chatGroupLabel" style="${isUnreadGroup?'background:#ff3b30;color:#fff':''}">${lbl} • ${grouped[lbl].length}</div>`; grouped[lbl].forEach(item=>{ if(item.type==='user'){ let u=item.data; let last=getLastMessageWith(u.uid); let chatTime=item.time; let lastText=last?(last.type==='image'?'📷 Photo':last.type==='audio'?'🎤 Voice note':last.type==='file'?'📄 '+(last.fileName||'File'):last.text):'Tap to open chat • Tap pic to view profile'; let exactTime=formatExactChatTime(chatTime); let unread=item.unread; html+=`<div class="user ${unread?'unreadRow':''}" onclick="openChat('${u.uid}')">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="event.stopPropagation(); openChat('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?'• 📩 NEW':''}</b><br><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${u.bio||''}</small><small style="color:${unread?'#008069':'#667781'};font-weight:${unread?'700':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px;flex-shrink:0"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br>${unread?`<span class="unreadBadge">${unread}</span>`:'<span>💬</span>'}<br><small style="color:#008069;font-size:10px;cursor:pointer" onclick="event.stopPropagation(); viewProfile('${u.uid}')">👤 View Profile</small></div></div>`; } else { let g=item.data; let last=getGroupLastMsg(g.id); let chatTime=item.time; let lastText=last?(last.type==='image'?'📷 Photo':(allUsers.find(u=>u.uid===last.from)?.name||'Someone')+': '+(last.text||'')):(g.description||'Tap to open group'); let exactTime=formatExactChatTime(chatTime); let memberCount=(g.members||[]).length; html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar" onclick="event.stopPropagation(); viewGroupProfile('${g.id}')" title="View group profile">👥</div><div style="flex:1;min-width:0" onclick="event.stopPropagation(); openGroup('${g.id}')"><b style="font-size:14px">${g.name} <span class="groupBadge">GROUP • ${memberCount}</span></b><br><small style="color:#008069;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${g.description||g.bio||''}</small><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px;flex-shrink:0"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br><span>👥 ${memberCount}</span></div></div>`; } }); }); document.getElementById('chatsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No chats yet.<br>Go to <b>Contacts</b> → Tap someone → Send a message.<br>Or go to <b>Groups</b> → Create Group.<br>Groups will show here too.</div>'; let allContacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email); document.getElementById('contactCount').innerText=allContacts.length||''; document.getElementById('groupCount').innerText=myGroups.length||''; }
+function renderContacts(q=''){ if(!me) return; let contacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase())); contacts.sort((a,b)=>{ let ua=getUnread(a.uid), ub=getUnread(b.uid); if((ub>0)!==(ua>0)) return (ub>0?1:0)-(ua>0?1:0); return a.name.localeCompare(b.name); }); document.getElementById('contactCount').innerText=contacts.length||''; let html=''; contacts.forEach(u=>{ let unread=getUnread(u.uid); html+=`<div class="user ${unread?'unreadRow':''}">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="openChat('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?`• <span style="color:#ff3b30">📩 ${unread} unread</span>`:''}</b><br><small style="color:#008069">${u.bio||''}</small><br><small style="color:#667781;word-break:break-word">${u.email||''} • ${u.phone||''}</small><br><small style="color:#008069;word-break:break-all">🔗 ${getUserShareLink(u.uid)} — ${u.name}'s own link</small><br><small style="color:#008069;font-weight:700;cursor:pointer" onclick="viewProfile('${u.uid}')">👤 Tap to View ${u.name}'s Profile</small></div><div style="text-align:center;flex-shrink:0">${unread?`<span class="unreadBadge">${unread}</span><br>`:''}<button onclick="viewProfile('${u.uid}')" style="background:#e7f8f3;border:none;padding:8px 10px;border-radius:20px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👤 View</button><br><button onclick="openChat('${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:8px 10px;border-radius:20px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">💬 Chat</button></div></div>`; }); document.getElementById('contactsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No contacts yet.<br>Ask friends to Create Account.</div>'; }
+function renderGroups(){ let html=''; groups.forEach(g=>{ let memberCount=(g.members||[]).length; let isMember=(g.members||[]).includes(me.uid); html+=`<div class="user"><div class="avatar" onclick="viewGroupProfile('${g.id}')">👥</div><div style="flex:1;min-width:0" onclick="openGroup('${g.id}')"><b>${g.name} <span class="groupBadge">${memberCount} members</span></b><br><small style="color:#008069">${g.description||''}</small><br><small style="color:#667781;word-break:break-word">${g.bio||''} • ${g.website||''}</small><br><small style="color:#008069;word-break:break-all">🔗 ${getGroupJoinLink(g.id)} — Group link only</small></div><div style="text-align:right;flex-shrink:0"><button onclick="viewGroupProfile('${g.id}')" style="background:#e7f8f3;border:none;padding:6px 10px;border-radius:14px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👥 Profile</button><br><button onclick="${isMember?`openGroup('${g.id}')`:`autoJoinGroup('${g.id}')`}" style="background:${isMember?'#00a884':'#111b21'};color:#fff;border:none;padding:6px 10px;border-radius:14px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">${isMember?'💬 Open':'✅ Join'}</button></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet. Create one above.</p>'; document.getElementById('groupCount').innerText=groups.filter(g=>(g.members||[]).includes(me.uid)).length||''; }
 async function createGroup(){ const name=document.getElementById('groupName').value.trim(); const desc=document.getElementById('groupDesc').value.trim(); const bio=document.getElementById('groupBio').value.trim(); const website=document.getElementById('groupWebsite').value.trim(); if(!name) return showToast("Enter group name"); let newGroup={name, description:desc, bio, website, members:[me.uid], createdBy:me.uid, admin:me.uid, createdAt:new Date().toISOString(), rules:['1. Be respectful to everyone','2. No spam or scam','3. No hate speech','4. Keep chats clean'], joinLink:''}; let gid='g'+Date.now(); newGroup.id=gid; newGroup.joinLink=getGroupJoinLink(gid); if(db){ try{ let ref=await db.collection("groups").add({name, description:desc, bio, website, members:[me.uid], createdBy:me.uid, admin:me.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), rules:newGroup.rules}); newGroup.id=ref.id; newGroup.joinLink=getGroupJoinLink(ref.id); db.collection("groups").doc(ref.id).update({joinLink:newGroup.joinLink}).catch(()=>{}); groups.push(newGroup); }catch(e){ groups.push(newGroup); let lg=getLocalGroups(); lg.push(newGroup); saveLocalGroups(lg); } } else { groups.push(newGroup); let lg=getLocalGroups(); lg.push(newGroup); saveLocalGroups(lg); } document.getElementById('groupName').value=''; document.getElementById('groupDesc').value=''; document.getElementById('groupBio').value=''; document.getElementById('groupWebsite').value=''; renderGroups(); renderChats(''); showToast("✅ Group created — Share join link!"); setTimeout(()=>viewGroupProfile(newGroup.id), 400); }
 function getStatusViewers(statusId){ try{ let all=JSON.parse(localStorage.getItem('et_status_views')||'{}'); return all[statusId]||[]; }catch(e){ return []; } }
 function hasViewed(statusId){ if(!me) return false; return getStatusViewers(statusId).some(v=>v.uid===me.uid); }
@@ -552,9 +443,41 @@ function canSeeStatus(fromUid){ return true; }
 function getLastStatusPerUser(){ let valid=statuses.filter(s=>{ let d=parseTime(s.createdAt); return (Date.now()-d.getTime())<=24*60*60*1000; }); valid.sort((a,b)=>parseTime(b.createdAt)-parseTime(a.createdAt)); let map=new Map(); valid.forEach(s=>{ if(!map.has(s.from)) map.set(s.from, s); }); return map; }
 async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return showToast("Type status first"); let local={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text',id:'s'+Date.now(),viewers:[],viewCount:0}; if(db){ try{ await db.collection("statuses").add({text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'text',viewers:[],viewCount:0}); }catch(e){} } let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls)); if(!db) { statuses.unshift(local); renderStatusDots(); } document.getElementById('statusText').value=''; showToast("Status posted"); }
 async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await compressImage(f); if(db){ try{ await db.collection("statuses").add({text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'image',viewers:[],viewCount:0}); }catch(e){} } let local={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image',id:'s'+Date.now(),viewers:[],viewCount:0}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls)); if(!db){ statuses.unshift(local); renderStatusDots(); } el.value=''; showToast("Status posted"); }
-function flowStatusCircle(){ let el=document.getElementById('statusLine'); if(!el) return; let max=el.scrollWidth - el.clientWidth; if(el.scrollLeft >= max-10){ el.scrollTo({left:0, behavior:'smooth'}); } else { el.scrollBy({left:120, behavior:'smooth'}); } }
-function renderStatusDots(){ if(!me) return; let lastMap=getLastStatusPerUser(); let myLast=lastMap.get(me.uid); let others=[...lastMap.entries()].filter(([uid,s])=>uid!==me.uid && canSeeStatus(uid)); others.sort((a,b)=>parseTime(b[1].createdAt)-parseTime(a[1].createdAt)); let seen=new Set(); others=others.filter(([uid])=>{ if(seen.has(uid)) return false; seen.add(uid); return true; }); let front=''; if(myLast){ let count=getViewerCount(myLast); front=`<div class="statusDotWrap" onclick="openMyStatus()" title="My Status • ${count} views" style="min-width:64px"><div style="position:relative"><div class="statusDot mine">${myLast.image?`<img src="${myLast.image}">`:(me.photoURL?`<img src="${me.photoURL}">`:'✓')}</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • ${count}👁️</span></div>`; document.getElementById('statusBarRight').innerText='👁️ '+count+' views'; document.getElementById('lastStatusPreview').innerText='You: '+(myLast.text||'📷 Photo')+' • '+formatTime(parseTime(myLast.createdAt))+' • '+count+' views • Tap to view'; } else { front=`<div class="statusDotWrap" onclick="document.getElementById('statusPicInput').click()" title="Add status" style="min-width:64px"><div style="position:relative"><div class="statusDot empty">+</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • Add</span></div>`; document.getElementById('statusBarRight').innerText='👁️ 0 views'; document.getElementById('lastStatusPreview').innerText='No status yet — tap + to add'; } document.getElementById('myStatusFront').innerHTML=front; let html=''; if(!others.length){ html=`<span style="font-size:12px;color:#999;margin-left:6px;white-space:nowrap">No status — chat with someone to see theirs • Swipe ↻ to flow</span>`; } else { others.forEach(([uid,s])=>{ let viewed=hasViewed(s.id); html+=`<div class="statusDotWrap" data-status-uid="${uid}" onclick="openStatusViewer('${uid}')" title="${s.fromName} • ${formatTime(parseTime(s.createdAt))}"><div class="statusDot ${viewed?'viewed':''}">${s.image?`<img src="${s.image}">`:(s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase())}</div><span class="statusDotLabel">${s.fromName}</span></div>`; }); } document.getElementById('statusLine').innerHTML=html; let el=document.getElementById('statusLine'); el.onscroll=()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5 && others.length>2){ setTimeout(()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) el.scrollTo({left:0, behavior:'smooth'}); }, 800); } }; }
-function openViewersDrawer(mode){ let viewers=[]; let title='👁️ Viewers'; let subtitle=''; if(mode==='my'){ let lastMap=getLastStatusPerUser(); let myLast=lastMap.get(me.uid); if(myLast){ viewers=getStatusViewers(myLast.id); title='👁️ Viewers — Your Last Status'; subtitle=(myLast.text||'📷 Photo')+' • '+viewers.length+' unique view'+(viewers.length!==1?'s':'')+' • 1 view per person'; } else { viewers=[]; title='👁️ Viewers'; subtitle='No status yet'; } } else if(mode==='current'){ let s=window._viewerList ? window._viewerList[window._viewerIndex||0] : null; if(s){ viewers=getStatusViewers(s.id); title='👁️ Viewers'; subtitle=(s.text||'Photo')+' • '+viewers.length+' view'+(viewers.length!==1?'s':''); } } document.getElementById('viewersTitle').innerText=title; document.getElementById('viewersSubtitle').innerText=subtitle; let html=''; if(!viewers.length) html='<div style="padding:24px;text-align:center;color:#888">No views yet.<br>Only people you chat with can see your status.</div>'; else { let uniq=new Map(); viewers.forEach(v=>{ if(!uniq.has(v.uid)) uniq.set(v.uid, v); }); let list=[...uniq.values()].sort((a,b)=>new Date(b.at)-new Date(a.at)); list.forEach(v=>{ let user=allUsers.find(u=>u.uid===v.uid); let pic=v.photoURL || user?.photoURL; let name=v.name || user?.name || 'User'; let when=v.at?formatDate(new Date(v.at))+' • '+formatTime(new Date(v.at)):''; html+=`<div class="viewerRow"><div class="avatar">${pic?`<img src="${pic}">`:name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:14px">${name}</b><br><small style="color:#888">${when} • 1 view</small></div><span style="background:#e7f8f3;color:#008069;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700">👁️ Viewed</span></div>`; }); } document.getElementById('viewersListContent').innerHTML=html; document.getElementById('viewersDrawer').style.display='flex'; }
+function flowStatusCircle(){ let el=document.getElementById('statusLine'); if(!el) return; let max=el.scrollWidth - el.clientWidth; if(el.scrollLeft >= max-10){ el.scrollTo({left:0, behavior:'smooth'}); } else { el.scrollBy({left:130, behavior:'smooth'}); } }
+function renderStatusDots(){
+  if(!me) return;
+  let lastMap=getLastStatusPerUser();
+  let myLast=lastMap.get(me.uid);
+  let others=[...lastMap.entries()].filter(([uid,s])=>uid!==me.uid && canSeeStatus(uid));
+  others.sort((a,b)=>parseTime(b[1].createdAt)-parseTime(a[1].createdAt));
+  let seen=new Set(); others=others.filter(([uid])=>{ if(seen.has(uid)) return false; seen.add(uid); return true; });
+  let front='';
+  if(myLast){
+    let count=getViewerCount(myLast);
+    front=`<div class="statusDotWrap" onclick="openMyStatus()" title="My Status • ${count} views"><div style="position:relative"><div class="statusDot mine">${myLast.image?`<img src="${myLast.image}">`:(me.photoURL?`<img src="${me.photoURL}">`:'✓')}</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You</span><span class="statusDotSub">${count} 👁️ • Tap</span></div>`;
+    document.getElementById('statusBarRight').innerText='👁️ '+count+' views';
+    document.getElementById('lastStatusPreview').innerText='You: '+(myLast.text||'📷 Photo')+' • '+formatTime(parseTime(myLast.createdAt))+' • '+count+' views • Tap to view';
+  } else {
+    front=`<div class="statusDotWrap" onclick="document.getElementById('statusPicInput').click()" title="Add status"><div style="position:relative"><div class="statusDot empty">+</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You</span><span class="statusDotSub">+ Add Status</span></div>`;
+    document.getElementById('statusBarRight').innerText='👁️ 0 views';
+    document.getElementById('lastStatusPreview').innerText='No status yet — tap + to add';
+  }
+  document.getElementById('myStatusFront').innerHTML=front;
+  let html='';
+  if(!others.length){
+    html=`<span style="font-size:12px;color:#999;margin-left:6px;white-space:nowrap">No status — chat with someone to see theirs • Swipe ↻</span>`;
+  } else {
+    others.forEach(([uid,s])=>{
+      let viewed=hasViewed(s.id);
+      let count=getViewerCount(s);
+      html+=`<div class="statusDotWrap" data-status-uid="${uid}" onclick="openStatusViewer('${uid}')" title="${s.fromName} • ${formatTime(parseTime(s.createdAt))}"><div style="position:relative"><div class="statusDot ${viewed?'viewed':''}">${s.image?`<img src="${s.image}">`:(s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase())}</div></div><span class="statusDotLabel">${s.fromName}</span><span class="statusDotSub">${viewed?'✓ Viewed • '+count+' 👁️':'● NEW • '+count+' 👁️'}</span></div>`;
+    });
+  }
+  document.getElementById('statusLine').innerHTML=html;
+  let el=document.getElementById('statusLine');
+  el.onscroll=()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5 && others.length>2){ setTimeout(()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) el.scrollTo({left:0, behavior:'smooth'}); }, 800); } };
+}
+function openViewersDrawer(mode){ let viewers=[]; let title='👁️ Viewers'; let subtitle=''; if(mode==='my'){ let lastMap=getLastStatusPerUser(); let myLast=lastMap.get(me.uid); if(myLast){ viewers=getStatusViewers(myLast.id); title='👁️ Viewers — Your Last Status'; subtitle=(myLast.text||'📷 Photo')+' • '+viewers.length+' unique view'+(viewers.length!==1?'s':'')+' • 1 view per person'; } else { viewers=[]; title='👁️ Viewers'; subtitle='No status yet'; } } else if(mode==='current'){ let s=window._viewerList ? window._viewerList[window._viewerIndex||0] : null; if(s){ viewers=getStatusViewers(s.id); title='👁️ Viewers'; subtitle=(s.text||'Photo')+' • '+viewers.length+' view'+(viewers.length!==1?'s':''); } } document.getElementById('viewersTitle').innerText=title; document.getElementById('viewersSubtitle').innerText=subtitle; let html=''; if(!viewers.length) html='<div style="padding:24px;text-align:center;color:#888">No views yet.<br>Only people you chat with can see your status.</div>'; else { let uniq=new Map(); viewers.forEach(v=>{ if(!uniq.has(v.uid)) uniq.set(v.uid, v); }); let list=[...uniq.values()].sort((a,b)=>new Date(b.at)-new Date(a.at)); list.forEach(v=>{ let user=allUsers.find(u=>u.uid===v.uid); let pic=v.photoURL || user?.photoURL; let name=v.name || user?.name || 'User'; let when=v.at?formatDate(new Date(v.at))+' • '+formatTime(new Date(v.at)):''; html+=`<div class="viewerRow"><div class="avatar">${pic?`<img src="${pic}">`:name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><b style="font-size:14px">${name}</b><br><small style="color:#888">${when} • 1 view</small></div><span style="background:#e7f8f3;color:#008069;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;flex-shrink:0">👁️ Viewed</span></div>`; }); } document.getElementById('viewersListContent').innerHTML=html; document.getElementById('viewersDrawer').style.display='flex'; }
 function openViewersFromViewer(){ openViewersDrawer('current'); }
 function closeViewersDrawer(){ document.getElementById('viewersDrawer').style.display='none'; }
 function openMyStatus(){ let mine=statuses.filter(s=>s.from===me.uid).sort((a,b)=>parseTime(a.createdAt)-parseTime(b.createdAt)); if(!mine.length){ document.getElementById('statusPicInput').click(); return; } window._viewerList=mine; showStatusAt(mine.length-1); document.getElementById('statusViewer').style.display='flex'; }
@@ -563,125 +486,21 @@ function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ 
 function nextStatus(){ showStatusAt((window._viewerIndex||0)+1); }
 function closeStatusViewer(){ document.getElementById('statusViewer').style.display='none'; }
 function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; showToast("Reply sent"); document.getElementById('statusReply').value=''; closeStatusViewer(); }
-function openChat(uid){
-  // Even new user: ensure they exist in allUsers so profile + chat works
-  let u=allUsers.find(x=>x.uid===uid);
-  if(!u){ u={uid:uid, name:'User', email:'', bio:'', photoURL:'', isOnline:true}; allUsers.push(u); }
-  chattingWith=u; chattingGroup=null;
-  // Clear unread for this user + hide banner
-  unreadMap[uid]=0; saveUnread(); updateTotalUnread();
-  if(lastInboxUid===uid){ lastInboxUid=null; lastInboxText=''; }
-  updateInboxBanner();
-  let now=new Date(); saveChatToDisplay(uid, now);
-  document.getElementById('chatHeader').innerText=u.name; document.getElementById('chatAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); updateHeader();
-  document.getElementById('typing').innerText='';
-  let last=getLastMessageWith(uid); if(last){ let d=parseTime(last.createdAt); document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); } else { document.getElementById('chatLastTime').innerText='No messages yet — Tap pic to view profile'; }
-  document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); startLiveChat(); renderChats(''); renderContacts(''); renderStatusDots();
-}
+function openChat(uid){ let u=allUsers.find(x=>x.uid===uid); if(!u){ u={uid:uid, name:'User', email:'', bio:'', photoURL:'', isOnline:true}; allUsers.push(u); } chattingWith=u; chattingGroup=null; unreadMap[uid]=0; saveUnread(); updateTotalUnread(); if(lastInboxUid===uid){ lastInboxUid=null; lastInboxText=''; } updateInboxBanner(); let now=new Date(); saveChatToDisplay(uid, now); document.getElementById('chatHeader').innerText=u.name; document.getElementById('chatAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); updateHeader(); document.getElementById('typing').innerText=''; let last=getLastMessageWith(uid); if(last){ let d=parseTime(last.createdAt); document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); } else { document.getElementById('chatLastTime').innerText='No messages yet — Tap pic to view profile'; } document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); startLiveChat(); renderChats(''); renderContacts(''); renderStatusDots(); }
 function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; if(!chattingGroup) return; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; updateHeader(); document.getElementById('chatLastTime').innerText=''; document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); startLiveChat(); }
-
-// ===== FAST MESSAGES + UNREAD FOR NEW USERS =====
-function handleIncomingMessage(f){
-  let created = f.createdAt?.toDate ? f.createdAt.toDate().toISOString() : (typeof f.createdAt==='string'?f.createdAt:new Date().toISOString());
-  let local=getLocalMsgs();
-  if(local.find(m=>m.fbId===f.id || (m.text===f.text && m.from===f.from && Math.abs(parseTime(m.createdAt)-parseTime(created))<3000))) return;
-  // Ensure sender exists even if new / never seen before - so profile + chat + unread works
-  if(f.from!==me.uid && !allUsers.find(u=>u.uid===f.from)){
-    let newU={uid:f.from, name:f.senderName||f.fromName||'New User', email:'', phone:'', bio:'New user 👋 Tap pic to view profile', website:'', photoURL:f.senderPhoto||f.photoURL||'', isOnline:true};
-    allUsers.push(newU);
-    let users=getLocalUsers(); if(!users.find(u=>u.uid===f.from)) { users.push({...newU, pass:''}); saveLocalUsers(users); }
-  }
-  let msg={fbId:f.id, from:f.from,to:f.to,groupId:f.groupId||null,text:f.text,type:f.type||'text',fileName:f.fileName||'',createdAt:created,timestamp:parseTime(created).getTime(), senderName:f.senderName||f.fromName||''};
-  local.push(msg); saveLocalMsgs(local);
-  if(f.to===me.uid || f.groupId){
-    let sender=allUsers.find(u=>u.uid===f.from);
-    let senderName=sender?.name||f.senderName||'Someone';
-    let isCurrentChat = (chattingWith && f.from===chattingWith.uid) || (chattingGroup && f.groupId===chattingGroup.id);
-    if(isCurrentChat){ appendSingleMessage(msg); }
-    else {
-      if(f.from!==me.uid && !f.groupId){
-        // NEW USER OR OLD: always count unread, save chat, show inbox banner on top
-        unreadMap[f.from]=(unreadMap[f.from]||0)+1; saveUnread();
-        lastInboxUid=f.from; lastInboxText=(f.type==='image'?'📷 Photo':f.type==='audio'?'🎤 Voice':(f.text||'New message')).slice(0,50);
-        saveChatToDisplay(f.from, parseTime(created));
-        updateTotalUnread(); updateInboxBanner();
-        showToast("📩 New message from "+senderName+": "+lastInboxText);
-        // Vibrate / title flash for attention
-        try{ navigator.vibrate && navigator.vibrate(200); }catch(e){}
-        document.title='📩 ('+Object.values(unreadMap).reduce((a,b)=>a+b,0)+') Easy Talkers';
-        setTimeout(()=>{ document.title='Easy Talkers ✨'; }, 3000);
-      }
-    }
-    renderChats(''); renderContacts('');
-  }
-}
-function startGlobalListener(){
-  if(!db) return;
-  if(unsubGlobal) unsubGlobal();
-  // FAST: Listen to all new messages, limit 100, instant onSnapshot
-  unsubGlobal=db.collection("messages").orderBy("createdAt","desc").limit(100).onSnapshot(snap=>{
-    snap.docChanges().forEach(change=>{
-      if(change.type==='added'){
-        let d=change.doc.data(); let f={id:change.doc.id, ...d};
-        if(f.from===me.uid) return;
-        if(f.to===me.uid || f.groupId){ handleIncomingMessage(f); }
-      }
-    });
-  }, ()=>{});
-  // FAST: Also listen to users so new users appear instantly
-  db.collection("users").onSnapshot(s=>{
-    let fb=s.docs.map(d=>d.data());
-    let changed=false;
-    fb.forEach(f=>{
-      if(!allUsers.find(m=>m.email===f.email && f.email)){
-        allUsers.push({...f, pass:''}); changed=true;
-      } else {
-        let ex=allUsers.find(m=>m.email===f.email); if(ex) Object.assign(ex, f);
-      }
-      if(!allUsers.find(m=>m.uid===f.uid)){ allUsers.push({...f, pass:''}); changed=true; }
-    });
-    if(changed){ renderChats(''); renderContacts(''); }
-  }, ()=>{});
-}
+function handleIncomingMessage(f){ let created = f.createdAt?.toDate ? f.createdAt.toDate().toISOString() : (typeof f.createdAt==='string'?f.createdAt:new Date().toISOString()); let local=getLocalMsgs(); if(local.find(m=>m.fbId===f.id || (m.text===f.text && m.from===f.from && Math.abs(parseTime(m.createdAt)-parseTime(created))<3000))) return; if(f.from!==me.uid && !allUsers.find(u=>u.uid===f.from)){ let newU={uid:f.from, name:f.senderName||f.fromName||'New User', email:'', phone:'', bio:'New user 👋 Tap pic to view profile', website:'', photoURL:f.senderPhoto||f.photoURL||'', isOnline:true}; allUsers.push(newU); let users=getLocalUsers(); if(!users.find(u=>u.uid===f.from)) { users.push({...newU, pass:''}); saveLocalUsers(users); } } let msg={fbId:f.id, from:f.from,to:f.to,groupId:f.groupId||null,text:f.text,type:f.type||'text',fileName:f.fileName||'',createdAt:created,timestamp:parseTime(created).getTime(), senderName:f.senderName||f.fromName||''}; local.push(msg); saveLocalMsgs(local); if(f.to===me.uid || f.groupId){ let sender=allUsers.find(u=>u.uid===f.from); let senderName=sender?.name||f.senderName||'Someone'; let isCurrentChat = (chattingWith && f.from===chattingWith.uid) || (chattingGroup && f.groupId===chattingGroup.id); if(isCurrentChat){ appendSingleMessage(msg); } else { if(f.from!==me.uid && !f.groupId){ unreadMap[f.from]=(unreadMap[f.from]||0)+1; saveUnread(); lastInboxUid=f.from; lastInboxText=(f.type==='image'?'📷 Photo':f.type==='audio'?'🎤 Voice':(f.text||'New message')).slice(0,50); saveChatToDisplay(f.from, parseTime(created)); updateTotalUnread(); updateInboxBanner(); showToast("📩 New message from "+senderName+": "+lastInboxText); try{ navigator.vibrate && navigator.vibrate(200); }catch(e){} document.title='📩 ('+Object.values(unreadMap).reduce((a,b)=>a+b,0)+') Easy Talkers'; setTimeout(()=>{ document.title='Easy Talkers ✨'; }, 3000); } } renderChats(''); renderContacts(''); } }
+function startGlobalListener(){ if(!db) return; if(unsubGlobal) unsubGlobal(); unsubGlobal=db.collection("messages").orderBy("createdAt","desc").limit(100).onSnapshot(snap=>{ snap.docChanges().forEach(change=>{ if(change.type==='added'){ let d=change.doc.data(); let f={id:change.doc.id, ...d}; if(f.from===me.uid) return; if(f.to===me.uid || f.groupId){ handleIncomingMessage(f); } } }); }, ()=>{}); db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let changed=false; fb.forEach(f=>{ if(!allUsers.find(m=>m.email===f.email && f.email)){ allUsers.push({...f, pass:''}); changed=true; } else { let ex=allUsers.find(m=>m.email===f.email); if(ex) Object.assign(ex, f); } if(!allUsers.find(m=>m.uid===f.uid)){ allUsers.push({...f, pass:''}); changed=true; } }); if(changed){ renderChats(''); renderContacts(''); } }, ()=>{}); }
 function getCurrentChatMsgs(){ let local=getLocalMsgs().filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); let all=[...local]; msgCache.forEach(c=>{ if(!all.find(m=>m.fbId===c.id || (m.text===c.text && m.from===c.from && Math.abs(parseTime(m.createdAt)-parseTime(c.createdAt))<2000))) all.push(c); }); all.sort((a,b)=>parseTime(a.createdAt)-parseTime(b.createdAt)); return all; }
-function appendSingleMessage(m){ let msgsEl=document.getElementById('msgs'); if(!msgsEl) return; if(msgsEl.innerHTML.includes('No messages yet')) msgsEl.innerHTML=''; let d=parseTime(m.createdAt); let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:260px;width:100%;border-radius:10px;display:block;object-fit:cover">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; let div=document.createElement('div'); div.className=(m.from===me.uid?'me':'them')+(m._sending?' sending':''); div.setAttribute('data-msg-date', dateLabel(d)); div.innerHTML=`${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatTime(d)} ${tick} ${m._sending?'• Sending...':''}</div>`; msgsEl.appendChild(div); msgsEl.scrollTop=99999; document.getElementById('stickyDatePill').innerText='📅 '+dateLabel(d); document.getElementById('stickyDatePill').style.display='block'; if(chattingWith) document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); }
-function renderMessages(list){ list.sort((a,b)=>parseTime(a.createdAt).getTime() - parseTime(b.createdAt).getTime()); let key=list.map(m=>m.fbId||m.localId||m.id||m.text+m.createdAt).join('|'); if(key===lastRenderKey && document.getElementById('msgs').children.length>0) return; lastRenderKey=key; let html=''; let lastDate=''; list.forEach(m=>{ let d=parseTime(m.createdAt); let dateStr=dateLabel(d); if(dateStr!==lastDate){ html+=`<div class="dateSep" data-date="${dateStr}">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:260px;width:100%;border-radius:10px;display:block;object-fit:cover">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}" data-msg-date="${dateStr}" title="${d.toLocaleString('en-GB')}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋</div>'; let pill=document.getElementById('stickyDatePill'); if(list.length){ pill.innerText='📅 '+dateLabel(parseTime(list[0].createdAt)); pill.style.display='block'; } else { pill.style.display='none'; } document.getElementById('msgs').scrollTop=99999; if(chattingWith && list.length){ let last=list[list.length-1]; document.getElementById('chatLastTime').innerText='Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt)); } let msgsEl=document.getElementById('msgs'); msgsEl.onscroll=()=>{ let seps=[...msgsEl.querySelectorAll('.dateSep')]; let current=seps[0]?.dataset.date||'TODAY'; seps.forEach(s=>{ if(s.getBoundingClientRect().top <= msgsEl.getBoundingClientRect().top+60) current=s.dataset.date; }); if(list.length) pill.innerText='📅 '+current; }; }
-// FAST: 200ms poll + instant Firestore chat listener
-function startLiveChat(){
-  renderMessages(getCurrentChatMsgs());
-  if(unsubChat) unsubChat();
-  if(db && (chattingWith || chattingGroup)){
-    let q;
-    if(chattingGroup) q=db.collection("messages").where("groupId","==",chattingGroup.id).orderBy("createdAt","asc");
-    else q=db.collection("messages").where("to","==",me.uid).orderBy("createdAt","asc");
-    // Fallback to polling if where query needs index - polling is fast anyway
-    try{ unsubChat=q.onSnapshot(snap=>{ snap.docChanges().forEach(ch=>{ if(ch.type==='added'){ let d=ch.doc.data(); handleIncomingMessage({id:ch.doc.id, ...d}); } }); }, ()=>{}); }catch(e){}
-  }
-  if(window._pollTimer) clearInterval(window._pollTimer);
-  window._pollTimer=setInterval(()=>{ if(!chattingWith && !chattingGroup) return; let fresh=getCurrentChatMsgs(); let key=fresh.map(m=>m.fbId||m.localId||m.id||m.text+m.createdAt).join('|'); if(key!==lastRenderKey) renderMessages(fresh); }, 200);
-}
+function appendSingleMessage(m){ let msgsEl=document.getElementById('msgs'); if(!msgsEl) return; if(msgsEl.innerHTML.includes('No messages yet')) msgsEl.innerHTML=''; let d=parseTime(m.createdAt); let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:260px;width:100%;border-radius:10px;display:block;object-fit:cover">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div style="min-width:0"><b style="word-break:break-word">${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; let div=document.createElement('div'); div.className=(m.from===me.uid?'me':'them')+(m._sending?' sending':''); div.setAttribute('data-msg-date', dateLabel(d)); div.innerHTML=`${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatTime(d)} ${tick} ${m._sending?'• Sending...':''}</div>`; msgsEl.appendChild(div); msgsEl.scrollTop=99999; document.getElementById('stickyDatePill').innerText='📅 '+dateLabel(d); document.getElementById('stickyDatePill').style.display='block'; if(chattingWith) document.getElementById('chatLastTime').innerText='Last message: '+formatDate(d)+' • '+formatTime(d); }
+function renderMessages(list){ list.sort((a,b)=>parseTime(a.createdAt).getTime() - parseTime(b.createdAt).getTime()); let key=list.map(m=>m.fbId||m.localId||m.id||m.text+m.createdAt).join('|'); if(key===lastRenderKey && document.getElementById('msgs').children.length>0) return; lastRenderKey=key; let html=''; let lastDate=''; list.forEach(m=>{ let d=parseTime(m.createdAt); let dateStr=dateLabel(d); if(dateStr!==lastDate){ html+=`<div class="dateSep" data-date="${dateStr}">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:260px;width:100%;border-radius:10px;display:block;object-fit:cover">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div style="min-width:0"><b style="word-break:break-word">${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}" data-msg-date="${dateStr}" title="${d.toLocaleString('en-GB')}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px;max-width:90%;align-self:center">No messages yet. Say Hi 👋</div>'; let pill=document.getElementById('stickyDatePill'); if(list.length){ pill.innerText='📅 '+dateLabel(parseTime(list[0].createdAt)); pill.style.display='block'; } else { pill.style.display='none'; } document.getElementById('msgs').scrollTop=99999; if(chattingWith && list.length){ let last=list[list.length-1]; document.getElementById('chatLastTime').innerText='Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt)); } let msgsEl=document.getElementById('msgs'); msgsEl.onscroll=()=>{ let seps=[...msgsEl.querySelectorAll('.dateSep')]; let current=seps[0]?.dataset.date||'TODAY'; seps.forEach(s=>{ if(s.getBoundingClientRect().top <= msgsEl.getBoundingClientRect().top+60) current=s.dataset.date; }); if(list.length) pill.innerText='📅 '+current; }; }
+function startLiveChat(){ renderMessages(getCurrentChatMsgs()); if(unsubChat) unsubChat(); if(db && (chattingWith || chattingGroup)){ let q; if(chattingGroup) q=db.collection("messages").where("groupId","==",chattingGroup.id).orderBy("createdAt","asc"); else q=db.collection("messages").where("to","==",me.uid).orderBy("createdAt","asc"); try{ unsubChat=q.onSnapshot(snap=>{ snap.docChanges().forEach(ch=>{ if(ch.type==='added'){ let d=ch.doc.data(); handleIncomingMessage({id:ch.doc.id, ...d}); } }); }, ()=>{}); }catch(e){} } if(window._pollTimer) clearInterval(window._pollTimer); window._pollTimer=setInterval(()=>{ if(!chattingWith && !chattingGroup) return; let fresh=getCurrentChatMsgs(); let key=fresh.map(m=>m.fbId||m.localId||m.id||m.text+m.createdAt).join('|'); if(key!==lastRenderKey) renderMessages(fresh); }, 200); }
 function listenMsgs(){ startLiveChat(); }
 function setTyping(){ if(!chattingWith && !chattingGroup) return; document.getElementById('typing').innerText='typing...'; clearTimeout(window._typingClear); window._typingClear=setTimeout(()=>{ document.getElementById('typing').innerText=''; }, 1500); }
-async function sendMsg(){
-  const inp=document.getElementById('msgInput'); let text=inp.value.trim(); if(!text) return;
-  if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); return; }
-  let now=new Date(); let localId='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
-  let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text,type:'text',read:false,createdAt:now.toISOString(), timestamp:now.getTime(), _sending:true, senderName:me.name, senderPhoto:me.photoURL||''};
-  inp.value=''; inp.focus();
-  // FAST: Show instantly, no waiting for Firebase
-  appendSingleMessage(msg);
-  let all=getLocalMsgs(); all.push({...msg, _sending:false}); saveLocalMsgs(all);
-  if(chattingWith) saveChatToDisplay(chattingWith.uid, now);
-  renderChats(''); renderContacts('');
-  try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){}
-  if(db){ let fbMsg={...msg}; delete fbMsg._sending; delete fbMsg.localId; db.collection("messages").add({...fbMsg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(()=>{ let msgsEl=document.getElementById('msgs'); let lastBubble=msgsEl.lastElementChild; if(lastBubble) lastBubble.classList.remove('sending'); }).catch(()=>{}); }
-  if(chattingWith) document.getElementById('chatLastTime').innerText='Last message: '+formatDate(now)+' • '+formatTime(now);
-  showTab('chats');
-}
+async function sendMsg(){ const inp=document.getElementById('msgInput'); let text=inp.value.trim(); if(!text) return; if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); return; } let now=new Date(); let localId='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text,type:'text',read:false,createdAt:now.toISOString(), timestamp:now.getTime(), _sending:true, senderName:me.name, senderPhoto:me.photoURL||''}; inp.value=''; inp.focus(); appendSingleMessage(msg); let all=getLocalMsgs(); all.push({...msg, _sending:false}); saveLocalMsgs(all); if(chattingWith) saveChatToDisplay(chattingWith.uid, now); renderChats(''); renderContacts(''); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db){ let fbMsg={...msg}; delete fbMsg._sending; delete fbMsg.localId; db.collection("messages").add({...fbMsg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(()=>{ let msgsEl=document.getElementById('msgs'); let lastBubble=msgsEl.lastElementChild; if(lastBubble) lastBubble.classList.remove('sending'); }).catch(()=>{}); } if(chattingWith) document.getElementById('chatLastTime').innerText='Last message: '+formatDate(now)+' • '+formatTime(now); showTab('chats'); }
 window.addEventListener('storage', (e)=>{ if(e.key==='et_last_msg' && me){ try{ let data=JSON.parse(e.newValue); let m=data.msg; if(m.to===me.uid || m.groupId){ handleIncomingMessage({id:'storage_'+Date.now(), from:m.from,to:m.to,groupId:m.groupId,text:m.text,type:m.type,createdAt:m.createdAt, senderName:m.senderName}); } }catch(err){} } });
 async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); el.value=''; return; } let now=new Date(); let localId='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); let placeholder={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:'',type:f.type.startsWith('image/')?'image':'file',fileName:f.name,read:false,createdAt:now.toISOString(), timestamp:now.getTime(), _sending:true}; appendSingleMessage({...placeholder, text:''}); const b64=await compressImage(f).catch(()=>fileToBase64(f)); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(chattingWith) saveChatToDisplay(chattingWith.uid, now); renderMessages(getCurrentChatMsgs()); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db) db.collection("messages").add({...msg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); el.value=''; showToast("Image sent"); renderChats(''); renderStatusDots(); }
 async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; showToast("🎤 Recording... Tap 🔴 to stop & send"); }catch(e){ showToast("Mic permission needed"); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); let now=new Date(); let localId='m_'+Date.now(); let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name}; appendSingleMessage(msg); let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(chattingWith) saveChatToDisplay(chattingWith.uid, now); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db) db.collection("messages").add({...msg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); showToast("Voice note sent"); renderChats(''); renderStatusDots(); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
 function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); inChatView=false; if(window._pollTimer) clearInterval(window._pollTimer); if(unsubChat) unsubChat(); if(isSignedIn) lockBack(); renderChats(''); renderContacts(''); renderStatusDots(); updateInboxBanner(); }
 </script>
 </body>
-                                                                            </html>
+  </html>
