@@ -239,7 +239,6 @@
 </div>
 </div>
 
-<!-- USER PROFILE - ONLY USER'S OWN PROFILE LINK, NO GROUP LINK -->
 <div id="profileViewModal">
 <div class="editSheet" style="text-align:center;padding:0;overflow:hidden">
 <div style="background:linear-gradient(135deg,#00a884,#008069);padding:16px 20px 40px;color:#fff;position:relative">
@@ -256,7 +255,6 @@
 <div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>📞 Phone</b><div id="viewPhone" style="color:#667781"></div></div>
 <div style="padding:10px 0;border-bottom:1px solid #f0f2f5"><b>✉️ Email</b><div id="viewEmail" style="color:#667781"></div></div>
 <div style="padding:10px 0"><b>💬 Chats</b><div id="viewChatInfo" style="color:#667781"></div></div>
-<!-- USER'S OWN PROFILE LINK - UNIQUE PER USER -->
 <div style="padding:12px;background:#e7f8f3;border-radius:12px;margin-top:6px"><b>🔗 <span id="viewLinkLabel">My Profile Link</span></b><div id="viewShareLink" style="font-size:12px;color:#008069;word-break:break-all;margin:6px 0"></div><div id="viewLinkOwner" style="font-size:11px;color:#667781;margin-bottom:6px"></div><button onclick="copyProfileLink()" style="background:#00a884;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">📋 Copy My Link</button> <button onclick="shareProfileLink()" style="background:#111b21;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:12px">↗️ Share My Link</button><div style="font-size:11px;color:#888;margin-top:4px">This is this person's own link — not a group link. Anyone who taps it opens THIS profile.</div></div>
 </div>
 <div style="padding:0 20px 20px;display:flex;gap:8px">
@@ -267,7 +265,6 @@
 </div>
 </div>
 
-<!-- GROUP PROFILE - ONLY GROUP JOIN LINK, NO USER LINK -->
 <div id="groupProfileModal">
 <div class="editSheet" style="text-align:center;padding:0;overflow:hidden">
 <div style="background:linear-gradient(135deg,#00a884,#008069);padding:16px 20px 40px;color:#fff;position:relative">
@@ -369,56 +366,14 @@ function openEditProfile(){ if(!me) return; document.getElementById('editName').
 function closeEditProfile(){ document.getElementById('editProfileModal').style.display='none'; }
 async function changeProfilePic(el){ if(!me||!el.files[0]) return; let b=await compressImage(el.files[0]); me.photoURL=b; document.getElementById('editAvatar').innerHTML=`<img src="${b}">`; document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; showToast("Photo selected — Tap Save to apply"); }
 async function saveProfile(){ let newName=document.getElementById('editName').value.trim(); let newPhone=document.getElementById('editPhone').value.trim(); let newBio=document.getElementById('editBio').value.trim(); let newWebsite=document.getElementById('editWebsite').value.trim(); if(!newName) return showToast("Enter name"); me.name=newName; me.phone=newPhone; me.bio=newBio; me.website=newWebsite; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].name=newName; users[idx].phone=newPhone; users[idx].photoURL=me.photoURL; users[idx].bio=newBio; users[idx].website=newWebsite; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({name:newName,phone:newPhone,photoURL:me.photoURL||'',bio:newBio,website:newWebsite}).catch(()=>{}); document.getElementById('meName').innerText=newName; document.getElementById('meBioSmall').innerText=newBio; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:newName[0].toUpperCase(); renderChats(''); renderContacts(''); closeEditProfile(); showToast("✅ Profile + Bio + Website saved"); }
-
-// ===== SEPARATE LINKS - USER vs GROUP - NEVER MIXED =====
-function getUserShareLink(uid){
-  // USER PROFILE LINK ONLY - built from USER UID, never group id
-  return location.origin+location.pathname+"?user="+encodeURIComponent(uid);
-}
-function getGroupJoinLink(gid){
-  // GROUP JOIN LINK ONLY - built from GROUP ID, never user id
-  return location.origin+location.pathname+"?join="+encodeURIComponent(gid);
-}
-function viewProfile(uid){
-  // IMPORTANT: Clear group viewing so user profile never shows group link
-  viewingGroupId=null;
-  let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return;
-  viewingProfileUid=uid;
-  document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase();
-  document.getElementById('viewName').innerText=u.name;
-  document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently';
-  document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋';
-  document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website';
-  document.getElementById('viewPhone').innerText=u.phone||'No phone';
-  document.getElementById('viewEmail').innerText=u.email||'';
-  // USER'S OWN LINK - each user gets their own, based on THEIR uid
-  let myLink=getUserShareLink(uid);
-  document.getElementById('viewShareLink').innerText=myLink;
-  document.getElementById('viewLinkLabel').innerText=(uid===me.uid?'My Profile Link':u.name+"'s Profile Link");
-  document.getElementById('viewLinkOwner').innerText='Owner: '+u.name+' • UID: '+uid;
-  let last=getLastMessageWith(uid);
-  document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — tap Message to start';
-  let isMe=uid===me.uid;
-  document.getElementById('viewChatBtn').style.display=isMe?'none':'block';
-  document.getElementById('viewEditBtn').style.display=isMe?'block':'none';
-  document.getElementById('profileViewModal').style.display='flex';
-}
+function getUserShareLink(uid){ return location.origin+location.pathname+"?user="+encodeURIComponent(uid); }
+function getGroupJoinLink(gid){ return location.origin+location.pathname+"?join="+encodeURIComponent(gid); }
+function viewProfile(uid){ viewingGroupId=null; let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return; viewingProfileUid=uid; document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); document.getElementById('viewName').innerText=u.name; document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently'; document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋'; document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website'; document.getElementById('viewPhone').innerText=u.phone||'No phone'; document.getElementById('viewEmail').innerText=u.email||''; let myLink=getUserShareLink(uid); document.getElementById('viewShareLink').innerText=myLink; document.getElementById('viewLinkLabel').innerText=(uid===me.uid?'My Profile Link':u.name+"'s Profile Link"); document.getElementById('viewLinkOwner').innerText='Owner: '+u.name+' • UID: '+uid; let last=getLastMessageWith(uid); document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — tap Message to start'; let isMe=uid===me.uid; document.getElementById('viewChatBtn').style.display=isMe?'none':'block'; document.getElementById('viewEditBtn').style.display=isMe?'block':'none'; document.getElementById('profileViewModal').style.display='flex'; }
 function closeProfileView(){ document.getElementById('profileViewModal').style.display='none'; }
 function chatFromProfile(){ if(!viewingProfileUid) return; closeProfileView(); openChat(viewingProfileUid); }
 function editFromProfile(){ closeProfileView(); openEditProfile(); }
-function copyProfileLink(){
-  // Copy ONLY the currently viewed USER's link, never group link
-  if(!viewingProfileUid) return;
-  let link=getUserShareLink(viewingProfileUid);
-  let u=allUsers.find(x=>x.uid===viewingProfileUid);
-  navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(u?.name||'User')+"'s profile link copied")).catch(()=>{ prompt("Copy "+(u?.name||'User')+"'s profile link:", link); });
-}
-function shareProfileLink(){
-  if(!viewingProfileUid) return;
-  let link=getUserShareLink(viewingProfileUid);
-  let u=allUsers.find(x=>x.uid===viewingProfileUid);
-  if(navigator.share){ navigator.share({title:u.name+" on Easy Talkers", text:"Chat with "+u.name+" on Easy Talkers — Tap to open their profile", url:link}).catch(()=>{}); } else { copyProfileLink(); }
-}
+function copyProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); let u=allUsers.find(x=>x.uid===viewingProfileUid); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(u?.name||'User')+"'s profile link copied")).catch(()=>{ prompt("Copy "+(u?.name||'User')+"'s profile link:", link); }); }
+function shareProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); let u=allUsers.find(x=>x.uid===viewingProfileUid); if(navigator.share){ navigator.share({title:u.name+" on Easy Talkers", text:"Chat with "+u.name+" on Easy Talkers — Tap to open their profile", url:link}).catch(()=>{}); } else { copyProfileLink(); } }
 function viewChatUserProfile(){ if(chattingGroup) viewGroupProfile(chattingGroup.id); else if(chattingWith) viewProfile(chattingWith.uid); }
 function getLocalGroups(){ try{ return JSON.parse(localStorage.getItem('et_groups')||'[]'); }catch(e){ return []; } }
 function saveLocalGroups(g){ localStorage.setItem('et_groups', JSON.stringify(g)); }
@@ -429,42 +384,7 @@ function autoJoinGroup(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; if
 function joinGroupFromProfile(){ if(viewingGroupId) autoJoinGroup(viewingGroupId); }
 function copyGroupLink(){ if(!viewingGroupId) return; let link=getGroupJoinLink(viewingGroupId); let g=groups.find(x=>x.id===viewingGroupId); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(g?.name||'Group')+" join link copied")).catch(()=>prompt("Copy group link:", link)); }
 function shareGroupLink(){ if(!viewingGroupId) return; let g=groups.find(x=>x.id===viewingGroupId); let link=getGroupJoinLink(viewingGroupId); if(navigator.share){ navigator.share({title:"Join "+g.name+" on Easy Talkers", text:"Join "+g.name+" — "+(g.description||''), url:link}).catch(()=>{}); } else { copyGroupLink(); } }
-function viewGroupProfile(gid){
-  // IMPORTANT: Clear user viewing so group profile never shows user link
-  viewingProfileUid=null;
-  let g=groups.find(x=>x.id===gid); if(!g) return;
-  viewingGroupId=gid;
-  document.getElementById('groupViewAvatar').innerHTML='👥';
-  document.getElementById('groupViewName').innerText=g.name;
-  let members=g.members||[];
-  document.getElementById('groupViewCount').innerText='👥 '+members.length+' member'+(members.length!==1?'s':'')+' • Tap to view members';
-  document.getElementById('groupViewMembersCount').innerText=members.length;
-  document.getElementById('groupViewDesc').innerText=g.description||'No description yet.';
-  document.getElementById('groupViewBio').innerText='📝 Bio: '+(g.bio||'No bio yet.');
-  document.getElementById('groupViewWebsite').innerHTML=g.website?`<a href="${g.website}" target="_blank">${g.website}</a>`:'No website';
-  let admin=allUsers.find(u=>u.uid===g.createdBy) || allUsers.find(u=>u.uid===g.admin) || {name:'Admin'};
-  document.getElementById('groupViewAdmin').innerText='👑 '+(admin.name||'Admin')+' • '+(admin.email||'');
-  let rules=g.rules||['1. Be respectful to everyone','2. No spam or scam','3. No hate speech','4. Keep chats clean'];
-  if(typeof rules==='string') rules=rules.split('\n');
-  document.getElementById('groupViewRules').innerHTML=rules.map(r=>'• '+r).join('<br>');
-  document.getElementById('groupViewLink').innerText=getGroupJoinLink(gid);
-  let mHtml='';
-  members.forEach(uid=>{
-    let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null);
-    if(!u) return;
-    let isAdmin=uid===g.createdBy;
-    // Member row: View button opens THAT MEMBER'S OWN user profile link, not group link
-    mHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name} ${isAdmin?'👑':''}</b><br><small style="color:#888">${u.bio||''}</small><br><small style="color:#008069">🔗 ${getUserShareLink(uid)}</small></div><button onclick="viewProfile('${uid}')" style="background:#f0f2f5;border:none;padding:5px 10px;border-radius:14px;font-size:11px;cursor:pointer">View Profile</button></div>`;
-  });
-  document.getElementById('groupViewMembers').innerHTML=mHtml||'No members yet';
-  let notIn=allUsers.filter(u=>u.uid!==me.uid && !members.includes(u.uid));
-  let addHtml='';
-  notIn.slice(0,20).forEach(u=>{
-    addHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name}</b><br><small style="color:#888">${u.email||''}</small></div><button onclick="addMemberToGroup('${gid}','${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:11px">+ Add</button></div>`;
-  });
-  document.getElementById('groupAddMembers').innerHTML=addHtml||'Everyone is already in group';
-  document.getElementById('groupProfileModal').style.display='flex';
-}
+function viewGroupProfile(gid){ viewingProfileUid=null; let g=groups.find(x=>x.id===gid); if(!g) return; viewingGroupId=gid; document.getElementById('groupViewAvatar').innerHTML='👥'; document.getElementById('groupViewName').innerText=g.name; let members=g.members||[]; document.getElementById('groupViewCount').innerText='👥 '+members.length+' member'+(members.length!==1?'s':'')+' • Tap to view members'; document.getElementById('groupViewMembersCount').innerText=members.length; document.getElementById('groupViewDesc').innerText=g.description||'No description yet.'; document.getElementById('groupViewBio').innerText='📝 Bio: '+(g.bio||'No bio yet.'); document.getElementById('groupViewWebsite').innerHTML=g.website?`<a href="${g.website}" target="_blank">${g.website}</a>`:'No website'; let admin=allUsers.find(u=>u.uid===g.createdBy) || allUsers.find(u=>u.uid===g.admin) || {name:'Admin'}; document.getElementById('groupViewAdmin').innerText='👑 '+(admin.name||'Admin')+' • '+(admin.email||''); let rules=g.rules||['1. Be respectful to everyone','2. No spam or scam','3. No hate speech','4. Keep chats clean']; if(typeof rules==='string') rules=rules.split('\n'); document.getElementById('groupViewRules').innerHTML=rules.map(r=>'• '+r).join('<br>'); document.getElementById('groupViewLink').innerText=getGroupJoinLink(gid); let mHtml=''; members.forEach(uid=>{ let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return; let isAdmin=uid===g.createdBy; mHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name} ${isAdmin?'👑':''}</b><br><small style="color:#888">${u.bio||''}</small><br><small style="color:#008069">🔗 ${getUserShareLink(uid)}</small></div><button onclick="viewProfile('${uid}')" style="background:#f0f2f5;border:none;padding:5px 10px;border-radius:14px;font-size:11px;cursor:pointer">View Profile</button></div>`; }); document.getElementById('groupViewMembers').innerHTML=mHtml||'No members yet'; let notIn=allUsers.filter(u=>u.uid!==me.uid && !members.includes(u.uid)); let addHtml=''; notIn.slice(0,20).forEach(u=>{ addHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:13px">${u.name}</b><br><small style="color:#888">${u.email||''}</small></div><button onclick="addMemberToGroup('${gid}','${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:11px">+ Add</button></div>`; }); document.getElementById('groupAddMembers').innerHTML=addHtml||'Everyone is already in group'; document.getElementById('groupProfileModal').style.display='flex'; }
 function closeGroupProfile(){ document.getElementById('groupProfileModal').style.display='none'; }
 function chatFromGroupProfile(){ if(!viewingGroupId) return; closeGroupProfile(); openGroup(viewingGroupId); }
 function editGroupFromProfile(){ closeGroupProfile(); openGroupEdit(viewingGroupId); }
@@ -503,11 +423,61 @@ function hasViewed(statusId){ if(!me) return false; return getStatusViewers(stat
 function addStatusViewer(statusId){ if(!me) return false; if(hasViewed(statusId)) return false; try{ let all=JSON.parse(localStorage.getItem('et_status_views')||'{}'); if(!all[statusId]) all[statusId]=[]; all[statusId].push({uid:me.uid, name:me.name, photoURL:me.photoURL||'', at:new Date().toISOString()}); localStorage.setItem('et_status_views', JSON.stringify(all)); if(db) db.collection("status_views").doc(statusId+"_"+me.uid).set({statusId, viewerUid:me.uid, viewerName:me.name, viewerPhoto:me.photoURL||'', at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); return true; }catch(e){ return false; } }
 function getViewerCount(s){ let viewers=getStatusViewers(s.id); let unique=new Set(viewers.map(v=>v.uid)); let fbUnique=0; if(s.viewers && Array.isArray(s.viewers)) fbUnique=new Set(s.viewers.map(v=>typeof v==='string'?v:v.uid)).size; return Math.max(unique.size, fbUnique, s.viewCount||0); }
 function canSeeStatus(fromUid){ if(fromUid===me.uid) return true; return getChatUserIds().has(fromUid); }
-function getLastStatusPerUser(){ let valid=statuses.filter(s=>{ let d=parseTime(s.createdAt); return (Date.now()-d.getTime())<=24*60*60*1000; }); valid.sort((a,b)=>parseTime(b.createdAt)-parseTime(a.createdAt)); let map=new Map(); valid.forEach(s=>{ if(!map.has(s.from)) map.set(s.from, s); }); return map; }
+function getLastStatusPerUser(){
+  // FIX: 1 LAST STATUS PER USER ONLY - Map ensures 1 entry per uid, no duplicates
+  let valid=statuses.filter(s=>{ let d=parseTime(s.createdAt); return (Date.now()-d.getTime())<=24*60*60*1000; });
+  valid.sort((a,b)=>parseTime(b.createdAt)-parseTime(a.createdAt));
+  let map=new Map();
+  valid.forEach(s=>{ if(!map.has(s.from)) map.set(s.from, s); });
+  return map;
+}
 async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return showToast("Type status first"); let local={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text',id:'s'+Date.now(),viewers:[],viewCount:0}; if(db){ try{ await db.collection("statuses").add({text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'text',viewers:[],viewCount:0}); }catch(e){} } let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls)); if(!db) { statuses.unshift(local); renderStatusDots(); } document.getElementById('statusText').value=''; showToast("Status posted"); }
 async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await compressImage(f); if(db){ try{ await db.collection("statuses").add({text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'image',viewers:[],viewCount:0}); }catch(e){} } let local={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image',id:'s'+Date.now(),viewers:[],viewCount:0}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls)); if(!db){ statuses.unshift(local); renderStatusDots(); } el.value=''; showToast("Status posted"); }
-function flowStatusCircle(){ let el=document.getElementById('statusLine'); if(!el) return; let max=el.scrollWidth - el.clientWidth; if(el.scrollLeft >= max-10){ el.scrollTo({left:0, behavior:'smooth'}); } else { el.scrollBy({left:120, behavior:'smooth'}); } }
-function renderStatusDots(){ if(!me) return; let lastMap=getLastStatusPerUser(); let myLast=lastMap.get(me.uid); let others=[...lastMap.entries()].filter(([uid,s])=>uid!==me.uid && canSeeStatus(uid)); others.sort((a,b)=>parseTime(b[1].createdAt)-parseTime(a[1].createdAt)); let front=''; if(myLast){ let count=getViewerCount(myLast); front=`<div class="statusDotWrap" onclick="openMyStatus()" title="My Status • ${count} views" style="min-width:64px"><div style="position:relative"><div class="statusDot mine">${myLast.image?`<img src="${myLast.image}">`:(me.photoURL?`<img src="${me.photoURL}">`:'✓')}</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • ${count}👁️</span></div>`; document.getElementById('statusBarRight').innerText='👁️ '+count+' views'; document.getElementById('lastStatusPreview').innerText='You: '+(myLast.text||'📷 Photo')+' • '+formatTime(parseTime(myLast.createdAt))+' • '+count+' views • Tap to view'; } else { front=`<div class="statusDotWrap" onclick="document.getElementById('statusPicInput').click()" title="Add status" style="min-width:64px"><div style="position:relative"><div class="statusDot empty">+</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • Add</span></div>`; document.getElementById('statusBarRight').innerText='👁️ 0 views'; document.getElementById('lastStatusPreview').innerText='No status yet — tap + to add'; } document.getElementById('myStatusFront').innerHTML=front; let html=''; let circleList=[...others, ...others]; if(!others.length){ html=`<span style="font-size:12px;color:#999;margin-left:6px;white-space:nowrap">No status — chat with someone to see theirs • Swipe ↻ to flow</span>`; } else { circleList.forEach(([uid,s], idx)=>{ let viewed=hasViewed(s.id); let count=getViewerCount(s); html+=`<div class="statusDotWrap" onclick="openStatusViewer('${uid}')" title="${s.fromName} • ${count} views • ${formatTime(parseTime(s.createdAt))}"><div class="statusDot ${viewed?'viewed':''}">${s.image?`<img src="${s.image}">`:(s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase())}</div><span class="statusDotLabel">${s.fromName}</span></div>`; }); } document.getElementById('statusLine').innerHTML=html; let el=document.getElementById('statusLine'); el.onscroll=()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5 && others.length>2){ setTimeout(()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) el.scrollTo({left:0, behavior:'smooth'}); }, 800); } }; }
+function flowStatusCircle(){
+  let el=document.getElementById('statusLine'); if(!el) return;
+  let max=el.scrollWidth - el.clientWidth;
+  if(el.scrollLeft >= max-10){ el.scrollTo({left:0, behavior:'smooth'}); } else { el.scrollBy({left:120, behavior:'smooth'}); }
+}
+function renderStatusDots(){
+  if(!me) return;
+  let lastMap=getLastStatusPerUser();
+  let myLast=lastMap.get(me.uid);
+  // FIX: Use Map values once - NO duplication, NO [...others, ...others]
+  let others=[...lastMap.entries()].filter(([uid,s])=>uid!==me.uid && canSeeStatus(uid));
+  others.sort((a,b)=>parseTime(b[1].createdAt)-parseTime(a[1].createdAt));
+  // Dedupe safety: ensure 1 per uid even if statuses had duplicates
+  let seen=new Set(); others=others.filter(([uid])=>{ if(seen.has(uid)) return false; seen.add(uid); return true; });
+  let front='';
+  if(myLast){
+    let count=getViewerCount(myLast);
+    front=`<div class="statusDotWrap" onclick="openMyStatus()" title="My Status • ${count} views" style="min-width:64px"><div style="position:relative"><div class="statusDot mine">${myLast.image?`<img src="${myLast.image}">`:(me.photoURL?`<img src="${me.photoURL}">`:'✓')}</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • ${count}👁️</span></div>`;
+    document.getElementById('statusBarRight').innerText='👁️ '+count+' views';
+    document.getElementById('lastStatusPreview').innerText='You: '+(myLast.text||'📷 Photo')+' • '+formatTime(parseTime(myLast.createdAt))+' • '+count+' views • Tap to view';
+  } else {
+    front=`<div class="statusDotWrap" onclick="document.getElementById('statusPicInput').click()" title="Add status" style="min-width:64px"><div style="position:relative"><div class="statusDot empty">+</div><span class="statusDotPlus">+</span></div><span class="statusDotLabel">You • Add</span></div>`;
+    document.getElementById('statusBarRight').innerText='👁️ 0 views';
+    document.getElementById('lastStatusPreview').innerText='No status yet — tap + to add';
+  }
+  document.getElementById('myStatusFront').innerHTML=front;
+  // FIX: Render others ONCE - no double
+  let html='';
+  if(!others.length){
+    html=`<span style="font-size:12px;color:#999;margin-left:6px;white-space:nowrap">No status — chat with someone to see theirs • Swipe ↻ to flow</span>`;
+  } else {
+    others.forEach(([uid,s])=>{
+      let viewed=hasViewed(s.id);
+      html+=`<div class="statusDotWrap" data-status-uid="${uid}" onclick="openStatusViewer('${uid}')" title="${s.fromName} • ${formatTime(parseTime(s.createdAt))}"><div class="statusDot ${viewed?'viewed':''}">${s.image?`<img src="${s.image}">`:(s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase())}</div><span class="statusDotLabel">${s.fromName}</span></div>`;
+    });
+  }
+  document.getElementById('statusLine').innerHTML=html;
+  let el=document.getElementById('statusLine');
+  // Circle flow WITHOUT duplication: when you hit end, jump back to start
+  el.onscroll=()=>{
+    if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5 && others.length>2){
+      setTimeout(()=>{ if(el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) el.scrollTo({left:0, behavior:'smooth'}); }, 800);
+    }
+  };
+}
 function openViewersDrawer(mode){ let viewers=[]; let title='👁️ Viewers'; let subtitle=''; if(mode==='my'){ let lastMap=getLastStatusPerUser(); let myLast=lastMap.get(me.uid); if(myLast){ viewers=getStatusViewers(myLast.id); title='👁️ Viewers — Your Last Status'; subtitle=(myLast.text||'📷 Photo')+' • '+viewers.length+' unique view'+(viewers.length!==1?'s':'')+' • 1 view per person'; } else { viewers=[]; title='👁️ Viewers'; subtitle='No status yet'; } } else if(mode==='current'){ let s=window._viewerList ? window._viewerList[window._viewerIndex||0] : null; if(s){ viewers=getStatusViewers(s.id); title='👁️ Viewers'; subtitle=(s.text||'Photo')+' • '+viewers.length+' view'+(viewers.length!==1?'s':''); } } document.getElementById('viewersTitle').innerText=title; document.getElementById('viewersSubtitle').innerText=subtitle; let html=''; if(!viewers.length) html='<div style="padding:24px;text-align:center;color:#888">No views yet.<br>Only people you chat with can see your status.</div>'; else { let uniq=new Map(); viewers.forEach(v=>{ if(!uniq.has(v.uid)) uniq.set(v.uid, v); }); let list=[...uniq.values()].sort((a,b)=>new Date(b.at)-new Date(a.at)); list.forEach(v=>{ let user=allUsers.find(u=>u.uid===v.uid); let pic=v.photoURL || user?.photoURL; let name=v.name || user?.name || 'User'; let when=v.at?formatDate(new Date(v.at))+' • '+formatTime(new Date(v.at)):''; html+=`<div class="viewerRow"><div class="avatar">${pic?`<img src="${pic}">`:name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:14px">${name}</b><br><small style="color:#888">${when} • 1 view</small></div><span style="background:#e7f8f3;color:#008069;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700">👁️ Viewed</span></div>`; }); } document.getElementById('viewersListContent').innerHTML=html; document.getElementById('viewersDrawer').style.display='flex'; }
 function openViewersFromViewer(){ openViewersDrawer('current'); }
 function closeViewersDrawer(){ document.getElementById('viewersDrawer').style.display='none'; }
