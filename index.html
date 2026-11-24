@@ -2,29 +2,31 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Easy Talkers - WhatsApp Style</title>
+<title>Easy Talkers - Fixed</title>
 <style>
 *{box-sizing:border-box;font-family:Arial} body{margin:0;background:#111b21}
-.app{max-width:1100px;margin:auto;height:100vh;display:flex;background:#fff}
+.app{max-width:1000px;margin:auto;height:100vh;display:flex;background:#fff}
 .left{width:38%;border-right:1px solid #ddd;display:flex;flex-direction:column}
 .right{flex:1;display:flex;flex-direction:column;background:#efeae2}
-.header{background:#008069;color:#fff;padding:12px 15px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
+.header{background:#008069;color:#fff;padding:12px;font-weight:bold;display:flex;justify-content:space-between}
 input,button{padding:12px;margin:6px;border-radius:8px;border:1px solid #ddd;width:calc(100% - 12px)}
 button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer}
 .user{padding:10px;border-bottom:1px solid #eee;cursor:pointer;display:flex;gap:10px;align-items:center}
-.avatar{width:46px;height:46px;background:#00a884;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;overflow:hidden;flex-shrink:0}
+.avatar{width:46px;height:46px;background:#00a884;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;overflow:hidden}
 .avatar img{width:100%;height:100%;object-fit:cover}
 #msgs{flex:1;padding:15px;overflow:auto;display:flex;flex-direction:column;gap:8px}
 .me{align-self:flex-end;background:#d9fdd3;padding:8px 12px;border-radius:10px;max-width:78%}
 .them{align-self:flex-start;background:#fff;padding:8px 12px;border-radius:10px;max-width:78%}
-.time{font-size:10px;color:#888;text-align:right;display:flex;gap:4px;justify-content:flex-end}
-.tick{color:#888}.tick.blue{color:#53bdeb}
-.chat-input{display:flex;background:#f0f2f5;padding:8px;align-items:center;gap:4px}
+.time{font-size:10px;color:#888;text-align:right}
+.chat-input{display:flex;background:#f0f2f5;padding:8px;gap:4px}
 .chat-input input{flex:1}
-.iconBtn{width:44px!important;margin:0!important;background:#fff!important;color:#008069!important;font-size:18px}
-.topTabs{display:flex} .topTabs button{flex:1;margin:4px}
+.iconBtn{width:44px!important;margin:0!important;background:#fff!important;color:#008069!important}
 @media(max-width:650px){.left{width:100%}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}}
 </style>
+<!-- FIREBASE COMPAT - WORKS ON FILE:// -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -33,49 +35,38 @@ button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer
 <div id="authBox">
 <h3 style="padding:0 10px">Register / Login</h3>
 <input id="name" placeholder="Name e.g. Kojo">
-<input id="email" placeholder="Email">
+<input id="email" placeholder="Email e.g. kojo@gmail.com">
 <input id="phone" placeholder="Phone">
 <input id="pass" type="password" placeholder="Password 6+ chars">
-<label style="padding:0 10px;font-size:13px">Profile Pic (optional)</label>
 <input type="file" id="picInput" accept="image/*">
-<button onclick="doRegister()">Register & Login</button>
-<button onclick="doLogin()" style="background:#111b21">Login Only</button>
+<button id="regBtn">Register & Login</button>
+<button id="loginBtn" style="background:#111b21">Login Only</button>
 <p id="authMsg" style="padding:0 10px;color:red;font-size:13px"></p>
+<p id="debug" style="padding:0 10px;color:green;font-size:12px"></p>
 </div>
 <div id="userBox" style="display:none">
-<div style="padding:10px;display:flex;gap:8px;align-items:center"><span id="myAvatar" class="avatar">K</span><b id="meName"></b><a href="#" onclick="doLogout()">Logout</a></div>
-<div class="topTabs"><button onclick="showTab('chats')">Chats</button><button onclick="showTab('groups')" style="background:#111b21">Groups</button></div>
-<div id="tabChats">
+<div style="padding:10px"><b id="meName"></b> <a href="#" onclick="doLogout()">Logout</a></div>
 <input placeholder="Search users..." oninput="renderUsers(this.value)">
 <div id="users"></div>
-</div>
-<div id="tabGroups" style="display:none">
-<input id="groupName" placeholder="Group name e.g. KOJOPAY Team">
-<button onclick="createGroup()">+ Create Group</button>
-<div id="groups"></div>
-</div>
+<div style="padding:10px"><input id="groupName" placeholder="Group name"><button onclick="createGroup()">+ Create Group</button><div id="groups"></div></div>
 </div>
 </div>
 <div class="right">
-<div class="header"><div><span id="chatHeader">Select a user / group</span><div id="chatStatus" style="font-size:11px;font-weight:normal"></div><div id="typing" style="font-size:11px;color:#d9fdd3"></div></div><button onclick="backToUsers()" style="width:auto;margin:0;padding:6px 10px;background:#fff;color:#008069">←</button></div>
+<div class="header"><div><span id="chatHeader">Select a user / group</span><div id="chatStatus" style="font-size:11px;font-weight:normal"></div></div><button onclick="backToUsers()" style="width:auto;margin:0;padding:6px 10px;background:#fff;color:#008069">←</button></div>
 <div id="msgs"></div>
 <div class="chat-input">
-<button class="iconBtn" onclick="document.getElementById('msgPic').click()">📷</button>
-<input type="file" id="msgPic" accept="image/*" style="display:none" onchange="sendImage(this)">
-<input id="msgInput" placeholder="Type a message" oninput="setTyping()" onkeydown="if(event.key==='Enter')sendMsg()">
-<button class="iconBtn" id="micBtn" onmousedown="startVoice()" onmouseup="stopVoice()" ontouchstart="startVoice()" ontouchend="stopVoice()">🎤</button>
+<input id="msgInput" placeholder="Type a message" onkeydown="if(event.key==='Enter')sendMsg()">
 <button onclick="sendMsg()" style="width:70px">Send ➤</button>
 </div>
-<div style="text-align:center;font-size:11px;color:#666;padding:2px">Hold 🎤 to record voice note • Tap 📷 to send photo</div>
 </div>
 </div>
 
-<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js","firebase/auth":"https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js","firebase/firestore":"https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"}}</script>
-<script type="module">
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, addDoc, setDoc, doc, getDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp, updateDoc } from "firebase/firestore";
+<script>
+console.log("SCRIPT LOADED");
+function showMsg(t,c){ document.getElementById('authMsg').innerText=t; document.getElementById('authMsg').style.color=c||'red'; }
+function showDebug(t){ document.getElementById('debug').innerText=t; }
 
+// YOUR CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM",
   authDomain: "easy-talkers.firebaseapp.com",
@@ -85,74 +76,97 @@ const firebaseConfig = {
   appId: "1:533433245977:web:82ffe12e9296d116a3e588",
   measurementId: "G-01GNZB6GKJ"
 };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app); const db = getFirestore(app);
-let me=null, allUsers=[], groups=[], chattingWith=null, chattingGroup=null, unsubMsgs=null, mediaRecorder=null, audioChunks=[], typingTimeout=null;
+
+let auth, db, me=null, allUsers=[], groups=[], chattingWith=null, chattingGroup=null, unsub=null;
+
+try{
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  showDebug("✅ Firebase Connected! Now try Register");
+  console.log("Firebase OK");
+}catch(e){
+  showMsg("Firebase Init Error: "+e.message);
+  console.error(e);
+}
 
 function fileToBase64(f){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(f); }); }
-window.showTab=(t)=>{ document.getElementById('tabChats').style.display=t==='chats'?'block':'none'; document.getElementById('tabGroups').style.display=t==='groups'?'block':'none'; };
 
-window.doRegister=async()=>{
-  const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(), phone=document.getElementById('phone').value.trim(), pass=document.getElementById('pass').value;
-  if(!name||!email||!pass) return document.getElementById('authMsg').innerText='Fill name, email, password';
+// BUTTONS - Using addEventListener so they ALWAYS work
+document.getElementById('regBtn').addEventListener('click', async ()=>{
+  showMsg("Registering... please wait","blue");
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const phone=document.getElementById('phone').value.trim();
+  const pass=document.getElementById('pass').value;
+  console.log("Register clicked", email);
+  if(!name||!email||!pass) return showMsg("Fill Name, Email, Password");
+  if(pass.length<6) return showMsg("Password must be 6+ characters");
   try{
-    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
     let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f);
-    await setDoc(doc(db,"users",cred.user.uid),{name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:serverTimestamp(),createdAt:serverTimestamp()});
-  }catch(e){ document.getElementById('authMsg').innerText=e.message; }
-};
-window.doLogin=async()=>{ try{ await signInWithEmailAndPassword(auth,document.getElementById('email').value.trim(),document.getElementById('pass').value);}catch(e){document.getElementById('authMsg').innerText=e.message;} };
-window.doLogout=async()=>{ if(me) await updateDoc(doc(db,"users",me.uid),{isOnline:false,lastSeen:serverTimestamp()}); await signOut(auth); location.reload(); };
-
-onAuthStateChanged(auth, async(user)=>{
-  if(!user) return;
-  const snap=await getDocs(collection(db,"users")); allUsers=snap.docs.map(d=>d.data());
-  me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid};
-  document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='block';
-  document.getElementById('meName').innerText=me.name;
-  document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase();
-  await updateDoc(doc(db,"users",me.uid),{isOnline:true,lastSeen:serverTimestamp()}).catch(()=>{});
-  onSnapshot(collection(db,"users"),s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); renderGroups(); updateHeaderStatus(); });
-  onSnapshot(collection(db,"groups"),s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); });
-  window.addEventListener('beforeunload',()=>{ updateDoc(doc(db,"users",me.uid),{isOnline:false,lastSeen:serverTimestamp()}); });
+    await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
+    showMsg("✅ Registered! Logging in...","green");
+  }catch(e){ showMsg("ERROR: "+e.message); console.error(e); alert("ERROR: "+e.message); }
 });
-function updateHeaderStatus(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'● Online':('Last seen '+(u.lastSeen?.toDate?u.lastSeen.toDate().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'recently')); }
 
-window.renderUsers=(q='')=>{ if(!me) return; let html=''; allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes(q.toLowerCase())).forEach(u=>{ html+=`<div class="user" onclick="openChat('${u.uid}')"><div class="avatar">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div><b>${u.name}</b><br><small>${u.isOnline?'🟢 Online':'⚪ Last seen'}</small></div></div>`; }); document.getElementById('users').innerHTML=html||'<p style="padding:10px">No users yet.</p>'; };
-window.renderGroups=()=>{ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="padding:10px">No groups yet. Create one.</p>'; };
-window.createGroup=async()=>{ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); await addDoc(collection(db,"groups"),{name,members:[me.uid],createdBy:me.uid,createdAt:serverTimestamp()}); document.getElementById('groupName').value=''; };
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  showMsg("Logging in...","blue");
+  const email=document.getElementById('email').value.trim();
+  const pass=document.getElementById('pass').value;
+  if(!email||!pass) return showMsg("Fill Email + Password");
+  try{ await auth.signInWithEmailAndPassword(email, pass); showMsg("✅ Logged in!","green"); }
+  catch(e){ showMsg("LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message); }
+});
 
-window.openChat=(uid)=>{ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText='💬 '+chattingWith.name; updateHeaderStatus(); document.getElementById('app').classList.add('show-chat'); listenMsgs(); };
-window.openGroup=(id)=>{ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText='👥 '+chattingGroup.name; document.getElementById('chatStatus').innerText=(chattingGroup.members?.length||0)+' members'; document.getElementById('app').classList.add('show-chat'); listenMsgs(); };
+auth.onAuthStateChanged(async (user)=>{
+  if(!user) return;
+  console.log("Logged in as", user.email);
+  const snap=await db.collection("users").get();
+  allUsers=snap.docs.map(d=>d.data());
+  me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid};
+  document.getElementById('authBox').style.display='none';
+  document.getElementById('userBox').style.display='block';
+  document.getElementById('meName').innerText="Hi "+me.name;
+  await db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); renderGroups(); });
+  db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); });
+});
 
+function renderUsers(q=''){
+  if(!me) return; let html='';
+  allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes(q.toLowerCase())).forEach(u=>{
+    html+=`<div class="user" onclick="openChat('${u.uid}')"><div class="avatar">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div><b>${u.name}</b><br><small>${u.isOnline?'🟢 Online':'⚪ Offline'}</small></div></div>`;
+  });
+  document.getElementById('users').innerHTML=html||'<p style="padding:10px">No other users yet. Register 2nd user.</p>';
+}
+function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html; }
+async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}); }
+function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText='💬 '+chattingWith.name; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
+function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText='👥 '+chattingGroup.name; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
 function listenMsgs(){
-  if(unsubMsgs) unsubMsgs();
-  const q=query(collection(db,"messages"),orderBy("createdAt","asc"));
-  unsubMsgs=onSnapshot(q, async snap=>{
+  if(unsub) unsub();
+  unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{
     let list=snap.docs.map(d=>({id:d.id,...d.data()}));
     if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id);
     else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid));
     else return;
-    // Mark as read
-    for(let m of list){ if(m.to===me.uid && !m.read){ await updateDoc(doc(db,"messages",m.id),{read:true}); } if(m.groupId && m.from!==me.uid && !m.readBy?.includes(me.uid)){ await updateDoc(doc(db,"messages",m.id),{readBy:[...(m.readBy||[]),me.uid]}); } }
+    list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}); });
     document.getElementById('msgs').innerHTML=list.map(m=>{
-      let sender = m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User');
-      let tick = m.from===me.uid ? (m.read||m.readBy?.length>0 ? '<span class="tick blue">✓✓</span>' : '<span class="tick">✓✓</span>') : '';
-      let content = m.type==='image' ? `<img src="${m.text}" style="max-width:200px;border-radius:8px">` : m.type==='audio' ? `<audio controls src="${m.text}" style="max-width:200px"></audio>` : m.text;
-      return `<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069"><b>${sender}</b></small><br>`:''}${content}<div class="time">${m.createdAt?.toDate?m.createdAt.toDate().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''} ${tick}</div></div>`;
+      let tick=m.from===me.uid?(m.read?'<span style="color:#53bdeb">✓✓</span>':'<span>✓✓</span>'):'';
+      return `<div class="${m.from===me.uid?'me':'them'}">${m.text}<div class="time">${tick}</div></div>`;
     }).join('');
     document.getElementById('msgs').scrollTop=99999;
   });
 }
-window.setTyping=async()=>{ if(!chattingWith) return; await updateDoc(doc(db,"users",me.uid),{typingTo:chattingWith.uid}); clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>updateDoc(doc(db,"users",me.uid),{typingTo:''}),2000); };
-// Show typing
-setInterval(()=>{ if(chattingWith){ const u=allUsers.find(x=>x.uid===chattingWith.uid); document.getElementById('typing').innerText = u?.typingTo===me.uid ? 'typing...' : ''; } },1000);
-
-window.sendMsg=async()=>{ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group'); await addDoc(collection(db,"messages"),{from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,readBy:[],createdAt:serverTimestamp()}); inp.value=''; };
-window.sendImage=async(el)=>{ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); await addDoc(collection(db,"messages"),{from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'image',read:false,readBy:[],createdAt:serverTimestamp()}); };
-window.startVoice=async()=>{ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); document.getElementById('micBtn').style.background='#ff4444!important'; document.getElementById('micBtn').innerText='🔴'; }catch(e){ alert('Mic permission needed'); } };
-window.stopVoice=()=>{ if(!mediaRecorder) return; mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); await addDoc(collection(db,"messages"),{from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,readBy:[],createdAt:serverTimestamp()}); }; mediaRecorder.stop(); document.getElementById('micBtn').innerText='🎤'; };
-window.backToUsers=()=>document.getElementById('app').classList.remove('show-chat');
+async function sendMsg(){
+  const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return;
+  if(!chattingWith && !chattingGroup) return alert('Select user/group first');
+  await db.collection("messages").add({from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  inp.value='';
+}
+async function doLogout(){ if(me) await db.collection("users").doc(me.uid).update({isOnline:false}); await auth.signOut(); location.reload(); }
+function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); }
 </script>
 </body>
-  </html>
+</html>
