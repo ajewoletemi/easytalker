@@ -22,7 +22,6 @@
 .linkBtn{background:none;border:none;color:#00a884;font-weight:700;cursor:pointer;font-size:14px;padding:8px}
 .logoutBtn{background:#ff3b30;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap}
 .user{padding:11px 14px;cursor:pointer;display:flex;gap:11px;align-items:center;border-bottom:1px solid #f5f5f5}
-.user:hover{background:#f0f2f5}
 .chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:64px}
 .backBtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:#111;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 #msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:#fff;min-height:200px}
@@ -55,6 +54,10 @@
 .statusName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .statusAdd{width:62px;height:62px;border-radius:50%;background:#f0f2f5;border:2px dashed #00a884;display:flex;align-items:center;justify-content:center;font-size:26px;margin:auto;position:relative}
 .statusAdd span{position:absolute;bottom:0;right:0;background:#00a884;color:#fff;width:20px;height:20px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+/* MY STATUS STANDS ALONE - SEPARATE BOX */
+.myStatusBox{border:2px solid #00a884;border-radius:14px;padding:8px;margin:0 4px;background:#f0fdf4}
+.otherStatusBox{border-left:2px solid #eee;padding-left:8px;display:flex;gap:12px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111b21;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:1000;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 #statusViewer{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;color:#fff}
 .viewerTop{display:flex;gap:4px;padding:10px}
 .progressBar{flex:1;height:3px;background:#555;border-radius:10px;overflow:hidden}
@@ -73,6 +76,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
+<div id="toast"></div>
 <div class="app" id="app">
 <div class="left">
 <div class="header-green">💬 Easy Talkers <button class="logoutBtn" id="logoutTopBtn" onclick="doLogout()" style="display:none">Logout ↪️</button></div>
@@ -123,33 +127,42 @@
 <input type="file" id="changePic" accept="image/*" style="display:none" onchange="changeProfilePic(this)">
 <button class="logoutBtn" onclick="doLogout()">Logout</button>
 </div>
+
+<!-- STATUS: MY STATUS ALONE + OTHERS SEPARATE -->
 <div style="border-bottom:1px solid #f0f2f5">
-<div class="statusRow" id="statusRow">
-<div class="statusOval" onclick="document.getElementById('statusPicInput').click()">
-<div class="statusAdd">📸<span>+</span></div>
+<div style="display:flex;align-items:flex-start;padding:10px 10px 4px;gap:8px">
+<!-- MY STATUS - STANDS ALONE -->
+<div class="myStatusBox" style="text-align:center">
+<div class="statusOval" onclick="openMyStatus()" style="margin:0">
+<div class="statusAdd" id="myStatusCircle">📸<span>+</span></div>
 <div class="statusName">My Status</div>
+<div id="myStatusCount" style="font-size:10px;color:#008069;font-weight:700"></div>
 </div>
-<input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
+</div>
+<!-- OTHER USERS STATUS - SCROLLABLE -->
+<div style="flex:1;min-width:0">
+<div style="font-size:11px;color:#667781;font-weight:700;margin:2px 0 4px">Recent updates</div>
+<div class="statusRow" id="otherStatusRow" style="padding:0">
 <div id="statusOvals" style="display:flex;gap:12px"></div>
 </div>
-<div style="padding:0 12px 8px;display:flex;gap:6px"><input id="statusText" placeholder="Type status text..." style="flex:1;padding:10px;border-radius:20px;border:1px solid #e9edef;outline:none"><button onclick="postStatus()" style="padding:10px 14px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer">Post</button></div>
+</div>
+<input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
+</div>
+<div style="padding:0 12px 8px;display:flex;gap:6px"><input id="statusText" placeholder="Type status text..." style="flex:1;padding:10px;border-radius:20px;border:1px solid #e9edef;outline:none"><button onclick="postStatus()" style="padding:10px 14px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer">Post</button><button onclick="document.getElementById('statusPicInput').click()" style="padding:10px 12px;border-radius:20px;border:none;background:#f0f2f5;cursor:pointer">📸</button></div>
 </div>
 
-<!-- 4 TABS: CHATS / CONTACTS / GROUPS -->
 <div style="display:flex;border-bottom:1px solid #e9edef">
 <button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats <span id="chatCount" style="background:#00a884;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 <button class="tabBtn" id="tabContactBtn" onclick="showTab('contacts')">Contacts <span id="contactCount" style="background:#e9edef;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 <button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups</button>
 </div>
 
-<!-- CHATS TAB - ONLY PEOPLE YOU CHATTED WITH -->
 <div id="tabChats" style="flex:1;overflow-y:auto">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search chats" oninput="renderChats(this.value)"></div>
 <div id="chatsList"></div>
 <div style="padding:12px;text-align:center"><button class="linkBtn" onclick="showTab('contacts')">+ New Chat — Go to Contacts →</button></div>
 </div>
 
-<!-- CONTACTS TAB - EVERYONE ON PLATFORM -->
 <div id="tabContacts" style="display:none;flex:1;overflow-y:auto">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search all contacts" oninput="renderContacts(this.value)"></div>
 <div style="padding:8px 14px;font-size:12px;color:#667781;font-weight:700">👥 ALL PEOPLE ON EASY TALKERS — Tap to start chat</div>
@@ -202,7 +215,9 @@ lockBack();
 const firebaseConfig = { apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM", authDomain: "easy-talkers.firebaseapp.com", projectId: "easy-talkers", storageBucket: "easy-talkers.firebasestorage.app", messagingSenderId: "533433245977", appId: "1:533433245977:web:82ffe12e9296d116a3e588", measurementId: "G-01GNZB6GKJ" };
 let auth=null, db=null;
 try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){}
-let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false;
+// TOAST - replaces all alert popups for messages
+function showToast(msg){ let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; },2000); }
+let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, unsubStatus=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false;
 let viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
 const emojis=["😀","😂","❤️","🔥","👍","🙏","😍","😢","😡","🎉","👏","😎","🤔","😅","💪","🙌","😭","😘","🥰","😇","🤣","😋","😴","🤝","💯","✨","🌹","⚽","🎶","🚀"];
 document.getElementById('emojiGrid').innerHTML=emojis.map(e=>`<span onclick="addEmoji('${e}')">${e}</span>`).join('');
@@ -222,10 +237,21 @@ function getLocalUsers(){ try{ return JSON.parse(localStorage.getItem('et_users'
 function saveLocalUsers(u){ localStorage.setItem('et_users', JSON.stringify(u)); }
 async function doRegister(){ const name=document.getElementById('name').value.trim(); const email=document.getElementById('email').value.trim().toLowerCase(); const phone=document.getElementById('phone').value.trim(); const pass=document.getElementById('pass').value; if(!name) return showMsg("Enter your Name"); if(!email) return showMsg("Enter your Email"); if(!pass) return showMsg("Enter Password"); if(pass.length<6) return showMsg("Password must be 6+ characters"); let users=getLocalUsers(); if(users.find(u=>u.email===email)) return showMsg("This email already exists. Go to Login."); let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f); let newUser={name,email,phone,pass,photoURL,uid:'local-'+Date.now(),isOnline:true}; users.push(newUser); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(newUser)); if(auth){ auth.createUserWithEmailAndPassword(email,pass).then(cred=>{ db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{}); }).catch(()=>{}); } showMsg("✅ Account created! Opening chats...","#00a884"); setTimeout(()=>{ loginSuccess(newUser); }, 500); }
 async function doLogin(){ const email=document.getElementById('loginEmail').value.trim().toLowerCase(); const pass=document.getElementById('loginPass').value; if(!email) return showLoginMsg("Enter your Email"); if(!pass) return showLoginMsg("Enter your Password"); showLoginMsg("Logging in...","#008069"); let users=getLocalUsers(); let found=users.find(u=>u.email===email); if(!found){ if(auth){ try{ let cred=await auth.signInWithEmailAndPassword(email,pass); let u={name:email.split('@')[0],email,phone:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true}; users.push(u); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(u)); loginSuccess(u); return; }catch(e){} } return showLoginMsg("No account found for this email. Tap 'Create Account' below."); } if(found.pass!==pass) return showLoginMsg("Wrong password. Try again."); localStorage.setItem('et_current', JSON.stringify(found)); showLoginMsg("✅ Login successful! Opening chats...","#00a884"); setTimeout(()=>{ loginSuccess(found); }, 400); }
-function loginSuccess(user){ me=user; isSignedIn=true; allUsers=getLocalUsers(); showApp(); if(db){ db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{}); db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); }); allUsers=merged; renderChats(''); renderContacts(''); }, ()=>{}); db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); }, ()=>{}); db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); }, ()=>{}); } try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); statuses=[...ls, ...statuses]; renderStatusOvals(); }catch(e){} }
+function loginSuccess(user){
+  me=user; isSignedIn=true; allUsers=getLocalUsers(); showApp();
+  if(db){
+    db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{});
+    db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); }); allUsers=merged; renderChats(''); renderContacts(''); }, ()=>{});
+    db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); }, ()=>{});
+    // STATUS - LIVE FROM FIREBASE SO OTHER USERS SEE IT
+    if(unsubStatus) unsubStatus();
+    unsubStatus=db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); }, ()=>{});
+  }
+  try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); if(!statuses.length) statuses=ls; renderStatusOvals(); }catch(e){}
+}
 window.addEventListener('load', ()=>{ let cur=localStorage.getItem('et_current'); if(cur){ try{ let u=JSON.parse(cur); loginSuccess(u); }catch(e){} } });
 async function doLogout(){ if(!confirm("Logout from Easy Talkers?")) return; localStorage.removeItem('et_current'); if(db && me) db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(auth) auth.signOut().catch(()=>{}); isSignedIn=false; location.reload(); }
-async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await fileToBase64(el.files[0]); me.photoURL=b; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].photoURL=b; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({photoURL:b}).catch(()=>{}); document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; alert("✅ Profile pic updated!"); }
+async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await fileToBase64(el.files[0]); me.photoURL=b; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].photoURL=b; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({photoURL:b}).catch(()=>{}); document.getElementById('myAvatar').innerHTML=`<img src="${b}">`; showToast("Profile pic updated"); }
 function avatarHTML(u){ if(u?.photoURL) return `<div class="avatar"><img src="${u.photoURL}"></div>`; return `<div class="avatar">${u?.name?u.name[0].toUpperCase():'👤'}</div>`; }
 function formatDate(d){ if(!d) return ''; const today=new Date(); const yesterday=new Date(); yesterday.setDate(today.getDate()-1); if(d.toDateString()===today.toDateString()) return 'Today'; if(d.toDateString()===yesterday.toDateString()) return 'Yesterday'; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function formatTime(d){ return d?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''; }
@@ -233,68 +259,111 @@ function showTab(t){ document.getElementById('tabChats').style.display=t==='chat
 function updateHeader(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'🟢 Online':('Last seen '+formatDate(new Date())); }
 function getLocalMsgs(){ try{ return JSON.parse(localStorage.getItem('et_msgs')||'[]'); }catch(e){ return []; } }
 function saveLocalMsgs(m){ localStorage.setItem('et_msgs', JSON.stringify(m)); }
-// ===== CHATS vs CONTACTS LOGIC =====
-function getChatUserIds(){
-  let msgs=getLocalMsgs();
-  let ids=new Set();
-  msgs.forEach(m=>{ if(m.from===me.uid && m.to) ids.add(m.to); if(m.to===me.uid) ids.add(m.from); });
-  return ids;
-}
-function getLastMessageWith(uid){
-  let msgs=getLocalMsgs().filter(m=>(m.from===me.uid && m.to===uid)||(m.from===uid && m.to===me.uid));
-  if(!msgs.length) return null;
-  return msgs[msgs.length-1];
-}
-function renderChats(q=''){
-  if(!me) return;
-  let chatIds=getChatUserIds();
-  let chatUsers=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && chatIds.has(u.uid) && u.name.toLowerCase().includes((q||'').toLowerCase()));
-  // Sort by last message time (newest first)
-  chatUsers.sort((a,b)=>{ let ma=getLastMessageWith(a.uid); let mb=getLastMessageWith(b.uid); return new Date(mb?.createdAt||0)-new Date(ma?.createdAt||0); });
-  document.getElementById('chatCount').innerText=chatUsers.length||'';
-  let html='';
-  chatUsers.forEach(u=>{
-    let last=getLastMessageWith(u.uid);
-    let lastText=last?(last.type==='image'?'📷 Photo':last.type==='audio'?'🎤 Voice note':last.type==='file'?'📄 '+ (last.fileName||'File'):last.text):'';
-    let lastTime=last?formatTime(new Date(last.createdAt)):'';
-    html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right"><small style="color:#00a884;font-size:11px">${lastTime}</small><br><span>💬</span></div></div>`;
-  });
-  document.getElementById('chatsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No chats yet.<br>Go to <b>Contacts</b> → Tap someone → Send a message.<br>They will appear here.</div>';
-  // Update contacts count too
-  let allContacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email);
-  document.getElementById('contactCount').innerText=allContacts.length||'';
-}
-function renderContacts(q=''){
-  if(!me) return;
-  let chatIds=getChatUserIds();
-  let contacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase()));
-  contacts.sort((a,b)=>a.name.localeCompare(b.name));
-  document.getElementById('contactCount').innerText=contacts.length||'';
-  let html='';
-  contacts.forEach(u=>{
-    let alreadyChatted=chatIds.has(u.uid);
-    html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:#667781">${u.email||''}</small><br><small style="color:${alreadyChatted?'#00a884':'#888'}">${alreadyChatted?'💬 Already chatting — tap to open':'👤 Tap to start chat'}</small></div><span style="font-size:20px">${alreadyChatted?'💬':'➕'}</span></div>`;
-  });
-  document.getElementById('contactsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No contacts yet.<br>Ask friends to Create Account.<br>Everyone who registers will appear here.</div>';
-}
+function getChatUserIds(){ let msgs=getLocalMsgs(); let ids=new Set(); msgs.forEach(m=>{ if(m.from===me.uid && m.to) ids.add(m.to); if(m.to===me.uid) ids.add(m.from); }); return ids; }
+function getLastMessageWith(uid){ let msgs=getLocalMsgs().filter(m=>(m.from===me.uid && m.to===uid)||(m.from===uid && m.to===me.uid)); if(!msgs.length) return null; return msgs[msgs.length-1]; }
+function renderChats(q=''){ if(!me) return; let chatIds=getChatUserIds(); let chatUsers=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && chatIds.has(u.uid) && u.name.toLowerCase().includes((q||'').toLowerCase())); chatUsers.sort((a,b)=>{ let ma=getLastMessageWith(a.uid); let mb=getLastMessageWith(b.uid); return new Date(mb?.createdAt||0)-new Date(ma?.createdAt||0); }); document.getElementById('chatCount').innerText=chatUsers.length||''; let html=''; chatUsers.forEach(u=>{ let last=getLastMessageWith(u.uid); let lastText=last?(last.type==='image'?'📷 Photo':last.type==='audio'?'🎤 Voice note':last.type==='file'?'📄 '+(last.fileName||'File'):last.text):''; let lastTime=last?formatTime(new Date(last.createdAt)):''; html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right"><small style="color:#00a884;font-size:11px">${lastTime}</small><br><span>💬</span></div></div>`; }); document.getElementById('chatsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No chats yet.<br>Go to <b>Contacts</b> → Tap someone → Send a message.<br>They will appear here.</div>'; let allContacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email); document.getElementById('contactCount').innerText=allContacts.length||''; }
+function renderContacts(q=''){ if(!me) return; let chatIds=getChatUserIds(); let contacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase())); contacts.sort((a,b)=>a.name.localeCompare(b.name)); document.getElementById('contactCount').innerText=contacts.length||''; let html=''; contacts.forEach(u=>{ let alreadyChatted=chatIds.has(u.uid); html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:#667781">${u.email||''}</small><br><small style="color:${alreadyChatted?'#00a884':'#888'}">${alreadyChatted?'💬 Already chatting — tap to open':'👤 Tap to start chat'}</small></div><span style="font-size:20px">${alreadyChatted?'💬':'➕'}</span></div>`; }); document.getElementById('contactsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No contacts yet.<br>Ask friends to Create Account.</div>'; }
 function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet.</p>'; }
-async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); if(db){ await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}).catch(()=>alert("Group needs Firebase")); } else { groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); } document.getElementById('groupName').value=''; }
-async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); let s={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text',id:'s'+Date.now()}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(s); localStorage.setItem('et_statuses', JSON.stringify(ls)); statuses.unshift(s); renderStatusOvals(); document.getElementById('statusText').value=''; if(db) db.collection("statuses").add({...s,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); }
-async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); let s={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image',id:'s'+Date.now()}; let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(s); localStorage.setItem('et_statuses', JSON.stringify(ls)); statuses.unshift(s); renderStatusOvals(); el.value=''; alert("✅ Status posted! Expires in 24h"); }
-function renderStatusOvals(){ let valid=statuses.filter(s=>{ let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); return (Date.now()-d.getTime())<=24*60*60*1000; }); let byUser={}; valid.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); }); let html=''; Object.keys(byUser).forEach(uid=>{ let latest=byUser[uid][0]; let viewed=viewedStatuses.has(latest.id); html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div></div>`; }); document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px">No status yet — post one!</div>'; }
-function openStatusViewer(uid){ let valid=statuses.filter(s=>s.from===uid); if(!valid.length) return; window._viewerList=valid; showStatusAt(0); document.getElementById('statusViewer').style.display='flex'; }
-function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ closeStatusViewer(); return; } let s=list[i]; viewedStatuses.add(s.id); localStorage.setItem('viewedStatus',JSON.stringify([...viewedStatuses])); renderStatusOvals(); let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); let hoursLeft=Math.max(0,24-Math.floor((Date.now()-d.getTime())/(1000*60*60))); document.getElementById('viewerProgress').innerHTML=list.map((_,idx)=>`<div class="progressBar"><div style="width:${idx<i?100:0}%"></div></div>`).join(''); document.getElementById('viewerAvatar').innerHTML=s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase(); document.getElementById('viewerName').innerText=s.fromName; document.getElementById('viewerTime').innerText=formatDate(d)+' • '+formatTime(d)+' • Expires in '+hoursLeft+'h'; document.getElementById('viewerContent').innerHTML=s.image?`<img src="${s.image}">`:`<div>${s.text}</div>`; window._viewerIndex=i; }
+async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return showToast("Enter group name"); if(db){ await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}).catch(()=>showToast("Group needs Firebase")); } else { groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); } document.getElementById('groupName').value=''; showToast("Group created"); }
+
+// ===== STATUS: MY STATUS ALONE, OTHERS SEPARATE + VISIBLE =====
+async function postStatus(){
+  const t=document.getElementById('statusText').value.trim(); if(!t) return showToast("Type status first");
+  let local={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text',id:'s'+Date.now()};
+  // Save to Firebase so OTHER USERS can see it
+  if(db){ try{ await db.collection("statuses").add({text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'text'}); }catch(e){} }
+  // Also local fallback
+  let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls));
+  if(!db) { statuses.unshift(local); renderStatusOvals(); }
+  document.getElementById('statusText').value=''; showToast("Status posted • Expires in 24h");
+}
+async function postStatusImage(el){
+  const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f);
+  if(db){ try{ await db.collection("statuses").add({text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp(),type:'image'}); }catch(e){} }
+  let local={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image',id:'s'+Date.now()};
+  let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); ls.unshift(local); localStorage.setItem('et_statuses', JSON.stringify(ls));
+  if(!db){ statuses.unshift(local); renderStatusOvals(); }
+  el.value=''; showToast("Status posted • Expires in 24h");
+}
+function renderStatusOvals(){
+  let valid=statuses.filter(s=>{ let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); return (Date.now()-d.getTime())<=24*60*60*1000; });
+  let myStatuses=valid.filter(s=>s.from===me.uid);
+  let otherStatuses=valid.filter(s=>s.from!==me.uid);
+  // MY STATUS - STANDS ALONE
+  if(myStatuses.length){
+    document.getElementById('myStatusCircle').innerHTML = myStatuses[0].image?`<img src="${myStatuses[0].image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(me.photoURL?`<img src="${me.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:'✅');
+    document.getElementById('myStatusCount').innerText=myStatuses.length+' update'+(myStatuses.length>1?'s':'')+' • Tap to view';
+    document.getElementById('myStatusCircle').style.background='#d9fdd3';
+  } else {
+    document.getElementById('myStatusCircle').innerHTML='📸<span>+</span>';
+    document.getElementById('myStatusCount').innerText='';
+    document.getElementById('myStatusCircle').style.background='#f0f2f5';
+  }
+  // OTHER USERS - GROUPED BY USER, ALL VISIBLE
+  let byUser={}; otherStatuses.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); });
+  let html='';
+  Object.keys(byUser).forEach(uid=>{
+    let latest=byUser[uid][0];
+    let viewed=viewedStatuses.has(latest.id);
+    html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div><div style="font-size:10px;color:#888">${byUser[uid].length} update${byUser[uid].length>1?'s':''} • Tap to view</div></div>`;
+  });
+  document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px;white-space:nowrap">No updates from others yet</div>';
+}
+function openMyStatus(){
+  let mine=statuses.filter(s=>s.from===me.uid);
+  if(!mine.length){ document.getElementById('statusPicInput').click(); return; }
+  window._viewerList=mine; showStatusAt(0); document.getElementById('statusViewer').style.display='flex';
+}
+function openStatusViewer(uid){
+  let valid=statuses.filter(s=>s.from===uid);
+  if(!valid.length) return;
+  window._viewerList=valid; showStatusAt(0); document.getElementById('statusViewer').style.display='flex';
+}
+function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ closeStatusViewer(); return; } let s=list[i]; viewedStatuses.add(s.id); localStorage.setItem('viewedStatus',JSON.stringify([...viewedStatuses])); renderStatusOvals(); let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); let hoursLeft=Math.max(0,24-Math.floor((Date.now()-d.getTime())/(1000*60*60))); document.getElementById('viewerProgress').innerHTML=list.map((_,idx)=>`<div class="progressBar"><div style="width:${idx<i?100:0}%"></div></div>`).join(''); document.getElementById('viewerAvatar').innerHTML=s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase(); document.getElementById('viewerName').innerText=s.fromName + (s.from===me.uid?' (You)':''); document.getElementById('viewerTime').innerText=formatDate(d)+' • '+formatTime(d)+' • Expires in '+hoursLeft+'h'; document.getElementById('viewerContent').innerHTML=s.image?`<img src="${s.image}">`:`<div>${s.text}</div>`; window._viewerIndex=i; }
 function nextStatus(){ showStatusAt((window._viewerIndex||0)+1); }
 function closeStatusViewer(){ document.getElementById('statusViewer').style.display='none'; }
-function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; alert("Reply sent to "+document.getElementById('viewerName').innerText+": "+txt); document.getElementById('statusReply').value=''; }
+function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; showToast("Reply sent"); document.getElementById('statusReply').value=''; closeStatusViewer(); }
+
 function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText=chattingWith.name; document.getElementById('chatAvatar').innerHTML=chattingWith.photoURL?`<img src="${chattingWith.photoURL}">`:chattingWith.name[0].toUpperCase(); updateHeader(); document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); listenMsgs(); }
 function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; document.getElementById('chatStatus').innerText=(chattingGroup.members?.length||0)+' members'; document.getElementById('app').classList.add('show-chat'); inChatView=true; lockBack(); listenMsgs(); }
 function renderMessages(list){ let html=''; let lastDate=''; list.forEach(m=>{ let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt?new Date(m.createdAt):new Date()); let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?'✓✓':''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋</div>'; document.getElementById('msgs').scrollTop=99999; }
 function listenMsgs(){ let local=getLocalMsgs().filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); renderMessages(local); if(db && !unsub){ unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); let filtered=list.filter(m=>{ if(chattingGroup) return m.groupId===chattingGroup.id; if(chattingWith) return (m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid); return false; }); let merged=[...local, ...filtered.filter(f=>!local.find(l=>l.text===f.text && l.from===f.from))]; renderMessages(merged); }, ()=>{}); } }
 async function setTyping(){ if(!chattingWith) return; }
-async function sendMsg(){ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:new Date().toISOString()}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); inp.value=''; listenMsgs(); renderChats(''); renderContacts(''); }
-async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:new Date().toISOString()}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); el.value=''; alert("✅ Sent: "+f.name); listenMsgs(); renderChats(''); }
-async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; alert("🎤 Recording... Tap 🔴 again to STOP & SEND"); }catch(e){ alert('Mic permission needed'); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:new Date().toISOString()}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); alert("✅ Voice note sent!"); listenMsgs(); renderChats(''); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
+// ===== NO MORE POPUP PROMPTS - SILENT SEND + TOAST =====
+async function sendMsg(){
+  const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return;
+  if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); return; }
+  let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:new Date().toISOString()};
+  let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all);
+  if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  inp.value=''; listenMsgs(); renderChats(''); renderContacts('');
+}
+async function sendFile(el){
+  const f=el.files[0]; if(!f) return;
+  if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); el.value=''; return; }
+  const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video';
+  let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:new Date().toISOString()};
+  let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all);
+  if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+  el.value=''; showToast("File sent"); listenMsgs(); renderChats('');
+}
+async function toggleVoice(){
+  if(!isRecording){
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true;
+      let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; showToast("🎤 Recording... Tap 🔴 to stop & send");
+    }catch(e){ showToast("Mic permission needed"); }
+  } else {
+    mediaRecorder.onstop=async()=>{
+      const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); });
+      let msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:new Date().toISOString()};
+      let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all);
+      if(db) db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+      showToast("Voice note sent"); listenMsgs(); renderChats('');
+    };
+    mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤';
+  }
+}
 function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); inChatView=false; if(isSignedIn) lockBack(); renderChats(''); renderContacts(''); }
 </script>
 </body>
