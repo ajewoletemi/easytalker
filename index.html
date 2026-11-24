@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Easy Talkers - Fixed</title>
+<title>Easy Talkers - Fixed Permissions</title>
 <style>
 *{box-sizing:border-box;font-family:Arial} body{margin:0;background:#111b21}
 .app{max-width:1000px;margin:auto;height:100vh;display:flex;background:#fff}
 .left{width:38%;border-right:1px solid #ddd;display:flex;flex-direction:column}
 .right{flex:1;display:flex;flex-direction:column;background:#efeae2}
-.header{background:#008069;color:#fff;padding:12px;font-weight:bold;display:flex;justify-content:space-between}
+.header{background:#008069;color:#fff;padding:12px;font-weight:bold}
 input,button{padding:12px;margin:6px;border-radius:8px;border:1px solid #ddd;width:calc(100% - 12px)}
 button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer}
 .user{padding:10px;border-bottom:1px solid #eee;cursor:pointer;display:flex;gap:10px;align-items:center}
@@ -17,13 +17,10 @@ button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer
 #msgs{flex:1;padding:15px;overflow:auto;display:flex;flex-direction:column;gap:8px}
 .me{align-self:flex-end;background:#d9fdd3;padding:8px 12px;border-radius:10px;max-width:78%}
 .them{align-self:flex-start;background:#fff;padding:8px 12px;border-radius:10px;max-width:78%}
-.time{font-size:10px;color:#888;text-align:right}
 .chat-input{display:flex;background:#f0f2f5;padding:8px;gap:4px}
 .chat-input input{flex:1}
-.iconBtn{width:44px!important;margin:0!important;background:#fff!important;color:#008069!important}
 @media(max-width:650px){.left{width:100%}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}}
 </style>
-<!-- FIREBASE COMPAT - WORKS ON FILE:// -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -31,14 +28,13 @@ button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer
 <body>
 <div class="app" id="app">
 <div class="left">
-<div class="header">💬 Easy Talkers <span style="font-size:11px;background:#fff;color:#008069;padding:4px 8px;border-radius:20px">LIVE</span></div>
+<div class="header">💬 Easy Talkers</div>
 <div id="authBox">
 <h3 style="padding:0 10px">Register / Login</h3>
 <input id="name" placeholder="Name e.g. Kojo">
-<input id="email" placeholder="Email e.g. kojo@gmail.com">
+<input id="email" placeholder="Email">
 <input id="phone" placeholder="Phone">
 <input id="pass" type="password" placeholder="Password 6+ chars">
-<input type="file" id="picInput" accept="image/*">
 <button id="regBtn">Register & Login</button>
 <button id="loginBtn" style="background:#111b21">Login Only</button>
 <p id="authMsg" style="padding:0 10px;color:red;font-size:13px"></p>
@@ -48,25 +44,16 @@ button{background:#00a884;color:#fff;border:none;font-weight:bold;cursor:pointer
 <div style="padding:10px"><b id="meName"></b> <a href="#" onclick="doLogout()">Logout</a></div>
 <input placeholder="Search users..." oninput="renderUsers(this.value)">
 <div id="users"></div>
-<div style="padding:10px"><input id="groupName" placeholder="Group name"><button onclick="createGroup()">+ Create Group</button><div id="groups"></div></div>
 </div>
 </div>
 <div class="right">
-<div class="header"><div><span id="chatHeader">Select a user / group</span><div id="chatStatus" style="font-size:11px;font-weight:normal"></div></div><button onclick="backToUsers()" style="width:auto;margin:0;padding:6px 10px;background:#fff;color:#008069">←</button></div>
+<div class="header"><span id="chatHeader">Select a user</span><button onclick="backToUsers()" style="width:auto;margin:0;padding:6px 10px;background:#fff;color:#008069">←</button></div>
 <div id="msgs"></div>
-<div class="chat-input">
-<input id="msgInput" placeholder="Type a message" onkeydown="if(event.key==='Enter')sendMsg()">
-<button onclick="sendMsg()" style="width:70px">Send ➤</button>
-</div>
+<div class="chat-input"><input id="msgInput" placeholder="Type a message" onkeydown="if(event.key==='Enter')sendMsg()"><button onclick="sendMsg()" style="width:70px">Send ➤</button></div>
 </div>
 </div>
 
 <script>
-console.log("SCRIPT LOADED");
-function showMsg(t,c){ document.getElementById('authMsg').innerText=t; document.getElementById('authMsg').style.color=c||'red'; }
-function showDebug(t){ document.getElementById('debug').innerText=t; }
-
-// YOUR CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM",
   authDomain: "easy-talkers.firebaseapp.com",
@@ -76,96 +63,111 @@ const firebaseConfig = {
   appId: "1:533433245977:web:82ffe12e9296d116a3e588",
   measurementId: "G-01GNZB6GKJ"
 };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+document.getElementById('debug').innerText = "✅ Firebase Connected";
 
-let auth, db, me=null, allUsers=[], groups=[], chattingWith=null, chattingGroup=null, unsub=null;
+let me=null, allUsers=[], chattingWith=null, unsub=null;
+function showMsg(t,c){ let el=document.getElementById('authMsg'); el.innerText=t; el.style.color=c||'red'; }
 
-try{
-  firebase.initializeApp(firebaseConfig);
-  auth = firebase.auth();
-  db = firebase.firestore();
-  showDebug("✅ Firebase Connected! Now try Register");
-  console.log("Firebase OK");
-}catch(e){
-  showMsg("Firebase Init Error: "+e.message);
-  console.error(e);
-}
-
-function fileToBase64(f){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(f); }); }
-
-// BUTTONS - Using addEventListener so they ALWAYS work
 document.getElementById('regBtn').addEventListener('click', async ()=>{
-  showMsg("Registering... please wait","blue");
   const name=document.getElementById('name').value.trim();
   const email=document.getElementById('email').value.trim();
   const phone=document.getElementById('phone').value.trim();
   const pass=document.getElementById('pass').value;
-  console.log("Register clicked", email);
   if(!name||!email||!pass) return showMsg("Fill Name, Email, Password");
-  if(pass.length<6) return showMsg("Password must be 6+ characters");
+  if(pass.length<6) return showMsg("Password must be 6+ chars");
+  showMsg("Registering...","blue");
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f);
-    await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
-    showMsg("✅ Registered! Logging in...","green");
-  }catch(e){ showMsg("ERROR: "+e.message); console.error(e); alert("ERROR: "+e.message); }
+    console.log("Auth created", cred.user.uid);
+    // Try to save to Firestore, but DON'T block login if rules fail
+    try{
+      await db.collection("users").doc(cred.user.uid).set({name,email,phone,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()});
+      console.log("User saved to Firestore");
+    }catch(fsErr){
+      console.error("Firestore save failed", fsErr);
+      alert("⚠️ IMPORTANT: Go to Firebase > Firestore > Rules and set allow read,write: if true, then Publish. Error: "+fsErr.message);
+      // Still continue - don't stop login
+    }
+    showMsg("✅ Registered! Opening chat...","green");
+  }catch(e){
+    if(e.code==='auth/email-already-in-use'){
+      showMsg("Email already used! Click Login Only button below.");
+    } else {
+      showMsg("ERROR: "+e.message);
+      alert(e.message);
+    }
+  }
 });
 
 document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  showMsg("Logging in...","blue");
   const email=document.getElementById('email').value.trim();
   const pass=document.getElementById('pass').value;
   if(!email||!pass) return showMsg("Fill Email + Password");
-  try{ await auth.signInWithEmailAndPassword(email, pass); showMsg("✅ Logged in!","green"); }
-  catch(e){ showMsg("LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message); }
+  showMsg("Logging in...","blue");
+  try{ await auth.signInWithEmailAndPassword(email, pass); }
+  catch(e){ showMsg("LOGIN ERROR: "+e.message); alert(e.message); }
 });
 
 auth.onAuthStateChanged(async (user)=>{
   if(!user) return;
-  console.log("Logged in as", user.email);
-  const snap=await db.collection("users").get();
-  allUsers=snap.docs.map(d=>d.data());
-  me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid};
-  document.getElementById('authBox').style.display='none';
-  document.getElementById('userBox').style.display='block';
-  document.getElementById('meName').innerText="Hi "+me.name;
-  await db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-  db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); renderGroups(); });
-  db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); });
+  console.log("Logged in", user.email);
+  // If user doc doesn't exist (because rules blocked it before), create it now
+  try{
+    const docSnap = await db.collection("users").doc(user.uid).get();
+    if(!docSnap.exists){
+      const name = document.getElementById('name').value.trim() || user.email.split('@')[0];
+      const phone = document.getElementById('phone').value.trim() || '';
+      await db.collection("users").doc(user.uid).set({name,email:user.email,phone,uid:user.uid,isOnline:true});
+    }
+    const snap = await db.collection("users").get();
+    allUsers = snap.docs.map(d=>d.data());
+    me = allUsers.find(u=>u.uid===user.uid) || {name:user.email,email:user.email,uid:user.uid};
+    // SHOW CHAT PAGE IMMEDIATELY - THIS WAS THE BUG
+    document.getElementById('authBox').style.display='none';
+    document.getElementById('userBox').style.display='block';
+    document.getElementById('meName').innerText="Hi "+me.name;
+    db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); }, err=>{ console.log("Users listen error", err); });
+  }catch(e){
+    console.error(e);
+    // FALLBACK: Show chat page even if Firestore fails, so user is not stuck
+    me = {name:document.getElementById('name').value||user.email, email:user.email, uid:user.uid};
+    document.getElementById('authBox').style.display='none';
+    document.getElementById('userBox').style.display='block';
+    document.getElementById('meName').innerText="Hi "+me.name+" (Offline Mode - Fix Rules)";
+    showMsg("");
+    alert("Firestore still blocked. Fix Rules in Firebase and refresh. Error: "+e.message);
+  }
 });
 
 function renderUsers(q=''){
   if(!me) return; let html='';
   allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes(q.toLowerCase())).forEach(u=>{
-    html+=`<div class="user" onclick="openChat('${u.uid}')"><div class="avatar">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div><b>${u.name}</b><br><small>${u.isOnline?'🟢 Online':'⚪ Offline'}</small></div></div>`;
+    html+=`<div class="user" onclick="openChat('${u.uid}')"><div class="avatar">${u.name[0].toUpperCase()}</div><div><b>${u.name}</b><br><small>${u.isOnline?'🟢 Online':'⚪ Offline'}</small></div></div>`;
   });
-  document.getElementById('users').innerHTML=html||'<p style="padding:10px">No other users yet. Register 2nd user.</p>';
+  document.getElementById('users').innerHTML=html||'<p style="padding:10px">No other users yet. Register 2nd user in another tab.</p>';
 }
-function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html; }
-async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}); }
-function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText='💬 '+chattingWith.name; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
-function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText='👥 '+chattingGroup.name; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
+function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); document.getElementById('chatHeader').innerText='💬 '+chattingWith.name; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
 function listenMsgs(){
   if(unsub) unsub();
   unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{
     let list=snap.docs.map(d=>({id:d.id,...d.data()}));
-    if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id);
-    else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid));
+    if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid));
     else return;
-    list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}); });
-    document.getElementById('msgs').innerHTML=list.map(m=>{
-      let tick=m.from===me.uid?(m.read?'<span style="color:#53bdeb">✓✓</span>':'<span>✓✓</span>'):'';
-      return `<div class="${m.from===me.uid?'me':'them'}">${m.text}<div class="time">${tick}</div></div>`;
-    }).join('');
+    list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}).catch(()=>{}); });
+    document.getElementById('msgs').innerHTML=list.map(m=>`<div class="${m.from===me.uid?'me':'them'}">${m.text}</div>`).join('');
     document.getElementById('msgs').scrollTop=99999;
-  });
+  }, err=>{ alert("Messages permission error: Fix Firestore Rules! "+err.message); });
 }
 async function sendMsg(){
   const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return;
-  if(!chattingWith && !chattingGroup) return alert('Select user/group first');
-  await db.collection("messages").add({from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  inp.value='';
+  if(!chattingWith) return alert('Select user first');
+  try{ await db.collection("messages").add({from:me.uid,to:chattingWith.uid,text:inp.value,read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); inp.value=''; }
+  catch(e){ alert("Send failed - Fix Firestore Rules: "+e.message); }
 }
-async function doLogout(){ if(me) await db.collection("users").doc(me.uid).update({isOnline:false}); await auth.signOut(); location.reload(); }
+async function doLogout(){ await auth.signOut(); location.reload(); }
 function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); }
 </script>
 </body>
