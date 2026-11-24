@@ -6,9 +6,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;font-family:'Inter',Arial} html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#fff}
-.app{width:100%;height:100dvh;max-width:100%;display:flex;background:#fff;overflow:hidden}
+.app{width:100%;height:100dvh;display:flex;background:#fff;overflow:hidden}
 .left{width:360px;min-width:300px;background:#fff;border-right:1px solid #e9edef;display:flex;flex-direction:column;height:100%;overflow:hidden}
-.right{flex:1;display:flex;flex-direction:column;background:#ffffff;height:100%;min-width:0}
+.right{flex:1;display:flex;flex-direction:column;background:#fff;height:100%;min-width:0}
 .sidebar-top{background:#f0f2f5;padding:10px 14px;display:flex;align-items:center;gap:10px}
 .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00a884,#008069);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;overflow:hidden;flex-shrink:0;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer}
 .avatar img{width:100%;height:100%;object-fit:cover}
@@ -16,14 +16,14 @@
 .avatar.small{width:32px;height:32px;font-size:14px}
 .header-green{background:linear-gradient(135deg,#00a884,#008069);color:#fff;padding:14px 16px;font-weight:800;font-size:19px;display:flex;justify-content:space-between;align-items:center}
 .field{padding:13px 14px;margin:6px 0;border-radius:12px;border:1px solid #e9edef;width:100%;outline:none;font-size:15px}
-.field:focus{border-color:#00a884;box-shadow:0 0 0 3px #d9fdd3}
 .btn{padding:13px;margin:6px 0;border-radius:12px;border:none;width:100%;font-weight:700;cursor:pointer;font-size:15px}
 .btn-green{background:#00a884;color:#fff} .btn-dark{background:#111b21;color:#fff} .btn-outline{background:#fff;color:#008069;border:2px solid #00a884}
-.btn:disabled{opacity:.6}
 .user{padding:11px 14px;cursor:pointer;display:flex;gap:11px;align-items:center;border-bottom:1px solid #f5f5f5}
 .user:hover{background:#f0f2f5}
-.chat-header{background:#f0f2f5;padding:8px 12px;display:flex;align-items:center;gap:10px}
-#msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:#fff}
+/* CHAT HEADER - BACK BUTTON ALWAYS VISIBLE */
+.chat-header{background:#f0f2f5;padding:8px 10px;display:flex;align-items:center;gap:8px;min-height:64px}
+.backBtn{width:40px;height:40px;border-radius:50%;border:none;background:#fff;color:#111;font-size:22px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;background:#fff;min-height:200px}
 .dateSep{align-self:center;background:#fff;padding:6px 12px;border-radius:12px;font-size:11px;color:#667781;box-shadow:0 1px 3px rgba(0,0,0,.12);margin:10px 0 4px}
 .me{align-self:flex-end;background:#d9fdd3;padding:8px 11px;border-radius:12px 12px 2px 12px;max-width:82%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word}
 .them{align-self:flex-start;background:#f0f2f5;padding:8px 11px;border-radius:12px 12px 12px 2px;max-width:82%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:14px;word-break:break-word}
@@ -34,19 +34,37 @@
 .pill input{border:none;outline:none;flex:1;font-size:15px;min-width:0}
 .iconBtn{width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#54656f;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .iconBtn.recording{background:#ff4444!important;color:#fff!important}
-.sendBtn{width:46px;height:46px;border-radius:50%;border:none;background:#00a884;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;box-shadow:0 3px 10px rgba(0,168,132,.4)}
+.sendBtn{width:46px;height:46px;border-radius:50%;border:none;background:#00a884;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0}
 .popup{position:absolute;bottom:70px;left:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:10px;z-index:99;display:none;width:260px}
 .popup button{width:100%;text-align:left;padding:11px;border:none;background:#f8f9fa;border-radius:10px;margin:4px 0;cursor:pointer;font-size:14px;font-weight:600}
 .emojiPopup{position:absolute;bottom:70px;right:8px;background:#fff;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:12px;z-index:99;display:none;width:280px}
 .emojiPopup span{font-size:26px;cursor:pointer;padding:4px;display:inline-block}
 .fileCard{background:#fff;border:1px solid #e9edef;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;max-width:260px}
-.fileCard a{color:#008069;font-weight:600;text-decoration:none;font-size:13px}
 .tabBtn{flex:1;padding:11px 4px;border:none;background:transparent;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;font-size:13px}
 .tabBtn.active{color:#00a884;border-bottom-color:#00a884}
 .uploadLabel{display:inline-block;background:#e7f8f3;color:#008069;padding:10px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer;margin:6px 0}
-.statusCard{margin:8px 12px;background:#f8f9fa;border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center}
-.authScroll{flex:1;overflow-y:auto;padding:16px}
-@media(max-width:760px){.left{width:100%;min-width:0}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}.avatar{width:40px;height:40px}}
+/* WHATSAPP STATUS - HORIZONTAL OVALS */
+.statusRow{display:flex;gap:12px;overflow-x:auto;padding:12px 12px 6px;scrollbar-width:none}
+.statusRow::-webkit-scrollbar{display:none}
+.statusOval{flex-shrink:0;width:68px;text-align:center;cursor:pointer}
+.statusCircle{width:62px;height:62px;border-radius:50%;padding:3px;background:conic-gradient(#00a884,#25d366,#00a884);display:flex;align-items:center;justify-content:center;margin:auto}
+.statusCircle.viewed{background:#ccc}
+.statusCircle .inner{width:54px;height:54px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:700}
+.statusCircle .inner img{width:100%;height:100%;object-fit:cover}
+.statusName{font-size:11px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statusAdd{width:62px;height:62px;border-radius:50%;background:#f0f2f5;border:2px dashed #00a884;display:flex;align-items:center;justify-content:center;font-size:26px;margin:auto;position:relative}
+.statusAdd span{position:absolute;bottom:0;right:0;background:#00a884;color:#fff;width:20px;height:20px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+/* STATUS VIEWER FULLSCREEN */
+#statusViewer{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column;color:#fff}
+.viewerTop{display:flex;gap:4px;padding:10px}
+.progressBar{flex:1;height:3px;background:#555;border-radius:10px;overflow:hidden}
+.progressBar div{height:100%;background:#fff;width:0%}
+.viewerHeader{display:flex;align-items:center;gap:10px;padding:0 14px}
+.viewerContent{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-size:22px;font-weight:600;line-height:1.4}
+.viewerContent img{max-width:100%;max-height:70vh;border-radius:12px}
+.viewerFooter{display:flex;gap:10px;padding:14px}
+.viewerFooter input{flex:1;padding:12px;border-radius:20px;border:none;outline:none}
+@media(max-width:760px){.left{width:100%;min-width:0}.right{display:none}.show-chat .left{display:none}.show-chat .right{display:flex}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -57,9 +75,8 @@
 <div class="left">
 <div class="header-green">💬 Easy Talkers <span style="font-size:11px;background:#fff;color:#008069;padding:5px 10px;border-radius:20px">LIVE ✨</span></div>
 
-<!-- AUTH - SCROLLS, FITS SCREEN -->
 <div id="authBox" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
-<div class="authScroll" style="text-align:center">
+<div style="flex:1;overflow-y:auto;padding:16px;text-align:center">
 <div class="avatar big" id="authAvatar" style="margin:auto">✨</div>
 <h2 style="margin:10px 0 2px">Welcome Back</h2>
 <p style="color:#667781;font-size:13px;margin:0 0 10px">Chat, Status, Files & Voice — like WhatsApp</p>
@@ -75,11 +92,9 @@
 <button class="btn btn-outline" onclick="guestLogin()">👤 Continue as Guest (Test Without Firebase)</button>
 <p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px"></p>
 <p id="debug" style="color:#00a884;font-size:12px"></p>
-<div style="background:#fff3cd;padding:10px;border-radius:10px;font-size:12px;text-align:left">⚠️ If Register says <b>Missing Permissions</b>: Go to Firebase → Firestore → Rules → Paste <b>allow read, write: if true;</b> → Publish → Try again with NEW email.</div>
 </div>
 </div>
 
-<!-- USER LIST -->
 <div id="userBox" style="display:none;flex-direction:column;flex:1;overflow:hidden">
 <div class="sidebar-top">
 <div style="display:flex;align-items:center;gap:10px;flex:1" onclick="document.getElementById('changePic').click()">
@@ -89,15 +104,25 @@
 <input type="file" id="changePic" accept="image/*" style="display:none" onchange="changeProfilePic(this)">
 <span style="font-size:20px;cursor:pointer" onclick="doLogout()">↪️</span>
 </div>
-<div style="display:flex;border-bottom:1px solid #e9edef"><button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats</button><button class="tabBtn" id="tabStatusBtn" onclick="showTab('status')">Status</button><button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups</button></div>
+
+<!-- STATUS OVALS - ALWAYS VISIBLE ON TOP LIKE WHATSAPP -->
+<div style="border-bottom:1px solid #f0f2f5">
+<div class="statusRow" id="statusRow">
+<div class="statusOval" onclick="document.getElementById('statusPicInput').click()">
+<div class="statusAdd">📸<span>+</span></div>
+<div class="statusName">My Status</div>
+</div>
+<input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
+<!-- Other statuses injected here -->
+<div id="statusOvals" style="display:flex;gap:12px"></div>
+</div>
+<div style="padding:0 12px 8px;display:flex;gap:6px"><input id="statusText" placeholder="Type status text..." style="flex:1;padding:10px;border-radius:20px;border:1px solid #e9edef;outline:none"><button onclick="postStatus()" style="padding:10px 14px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700;cursor:pointer">Post</button></div>
+</div>
+
+<div style="display:flex;border-bottom:1px solid #e9edef"><button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats</button><button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups</button></div>
 <div id="tabChats" style="flex:1;overflow-y:auto">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1" placeholder="Search chats" oninput="renderUsers(this.value)"></div>
 <div id="users"></div>
-</div>
-<div id="tabStatus" style="display:none;flex:1;overflow-y:auto;padding:10px">
-<input class="field" id="statusText" placeholder="What's on your mind? Share Status...">
-<button class="btn btn-green" onclick="postStatus()">+ Post My Status</button>
-<div id="statusList"></div>
 </div>
 <div id="tabGroups" style="display:none;flex:1;overflow-y:auto;padding:10px">
 <input class="field" id="groupName" placeholder="Group name e.g. KOJOPAY Team">
@@ -107,16 +132,15 @@
 </div>
 </div>
 
+<!-- RIGHT CHAT - ALWAYS HAS BACK BUTTON + CHAT BOX -->
 <div class="right">
 <div class="chat-header">
-<button class="iconBtn" onclick="backToUsers()" id="backBtn" style="display:none">←</button>
+<button class="backBtn" onclick="backToUsers()">←</button>
 <div class="avatar" id="chatAvatar">💬</div>
 <div style="flex:1;min-width:0"><b id="chatHeader" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Select a chat</b><div id="chatStatus" style="font-size:12px;color:#667781"></div><div id="typing" style="font-size:12px;color:#00a884;font-weight:600"></div></div>
 <span style="font-size:20px">📹</span><span style="font-size:20px">📞</span>
 </div>
-<div id="msgs"><div style="text-align:center;color:#667781;background:#f0f2f5;padding:10px 16px;border-radius:12px;align-self:center;font-size:12px;margin-top:30px">🔒 Messages are end-to-end encrypted<br>Select a user to start chatting</div></div>
-
-<!-- CHAT INPUT WITH POPUPS -->
+<div id="msgs"><div style="text-align:center;color:#667781;background:#f0f2f5;padding:10px 16px;border-radius:12px;align-self:center;font-size:12px;margin-top:30px">🔒 Messages are end-to-end encrypted<br>Tap a user on the left to open chat here</div></div>
 <div class="chat-input">
 <button class="iconBtn" onclick="toggleAttach(event)">📎</button>
 <button class="iconBtn" onclick="document.getElementById('imgInput').click()">📷</button>
@@ -124,31 +148,29 @@
 <input type="file" id="fileInput" style="display:none" onchange="sendFile(this)">
 <div class="pill"><input id="msgInput" placeholder="Type a message" oninput="setTyping()" onkeydown="if(event.key==='Enter')sendMsg()"><span style="cursor:pointer;font-size:20px" onclick="toggleEmoji(event)">😊</span></div>
 <button class="iconBtn" id="micBtn" onclick="toggleVoice()">🎤</button>
-<button class="sendBtn" onclick="sendMsg()" title="Send">➤</button>
-
-<!-- ATTACH POPUP -->
-<div class="popup" id="attachPopup">
-<div style="font-weight:700;margin-bottom:6px">Attach</div>
-<button onclick="pickFile('image')">🖼️ Photo / Image</button>
-<button onclick="pickFile('video')">🎥 Video</button>
-<button onclick="pickFile('file')">📄 Document / PDF / Any File</button>
-<button onclick="closePopups()" style="background:#fff;text-align:center;color:#888">✕ Close</button>
-</div>
-<!-- EMOJI POPUP -->
-<div class="emojiPopup" id="emojiPopup">
-<div style="font-weight:700;margin-bottom:6px">Emojis 😊 <span style="float:right;cursor:pointer" onclick="closePopups()">✕</span></div>
-<div id="emojiGrid"></div>
-</div>
+<button class="sendBtn" onclick="sendMsg()">➤</button>
+<div class="popup" id="attachPopup"><div style="font-weight:700;margin-bottom:6px">Attach</div><button onclick="pickFile('image')">🖼️ Photo / Image</button><button onclick="pickFile('video')">🎥 Video</button><button onclick="pickFile('file')">📄 Document / PDF / Any File</button><button onclick="closePopups()" style="background:#fff;text-align:center;color:#888">✕ Close</button></div>
+<div class="emojiPopup" id="emojiPopup"><div style="font-weight:700;margin-bottom:6px">Emojis 😊 <span style="float:right;cursor:pointer" onclick="closePopups()">✕</span></div><div id="emojiGrid"></div></div>
 </div>
 <div style="text-align:center;font-size:11px;color:#54656f;padding:3px 0;background:#f0f2f5">Tap 📎 Attach • Tap 😊 Emoji • Tap 🎤 to Record, Tap 🔴 to Stop • Tap ➤ Send</div>
 </div>
 </div>
 
+<!-- STATUS VIEWER -->
+<div id="statusViewer">
+<div class="viewerTop" id="viewerProgress"></div>
+<div class="viewerHeader"><button onclick="closeStatusViewer()" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer">✕</button><div class="avatar small" id="viewerAvatar">K</div><div><b id="viewerName">User</b><div id="viewerTime" style="font-size:12px;color:#ccc"></div></div><span style="margin-left:auto;font-size:12px">Expires in 24h ⏳</span></div>
+<div class="viewerContent" id="viewerContent" onclick="nextStatus()"></div>
+<div style="text-align:center;color:#aaa;font-size:12px">Tap right → Next • Tap left ← Prev • Tap ✕ to close</div>
+<div class="viewerFooter"><input id="statusReply" placeholder="Reply to status..."><button onclick="replyStatus()" style="padding:12px 18px;border-radius:20px;border:none;background:#00a884;color:#fff;font-weight:700">➤</button></div>
+</div>
+
 <script>
 const firebaseConfig = { apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM", authDomain: "easy-talkers.firebaseapp.com", projectId: "easy-talkers", storageBucket: "easy-talkers.firebasestorage.app", messagingSenderId: "533433245977", appId: "1:533433245977:web:82ffe12e9296d116a3e588", measurementId: "G-01GNZB6GKJ" };
 let auth=null, db=null, firebaseOK=false;
-try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); firebaseOK=true; document.getElementById('debug').innerText="✅ Firebase Connected"; }catch(e){ document.getElementById('debug').innerText="⚠️ Firebase failed: "+e.message+" — Use Guest Mode"; }
+try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); firebaseOK=true; document.getElementById('debug').innerText="✅ Firebase Connected"; }catch(e){ document.getElementById('debug').innerText="⚠️ Use Guest Mode"; }
 let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, mediaRecorder=null, audioChunks=[], typingTimeout=null, isRecording=false, guestMode=false, localMsgs=[];
+let currentStatusIndex=0, statusTimer=null, viewedStatuses=new Set(JSON.parse(localStorage.getItem('viewedStatus')||'[]'));
 const emojis=["😀","😂","❤️","🔥","👍","🙏","😍","😢","😡","🎉","👏","😎","🤔","😅","💪","🙌","😭","😘","🥰","😇","🤣","😋","😴","🤝","💯","✨","🌹","⚽","🎶","🚀"];
 document.getElementById('emojiGrid').innerHTML=emojis.map(e=>`<span onclick="addEmoji('${e}')">${e}</span>`).join('');
 function addEmoji(e){ document.getElementById('msgInput').value+=e; document.getElementById('msgInput').focus(); closePopups(); }
@@ -164,117 +186,46 @@ async function changeProfilePic(el){ if(!me||!el.files[0]) return; const b=await
 function avatarHTML(u){ if(u?.photoURL) return `<div class="avatar"><img src="${u.photoURL}"></div>`; return `<div class="avatar">${u?.name?u.name[0].toUpperCase():'👤'}</div>`; }
 function formatDate(d){ if(!d) return ''; const today=new Date(); const yesterday=new Date(); yesterday.setDate(today.getDate()-1); if(d.toDateString()===today.toDateString()) return 'Today'; if(d.toDateString()===yesterday.toDateString()) return 'Yesterday'; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function formatTime(d){ return d?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''; }
-
-// GUEST MODE - WORKS EVEN IF FIREBASE BLOCKED
-function guestLogin(){
-  const name=document.getElementById('name').value.trim()||'Guest '+Math.floor(Math.random()*100);
-  guestMode=true; me={name, email:'guest@test.com', uid:'guest-'+Date.now(), photoURL:'', isOnline:true};
-  allUsers=[me,{name:'Demo Kojo',uid:'demo1',photoURL:'',isOnline:true},{name:'Demo Test',uid:'demo2',photoURL:'',isOnline:false}];
-  document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex';
-  document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.name[0].toUpperCase();
-  renderUsers(''); alert("✅ Guest Mode ON — You can now chat & test all features. Fix Firebase Rules for real users.");
-}
-
-document.getElementById('regBtn').addEventListener('click', async ()=>{
-  const btn=document.getElementById('regBtn'); btn.disabled=true; btn.innerText='Creating...';
-  const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(), phone=document.getElementById('phone').value.trim(), pass=document.getElementById('pass').value;
-  if(!name||!email||!pass){ showMsg("Fill Name, Email, Password"); btn.disabled=false; btn.innerText='Create Account →'; return; }
-  if(pass.length<6){ showMsg("Password must be 6+ chars"); btn.disabled=false; btn.innerText='Create Account →'; return; }
-  showMsg("Creating account...","#008069");
-  try{
-    const cred=await auth.createUserWithEmailAndPassword(email,pass);
-    let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f);
-    try{ await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}); }
-    catch(fsErr){ alert("⚠️ Firestore Rules blocked! Go to Firebase > Firestore > Rules > allow read,write: if true > Publish. Then login with same email. Error: "+fsErr.message); }
-    showMsg("✅ Registered! Opening chats...","#00a884");
-  }catch(e){ if(e.code==='auth/email-already-in-use') showMsg("Email already used! Click Login button."); else { showMsg("ERROR: "+e.message); alert(e.message); } }
-  btn.disabled=false; btn.innerText='Create Account →';
-});
-document.getElementById('loginBtn').addEventListener('click', async ()=>{
-  const btn=document.getElementById('loginBtn'); btn.disabled=true; btn.innerText='Logging in...';
-  const email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value;
-  if(!email||!pass){ showMsg("Fill Email + Password"); btn.disabled=false; btn.innerText='Login'; return; }
-  showMsg("Logging in...","#008069");
-  try{ await auth.signInWithEmailAndPassword(email,pass); showMsg("✅ Logged in!","#00a884"); }
-  catch(e){ showMsg("LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message+"\n\nIf email already registered, use exact same password. Or use Guest Mode to test."); }
-  btn.disabled=false; btn.innerText='Login';
-});
-
-if(firebaseOK){
-auth.onAuthStateChanged(async (user)=>{
-  if(!user||guestMode) return;
-  try{
-    const docSnap=await db.collection("users").doc(user.uid).get();
-    if(!docSnap.exists){ const name=document.getElementById('name').value.trim()||user.email.split('@')[0]; await db.collection("users").doc(user.uid).set({name,email:user.email,phone:'',photoURL:'',uid:user.uid,isOnline:true}); }
-    const snap=await db.collection("users").get(); allUsers=snap.docs.map(d=>d.data());
-    me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid};
-    document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex';
-    document.getElementById('meName').innerText=me.name;
-    document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase();
-    db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-    db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); updateHeader(); });
-    db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); });
-    db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatus(); });
-  }catch(e){ alert("Firestore error (Fix Rules): "+e.message); }
-});
-}
-function showTab(t){ document.getElementById('tabChats').style.display=t==='chats'?'block':'none'; document.getElementById('tabStatus').style.display=t==='status'?'block':'none'; document.getElementById('tabGroups').style.display=t==='groups'?'block':'none'; document.getElementById('tabChatBtn').classList.toggle('active',t==='chats'); document.getElementById('tabStatusBtn').classList.toggle('active',t==='status'); document.getElementById('tabGroupBtn').classList.toggle('active',t==='groups'); }
-function updateHeader(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'🟢 Online • Last seen today':('Last seen '+(u.lastSeen?.toDate?formatDate(u.lastSeen.toDate())+' • '+formatTime(u.lastSeen.toDate()):'recently')); }
+function isExpired(s){ let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); return (Date.now()-d.getTime())>24*60*60*1000; }
+function filterValidStatuses(){ return statuses.filter(s=>!isExpired(s)); }
+function guestLogin(){ const name=document.getElementById('name').value.trim()||'Guest '+Math.floor(Math.random()*100); guestMode=true; me={name, email:'guest@test.com', uid:'guest-'+Date.now(), photoURL:'', isOnline:true}; allUsers=[me,{name:'Demo Kojo',uid:'demo1',photoURL:'',isOnline:true},{name:'Demo Test',uid:'demo2',photoURL:'',isOnline:false}]; statuses=[{id:'s1',text:'Hello from Demo Kojo! 👋 My status expires in 24h',fromName:'Demo Kojo',from:'demo1',createdAt:new Date(),photoURL:''}]; document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex'; document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.name[0].toUpperCase(); renderUsers(''); renderStatusOvals(); alert("✅ Guest Mode ON"); }
+document.getElementById('regBtn').addEventListener('click', async ()=>{ const btn=document.getElementById('regBtn'); btn.disabled=true; btn.innerText='Creating...'; const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(), phone=document.getElementById('phone').value.trim(), pass=document.getElementById('pass').value; if(!name||!email||!pass){ showMsg("Fill Name, Email, Password"); btn.disabled=false; btn.innerText='Create Account →'; return; } if(pass.length<6){ showMsg("Password must be 6+ chars"); btn.disabled=false; btn.innerText='Create Account →'; return; } showMsg("Creating account...","#008069"); try{ const cred=await auth.createUserWithEmailAndPassword(email,pass); let photoURL=''; const f=document.getElementById('picInput').files[0]; if(f) photoURL=await fileToBase64(f); try{ await db.collection("users").doc(cred.user.uid).set({name,email,phone,photoURL,uid:cred.user.uid,isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}); }catch(fsErr){ alert("⚠️ Fix Firestore Rules: Firebase > Firestore > Rules > allow read,write: if true > Publish. Error: "+fsErr.message); } showMsg("✅ Registered! Opening chats...","#00a884"); }catch(e){ if(e.code==='auth/email-already-in-use') showMsg("Email already used! Click Login."); else { showMsg("ERROR: "+e.message); alert(e.message); } } btn.disabled=false; btn.innerText='Create Account →'; });
+document.getElementById('loginBtn').addEventListener('click', async ()=>{ const btn=document.getElementById('loginBtn'); btn.disabled=true; btn.innerText='Logging in...'; const email=document.getElementById('email').value.trim(), pass=document.getElementById('pass').value; if(!email||!pass){ showMsg("Fill Email + Password"); btn.disabled=false; btn.innerText='Login'; return; } showMsg("Logging in...","#008069"); try{ await auth.signInWithEmailAndPassword(email,pass); showMsg("✅ Logged in!","#00a884"); }catch(e){ showMsg("LOGIN ERROR: "+e.message); alert("LOGIN ERROR: "+e.message); } btn.disabled=false; btn.innerText='Login'; });
+if(firebaseOK){ auth.onAuthStateChanged(async (user)=>{ if(!user||guestMode) return; try{ const docSnap=await db.collection("users").doc(user.uid).get(); if(!docSnap.exists){ const name=document.getElementById('name').value.trim()||user.email.split('@')[0]; await db.collection("users").doc(user.uid).set({name,email:user.email,phone:'',photoURL:'',uid:user.uid,isOnline:true}); } const snap=await db.collection("users").get(); allUsers=snap.docs.map(d=>d.data()); me=allUsers.find(u=>u.uid===user.uid)||{name:user.email,email:user.email,uid:user.uid}; document.getElementById('authBox').style.display='none'; document.getElementById('userBox').style.display='flex'; document.getElementById('meName').innerText=me.name; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:me.name[0].toUpperCase(); db.collection("users").doc(me.uid).update({isOnline:true,lastSeen:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); db.collection("users").onSnapshot(s=>{ allUsers=s.docs.map(d=>d.data()); renderUsers(''); updateHeader(); }); db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); renderGroups(); }); db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusOvals(); }); }catch(e){ alert("Firestore error (Fix Rules): "+e.message); } }); }
+function showTab(t){ document.getElementById('tabChats').style.display=t==='chats'?'block':'none'; document.getElementById('tabGroups').style.display=t==='groups'?'block':'none'; document.getElementById('tabChatBtn').classList.toggle('active',t==='chats'); document.getElementById('tabGroupBtn').classList.toggle('active',t==='groups'); }
+function updateHeader(){ if(!chattingWith) return; const u=allUsers.find(x=>x.uid===chattingWith.uid); if(u) document.getElementById('chatStatus').innerText=u.isOnline?'🟢 Online':('Last seen '+formatDate(u.lastSeen?.toDate?u.lastSeen.toDate():new Date())+' • '+formatTime(u.lastSeen?.toDate?u.lastSeen.toDate():new Date())); }
 function renderUsers(q=''){ if(!me) return; let html=''; allUsers.filter(u=>u.uid!==me.uid && u.name.toLowerCase().includes((q||'').toLowerCase())).forEach(u=>{ html+=`<div class="user" onclick="openChat('${u.uid}')">${avatarHTML(u)}<div style="flex:1;min-width:0"><b style="font-size:14px">${u.name}</b><br><small style="color:${u.isOnline?'#00a884':'#667781'}">${u.isOnline?'🟢 Online':'⚪ Last seen'}</small></div><span>💬</span></div>`; }); document.getElementById('users').innerHTML=html||'<p style="padding:16px;color:#667781;font-size:13px">No users yet. Register 2nd user or use Guest Mode.</p>'; }
 function renderGroups(){ let html=''; groups.forEach(g=>{ html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar">👥</div><div><b>${g.name}</b><br><small>${g.members?.length||0} members</small></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet.</p>'; }
 async function createGroup(){ const name=document.getElementById('groupName').value.trim(); if(!name) return alert('Enter group name'); if(guestMode){ groups.push({id:'g'+Date.now(),name,members:[me.uid]}); renderGroups(); return; } await db.collection("groups").add({name,members:[me.uid],createdBy:me.uid}); document.getElementById('groupName').value=''; }
-async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); if(guestMode){ statuses.unshift({text:t,fromName:me.name,from:me.uid,createdAt:new Date(),photoURL:me.photoURL}); renderStatus(); document.getElementById('statusText').value=''; return; } await db.collection("statuses").add({text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById('statusText').value=''; }
-function renderStatus(){ let html=''; if(!statuses.length) html='<p style="color:#667781;font-size:13px">No status yet. Post one!</p>'; statuses.forEach(s=>{ let d=s.createdAt?.toDate?s.createdAt.toDate(): (s.createdAt instanceof Date?s.createdAt:new Date()); html+=`<div class="statusCard"><div class="avatar">${s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase()}</div><div><b>${s.fromName}</b><div style="font-size:13px">${s.text}</div><small style="color:#667781">${formatDate(d)} • ${formatTime(d)}</small></div></div>`; }); document.getElementById('statusList').innerHTML=html; }
-function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText=chattingWith.name; document.getElementById('chatAvatar').innerHTML=chattingWith.photoURL?`<img src="${chattingWith.photoURL}">`:chattingWith.name[0].toUpperCase(); updateHeader(); document.getElementById('app').classList.add('show-chat'); document.getElementById('backBtn').style.display='flex'; listenMsgs(); }
+
+// --- STATUS: 24H EXPIRY + OVAL + VIEWER ---
+async function postStatus(){ const t=document.getElementById('statusText').value.trim(); if(!t) return alert('Type status first'); const data={text:t,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'text'}; if(guestMode){ statuses.unshift({...data,id:'s'+Date.now()}); renderStatusOvals(); document.getElementById('statusText').value=''; return; } await db.collection("statuses").add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); document.getElementById('statusText').value=''; }
+async function postStatusImage(el){ const f=el.files[0]; if(!f) return; const b64=await fileToBase64(f); const data={text:'',image:b64,from:me.uid,fromName:me.name,photoURL:me.photoURL||'',createdAt:new Date(),type:'image'}; if(guestMode){ statuses.unshift({...data,id:'s'+Date.now()}); renderStatusOvals(); } else { await db.collection("statuses").add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } el.value=''; alert("✅ Status posted! Expires in 24h"); }
+function renderStatusOvals(){ let valid=filterValidStatuses(); // Group by user, show latest per user like WhatsApp
+  let byUser={}; valid.forEach(s=>{ if(!byUser[s.from]) byUser[s.from]=[]; byUser[s.from].push(s); });
+  let html=''; Object.keys(byUser).forEach(uid=>{ let latest=byUser[uid][0]; let viewed=viewedStatuses.has(latest.id); html+=`<div class="statusOval" onclick="openStatusViewer('${uid}')"><div class="statusCircle ${viewed?'viewed':''}"><div class="inner">${latest.image?`<img src="${latest.image}">`:(latest.photoURL?`<img src="${latest.photoURL}">`:latest.fromName[0].toUpperCase())}</div></div><div class="statusName">${latest.fromName}</div><div style="font-size:10px;color:#888">${byUser[uid].length} update${byUser[uid].length>1?'s':''}</div></div>`; });
+  document.getElementById('statusOvals').innerHTML=html||'<div style="font-size:12px;color:#888;padding:14px 4px">No status yet — post one!</div>';
+}
+function openStatusViewer(uid){ let valid=filterValidStatuses().filter(s=>s.from===uid); if(!valid.length) return; currentStatusIndex=0; window._viewerList=valid; showStatusAt(0); document.getElementById('statusViewer').style.display='flex'; }
+function showStatusAt(i){ let list=window._viewerList; if(i<0||i>=list.length){ closeStatusViewer(); return; } currentStatusIndex=i; let s=list[i]; viewedStatuses.add(s.id); localStorage.setItem('viewedStatus',JSON.stringify([...viewedStatuses])); renderStatusOvals(); let d=s.createdAt?.toDate?s.createdAt.toDate():(s.createdAt instanceof Date?s.createdAt:new Date()); let hoursLeft=Math.max(0,24-Math.floor((Date.now()-d.getTime())/(1000*60*60))); document.getElementById('viewerProgress').innerHTML=list.map((_,idx)=>`<div class="progressBar"><div style="width:${idx<i?100:idx===i?0:0}%"></div></div>`).join(''); document.getElementById('viewerAvatar').innerHTML=s.photoURL?`<img src="${s.photoURL}">`:s.fromName[0].toUpperCase(); document.getElementById('viewerName').innerText=s.fromName; document.getElementById('viewerTime').innerText=formatDate(d)+' • '+formatTime(d)+' • Expires in '+hoursLeft+'h'; document.getElementById('viewerContent').innerHTML=s.image?`<img src="${s.image}">`:`<div>${s.text}</div>`; // Auto progress 5 sec
+  clearTimeout(statusTimer); let bar=document.querySelectorAll('.progressBar div')[i]; let w=0; let interval=setInterval(()=>{ w+=2; if(bar) bar.style.width=w+'%'; if(w>=100){ clearInterval(interval); nextStatus(); } },100); statusTimer=setTimeout(()=>{},6000); window._progressInterval=interval;
+}
+function nextStatus(){ clearInterval(window._progressInterval); showStatusAt(currentStatusIndex+1); }
+function prevStatus(){ clearInterval(window._progressInterval); if(currentStatusIndex>0) showStatusAt(currentStatusIndex-1); else closeStatusViewer(); }
+function closeStatusViewer(){ clearInterval(window._progressInterval); document.getElementById('statusViewer').style.display='none'; }
+function replyStatus(){ let txt=document.getElementById('statusReply').value.trim(); if(!txt) return; alert("Reply sent to "+document.getElementById('viewerName').innerText+": "+txt); document.getElementById('statusReply').value=''; }
+
+function openChat(uid){ chattingWith=allUsers.find(u=>u.uid===uid); chattingGroup=null; document.getElementById('chatHeader').innerText=chattingWith.name; document.getElementById('chatAvatar').innerHTML=chattingWith.photoURL?`<img src="${chattingWith.photoURL}">`:chattingWith.name[0].toUpperCase(); updateHeader(); document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
 function openGroup(id){ chattingGroup=groups.find(g=>g.id===id); chattingWith=null; document.getElementById('chatHeader').innerText=chattingGroup.name; document.getElementById('chatAvatar').innerHTML='👥'; document.getElementById('chatStatus').innerText=(chattingGroup.members?.length||0)+' members'; document.getElementById('app').classList.add('show-chat'); listenMsgs(); }
-function renderMessages(list){
-  let html=''; let lastDate='';
-  list.forEach(m=>{
-    let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt instanceof Date?m.createdAt:new Date());
-    let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; }
-    let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User');
-    let tick=m.from===me.uid?(m.read?'<span class="tick blue">✓✓</span>':'<span class="tick">✓✓</span>'):'';
-    let content='';
-    if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`;
-    else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`;
-    else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download / Open</a></div></div>`;
-    else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`;
-    else content=m.text;
-    html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`;
-  });
-  document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px">No messages yet. Say Hi 👋</div>';
-  document.getElementById('msgs').scrollTop=99999;
-}
-function listenMsgs(){
-  if(guestMode){
-    let list=localMsgs.filter(m=>(m.from===me.uid && m.to===chattingWith?.uid)||(m.from===chattingWith?.uid && m.to===me.uid));
-    renderMessages(list); return;
-  }
-  if(unsub) unsub();
-  unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{
-    let list=snap.docs.map(d=>({id:d.id,...d.data()}));
-    if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id);
-    else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid));
-    else return;
-    list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}).catch(()=>{}); });
-    renderMessages(list);
-  });
-}
+function renderMessages(list){ let html=''; let lastDate=''; list.forEach(m=>{ let d=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt instanceof Date?m.createdAt:new Date()); let dateStr=formatDate(d); if(dateStr!==lastDate){ html+=`<div class="dateSep">📅 ${dateStr}</div>`; lastDate=dateStr; } let sender=m.from===me.uid?'You':(allUsers.find(u=>u.uid===m.from)?.name||'User'); let tick=m.from===me.uid?(m.read?'<span class="tick blue">✓✓</span>':'<span class="tick">✓✓</span>'):''; let content=''; if(m.type==='image') content=`<img src="${m.text}" style="max-width:240px;border-radius:10px;display:block">`; else if(m.type==='audio') content=`<audio controls src="${m.text}" style="max-width:220px"></audio>`; else if(m.type==='file') content=`<div class="fileCard">📄 <div><b>${m.fileName||'File'}</b><br><a href="${m.text}" download="${m.fileName||'file'}">⬇️ Download</a></div></div>`; else if(m.type==='video') content=`<video controls src="${m.text}" style="max-width:240px;border-radius:10px"></video>`; else content=m.text; html+=`<div class="${m.from===me.uid?'me':'them'}">${chattingGroup?`<small style="color:#008069;font-weight:700">${sender}</small><br>`:''}${content}<div class="time">${formatDate(d)} • ${formatTime(d)} ${tick}</div></div>`; }); document.getElementById('msgs').innerHTML=html||'<div style="text-align:center;color:#999;font-size:13px;padding:20px">No messages yet. Say Hi 👋<br>Chat box is below 👇</div>'; document.getElementById('msgs').scrollTop=99999; }
+function listenMsgs(){ if(guestMode){ let list=localMsgs.filter(m=>(m.from===me.uid && m.to===chattingWith?.uid)||(m.from===chattingWith?.uid && m.to===me.uid)); renderMessages(list); return; } if(unsub) unsub(); unsub=db.collection("messages").orderBy("createdAt","asc").onSnapshot(snap=>{ let list=snap.docs.map(d=>({id:d.id,...d.data()})); if(chattingGroup) list=list.filter(m=>m.groupId===chattingGroup.id); else if(chattingWith) list=list.filter(m=>(m.from===me.uid && m.to===chattingWith.uid)||(m.from===chattingWith.uid && m.to===me.uid)); else return; list.forEach(m=>{ if(m.to===me.uid && !m.read) db.collection("messages").doc(m.id).update({read:true}).catch(()=>{}); }); renderMessages(list); }); }
 async function setTyping(){ if(!chattingWith||guestMode) return; await db.collection("users").doc(me.uid).update({typingTo:chattingWith.uid}).catch(()=>{}); clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>db.collection("users").doc(me.uid).update({typingTo:''}).catch(()=>{}),2000); }
 setInterval(()=>{ if(chattingWith && !guestMode){ const u=allUsers.find(x=>x.uid===chattingWith.uid); document.getElementById('typing').innerText=u?.typingTo===me.uid?'typing...':''; } },1000);
 async function sendMsg(){ const inp=document.getElementById('msgInput'); if(!inp.value.trim()) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:inp.value,type:'text',read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); renderMessages(localMsgs.filter(m=>(m.from===me.uid && m.to===chattingWith?.uid)||(m.from===chattingWith?.uid && m.to===me.uid))); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } inp.value=''; }
 async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup) return alert('Select user/group first'); const b64=await fileToBase64(f); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); listenMsgs(); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } el.value=''; alert("✅ Sent: "+f.name); }
-async function toggleVoice(){
-  if(!isRecording){
-    try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; alert("🎤 Recording... Tap 🔴 again to STOP & SEND"); }
-    catch(e){ alert('Mic permission needed - Allow mic in browser'); }
-  } else {
-    mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); listenMsgs(); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } alert("✅ Voice note sent!"); };
-    mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤';
-  }
-}
+async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; alert("🎤 Recording... Tap 🔴 again to STOP & SEND"); }catch(e){ alert('Mic permission needed'); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); const msg={from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:new Date()}; if(guestMode){ localMsgs.push(msg); listenMsgs(); } else { await db.collection("messages").add({...msg,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); } alert("✅ Voice note sent!"); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
 async function doLogout(){ if(me && !guestMode) await db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(!guestMode) await auth.signOut(); location.reload(); }
 function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); }
 </script>
 </body>
-  </html>
+                                                                                                         </html>
