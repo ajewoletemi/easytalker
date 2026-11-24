@@ -247,4 +247,27 @@ loginSuccess = function(user){
   }catch(e2){ console.log(e2); }
 };
 </script>
+  <script>
+// === AUTO-LOGIN ===
+(function(){
+  try{
+    var saved = localStorage.getItem('et_current');
+    if(!saved) return;
+    var u = JSON.parse(saved);
+    if(!u || !u.email) return;
+    // wait a tiny bit so all functions are ready, then open chat center
+    setTimeout(function(){
+      if(typeof loginSuccess === 'function'){
+        loginSuccess(u);
+      }
+    }, 300);
+  }catch(e){ console.log(e); }
+})();
+// === Save login every time you login, so next time it auto-logins ===
+var _saveLogin = loginSuccess;
+loginSuccess = function(user){
+  try{ localStorage.setItem('et_current', JSON.stringify(user)); }catch(e){}
+  return _saveLogin(user);
+};
+</script>
 </script></body></html>
