@@ -58,7 +58,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 .tabBtn{flex:1;padding:11px 2px;border:none;background:transparent;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tabBtn.active{color:#00a884;border-bottom-color:#00a884}
 .uploadLabel{display:inline-block;background:#e7f8f3;color:#008069;padding:10px 16px;border-radius:20px;font-weight:600;font-size:13px;cursor:pointer;margin:6px 0;max-width:100%}
-/* ===== STATUS - NO CUT, FIT TO SCREEN ===== */
 .statusBar{padding:12px 12px 10px;border-bottom:1px solid #f0f2f5;background:#fff;flex-shrink:0;overflow:visible}
 .statusLineWrap{display:flex;align-items:flex-start;gap:8px;width:100%;min-width:0;overflow:visible;padding-top:6px}
 .statusLine{position:relative;height:104px;display:flex;align-items:flex-start;gap:12px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;flex:1;scroll-behavior:smooth;padding:8px 4px 4px;min-width:0}
@@ -75,15 +74,12 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 .statusDotPlus{position:absolute;bottom:20px;right:0px;background:#00a884;color:#fff;width:20px;height:20px;border-radius:50%;font-size:13px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.25);z-index:2}
 .circleFlowBtn{width:36px;height:36px;border-radius:50%;background:#00a884;color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,168,132,.4);margin-top:14px}
 .groupBadge{background:#e7f8f3;color:#008069;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;white-space:nowrap}
-/* ===== GROUP RULES - SMALL, BEAUTIFUL, UNIQUE ===== */
 .rulesWrap{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .ruleCard{display:flex;gap:8px;align-items:flex-start;background:linear-gradient(135deg,#f0fdf4,#e7f8f3);border:1px solid #d9fdd3;border-radius:12px;padding:8px 10px}
 .ruleNum{width:22px;height:22px;min-width:22px;border-radius:50%;background:linear-gradient(135deg,#00a884,#008069);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ruleText{font-size:11px;line-height:1.4;color:#23443a;font-weight:600;word-break:break-word}
 .ruleIcon{font-size:12px;flex-shrink:0}
 .groupHeaderCard{background:linear-gradient(135deg,#00a884,#008069,#00c896);color:#fff;border-radius:16px;padding:12px;margin:0 0 8px;text-align:left}
-.groupHeaderCard b{font-size:14px}
-.groupHeaderCard small{font-size:11px;opacity:.9}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111b21;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;z-index:1000;display:none;box-shadow:0 4px 12px rgba(0,0,0,.3);max-width:calc(100vw - 32px);text-align:center;word-break:break-word}
 #editProfileModal,#profileViewModal,#groupProfileModal,#groupEditModal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
 .editSheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px;max-height:92dvh;overflow-y:auto;overflow-x:hidden}
@@ -125,9 +121,9 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div class="avatar big" style="margin:auto">👋</div>
 <h2 style="margin:12px 0 2px">Welcome Back</h2>
 <p style="color:#667781;font-size:13px;margin:0 0 16px">Login to continue chatting</p>
-<input class="field" id="loginEmail" placeholder="✉️ Email e.g. kojo@gmail.com">
-<input class="field" id="loginPass" type="password" placeholder="🔒 Password">
-<button class="btn btn-dark" onclick="doLogin()">Login →</button>
+<input class="field" id="loginEmail" placeholder="✉️ Email e.g. kojo@gmail.com" autocomplete="email">
+<input class="field" id="loginPass" type="password" placeholder="🔒 Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+<button class="btn btn-dark" id="loginBtn" onclick="doLogin()">Login →</button>
 <p id="loginMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600;word-break:break-word"></p>
 <div style="margin-top:16px;border-top:1px solid #eee;padding-top:14px">
 <p style="color:#667781;font-size:13px;margin:0">Don't have an account?</p>
@@ -149,7 +145,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <label class="uploadLabel" for="picInput">📸 Choose Profile Picture</label>
 <input type="file" id="picInput" accept="image/*" style="display:none" onchange="previewPic(this)">
 <div id="picName" style="font-size:12px;color:#008069;word-break:break-word"></div>
-<button class="btn btn-green" onclick="doRegister()">Create Account →</button>
+<button class="btn btn-green" id="signupBtn" onclick="doRegister()">Create Account →</button>
 <p id="authMsg" style="color:#e74c3c;font-size:13px;min-height:18px;font-weight:600;word-break:break-word"></p>
 <div style="margin-top:10px;border-top:1px solid #eee;padding-top:12px">
 <p style="color:#667781;font-size:13px;margin:0">Already have an account?</p>
@@ -164,9 +160,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <div style="flex:1;min-width:0"><b id="meName" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Me</b><div style="font-size:12px;color:#00a884">🟢 Online • Tap to Edit Profile ✏️</div><div id="meEmailSmall" style="font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div><div id="meBioSmall" style="font-size:11px;color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div></div>
 <span style="font-size:18px;flex-shrink:0">✏️</span>
 </div>
-
 <div id="inboxBanner" class="inboxBanner" style="display:none" onclick="openInboxSender()"></div>
-
 <div class="statusBar">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;gap:8px">
 <span style="font-size:12px;color:#111;font-weight:800;letter-spacing:.5px">● STATUS • Tap circle to view</span>
@@ -185,26 +179,22 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 <input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="postStatusImage(this)">
 <div id="lastStatusPreview" style="font-size:12px;color:#667781;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" onclick="openMyStatus()"></div>
 </div>
-
 <div style="display:flex;border-bottom:1px solid #e9edef;flex-shrink:0">
 <button class="tabBtn active" id="tabChatBtn" onclick="showTab('chats')">Chats <span id="chatCount" style="background:#00a884;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px"></span> <span id="totalUnread" style="background:#ff3b30;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;display:none"></span></button>
 <button class="tabBtn" id="tabContactBtn" onclick="showTab('contacts')">Contacts <span id="contactCount" style="background:#e9edef;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 <button class="tabBtn" id="tabGroupBtn" onclick="showTab('groups')">Groups <span id="groupCount" style="background:#e7f8f3;color:#008069;padding:1px 6px;border-radius:10px;font-size:10px"></span></button>
 </div>
-
 <div id="tabChats" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1;min-width:0" placeholder="Search chats + groups" oninput="renderChats(this.value)"></div>
 <div style="padding:6px 14px;font-size:11px;color:#888">Chats + Groups together • Unread on top • Newest first</div>
 <div id="chatsList"></div>
 <div style="padding:12px;text-align:center"><button class="linkBtn" onclick="showTab('contacts')">+ New Chat — Go to Contacts →</button></div>
 </div>
-
 <div id="tabContacts" style="display:none;flex:1;overflow-y:auto;overflow-x:hidden;min-height:0">
 <div style="margin:10px;background:#f0f2f5;border-radius:20px;padding:8px 14px;display:flex;gap:8px">🔍 <input style="border:none;background:transparent;outline:none;flex:1;min-width:0" placeholder="Search all contacts" oninput="renderContacts(this.value)"></div>
 <div style="padding:8px 14px;font-size:12px;color:#667781;font-weight:700">👥 ALL PEOPLE — Tap pic to view profile • Tap name to chat • Everyone can view each other</div>
 <div id="contactsList"></div>
 </div>
-
 <div id="tabGroups" style="display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;min-height:0">
 <div style="font-size:12px;color:#667781;font-weight:700;margin-bottom:8px">👥 CREATE GROUP — Visible to all members in Chats</div>
 <input class="field" id="groupName" placeholder="Group name e.g. KOJOPAY Team">
@@ -266,7 +256,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 
-<!-- USER PROFILE - NO USER LINK, WITH CHAT BAR -->
 <div id="profileViewModal">
 <div class="editSheet profileSheet">
 <div style="background:linear-gradient(135deg,#00a884,#008069);padding:14px 20px 36px;color:#fff;position:relative;flex-shrink:0">
@@ -291,7 +280,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 </div>
-<!-- CHAT BAR IN PROFILE - SEND WITHOUT OPENING CHAT -->
 <div class="profileChatBar" id="profileChatBar">
 <input id="profileMsgInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsgFromProfile()">
 <button onclick="sendMsgFromProfile()" title="Send message">➤</button>
@@ -300,7 +288,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidde
 </div>
 </div>
 
-<!-- GROUP PROFILE - BEAUTIFIED RULES -->
 <div id="groupProfileModal">
 <div class="editSheet" style="text-align:center;padding:0;overflow:hidden">
 <div style="background:linear-gradient(135deg,#00a884,#008069,#00c896);padding:14px 20px 36px;color:#fff;position:relative">
@@ -375,8 +362,8 @@ window.addEventListener('popstate',()=>{ if(isSignedIn){ if(inChatView){ backToU
 lockBack();
 const firebaseConfig = { apiKey: "AIzaSyAChqhvE2euGLd7ByhAo_nGFZdItIkKZqM", authDomain: "easy-talkers.firebaseapp.com", projectId: "easy-talkers", storageBucket: "easy-talkers.firebasestorage.app", messagingSenderId: "533433245977", appId: "1:533433245977:web:82ffe12e9296d116a3e588", measurementId: "G-01GNZB6GKJ" };
 let auth=null, db=null;
-try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){}
-function showToast(msg){ let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; },2000); }
+try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){ console.log("Firebase init failed, using local mode"); }
+function showToast(msg){ let t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; },2500); }
 let me=null, allUsers=[], groups=[], statuses=[], chattingWith=null, chattingGroup=null, unsub=null, unsubStatus=null, unsubGlobal=null, unsubChat=null, mediaRecorder=null, audioChunks=[], isRecording=false;
 let msgCache=[]; let lastRenderKey=''; let unreadMap={}; let viewingProfileUid=null; let viewingGroupId=null; let lastInboxUid=null; let lastInboxText='';
 try{ unreadMap=JSON.parse(localStorage.getItem('et_unread')||'{}'); }catch(e){ unreadMap={}; }
@@ -405,56 +392,11 @@ async function changeProfilePic(el){ if(!me||!el.files[0]) return; let b=await c
 async function saveProfile(){ let newName=document.getElementById('editName').value.trim(); let newPhone=document.getElementById('editPhone').value.trim(); let newBio=document.getElementById('editBio').value.trim(); let newWebsite=document.getElementById('editWebsite').value.trim(); if(!newName) return showToast("Enter name"); me.name=newName; me.phone=newPhone; me.bio=newBio; me.website=newWebsite; let users=getLocalUsers(); let idx=users.findIndex(u=>u.email===me.email); if(idx>=0){ users[idx].name=newName; users[idx].phone=newPhone; users[idx].photoURL=me.photoURL; users[idx].bio=newBio; users[idx].website=newWebsite; saveLocalUsers(users); } localStorage.setItem('et_current', JSON.stringify(me)); if(db) db.collection("users").doc(me.uid).update({name:newName,phone:newPhone,photoURL:me.photoURL||'',bio:newBio,website:newWebsite}).catch(()=>{}); document.getElementById('meName').innerText=newName; document.getElementById('meBioSmall').innerText=newBio; document.getElementById('myAvatar').innerHTML=me.photoURL?`<img src="${me.photoURL}">`:newName[0].toUpperCase(); renderChats(''); renderContacts(''); closeEditProfile(); showToast("✅ Profile + Bio + Website saved"); }
 function getUserShareLink(uid){ return location.origin+location.pathname+"?user="+encodeURIComponent(uid); }
 function getGroupJoinLink(gid){ return location.origin+location.pathname+"?join="+encodeURIComponent(gid); }
-
-// ===== USER PROFILE - NO LINK SHOWN, WITH CHAT BAR =====
-function viewProfile(uid){
-  viewingGroupId=null;
-  let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null);
-  if(!u){ let fromMsg=getLocalMsgs().find(m=>m.from===uid); u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true}; if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName; if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u); }
-  viewingProfileUid=uid;
-  document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase();
-  document.getElementById('viewName').innerText=u.name;
-  document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently';
-  document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!';
-  document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website';
-  document.getElementById('viewPhone').innerText=u.phone||'No phone';
-  document.getElementById('viewEmail').innerText=u.email||'';
-  let last=getLastMessageWith(uid);
-  document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — send a message below 👇';
-  let isMe=uid===me.uid;
-  document.getElementById('viewChatBtn').style.display=isMe?'none':'block';
-  document.getElementById('viewEditBtn').style.display=isMe?'block':'none';
-  // Chat bar: hidden for own profile, shown for others
-  document.getElementById('profileChatBar').style.display=isMe?'none':'flex';
-  document.getElementById('profileChatHint').style.display=isMe?'none':'block';
-  document.getElementById('profileChatName').innerText=u.name;
-  document.getElementById('profileMsgInput').placeholder='Type a message to '+u.name+'...';
-  document.getElementById('profileMsgInput').value='';
-  document.getElementById('profileViewModal').style.display='flex';
-  setTimeout(()=>{ if(!isMe) document.getElementById('profileMsgInput').focus(); }, 300);
-}
+function viewProfile(uid){ viewingGroupId=null; let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u){ let fromMsg=getLocalMsgs().find(m=>m.from===uid); u={uid:uid, name:'User', email:'', phone:'', bio:'New user on Easy Talkers 👋', website:'', photoURL:'', isOnline:true}; if(fromMsg && fromMsg.senderName) u.name=fromMsg.senderName; if(!allUsers.find(x=>x.uid===uid)) allUsers.push(u); } viewingProfileUid=uid; document.getElementById('viewAvatar').innerHTML=u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase(); document.getElementById('viewName').innerText=u.name; document.getElementById('viewOnline').innerText=u.isOnline?'🟢 Online':'⚪ Last seen recently'; document.getElementById('viewBio').innerText=u.bio||'No bio yet. 👋 Tap Message to say Hi!'; document.getElementById('viewWebsite').innerHTML=u.website?`<a href="${u.website}" target="_blank">${u.website}</a>`:'No website'; document.getElementById('viewPhone').innerText=u.phone||'No phone'; document.getElementById('viewEmail').innerText=u.email||''; let last=getLastMessageWith(uid); document.getElementById('viewChatInfo').innerText=last?('Last message: '+formatDate(parseTime(last.createdAt))+' • '+formatTime(parseTime(last.createdAt))+' — '+(last.text||'Photo')):'No chats yet — send a message below 👇'; let isMe=uid===me.uid; document.getElementById('viewChatBtn').style.display=isMe?'none':'block'; document.getElementById('viewEditBtn').style.display=isMe?'block':'none'; document.getElementById('profileChatBar').style.display=isMe?'none':'flex'; document.getElementById('profileChatHint').style.display=isMe?'none':'block'; document.getElementById('profileChatName').innerText=u.name; document.getElementById('profileMsgInput').placeholder='Type a message to '+u.name+'...'; document.getElementById('profileMsgInput').value=''; document.getElementById('profileViewModal').style.display='flex'; setTimeout(()=>{ if(!isMe) document.getElementById('profileMsgInput').focus(); }, 300); }
 function closeProfileView(){ document.getElementById('profileViewModal').style.display='none'; }
 function chatFromProfile(){ if(!viewingProfileUid) return; closeProfileView(); openChat(viewingProfileUid); }
 function editFromProfile(){ closeProfileView(); openEditProfile(); }
-// SEND MESSAGE DIRECTLY FROM PROFILE VIEW
-function sendMsgFromProfile(){
-  let inp=document.getElementById('profileMsgInput');
-  let text=inp.value.trim();
-  if(!text) return;
-  if(!viewingProfileUid) return;
-  if(viewingProfileUid===me.uid){ showToast("This is your own profile"); return; }
-  let now=new Date();
-  let msg={localId:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), from:me.uid, to:viewingProfileUid, groupId:null, text:text, type:'text', read:false, createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name, senderPhoto:me.photoURL||''};
-  inp.value='';
-  let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all);
-  saveChatToDisplay(viewingProfileUid, now);
-  try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){}
-  if(db){ let fb={...msg}; delete fb.localId; db.collection("messages").add({...fb, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); }
-  renderChats(''); renderContacts('');
-  showToast("✅ Sent to "+(allUsers.find(u=>u.uid===viewingProfileUid)?.name||'user')+" — Tap Open Full Chat to see it");
-  // Update profile chat info instantly
-  document.getElementById('viewChatInfo').innerText='Last message: '+formatDate(now)+' • '+formatTime(now)+' — '+text;
-}
+function sendMsgFromProfile(){ let inp=document.getElementById('profileMsgInput'); let text=inp.value.trim(); if(!text) return; if(!viewingProfileUid) return; if(viewingProfileUid===me.uid){ showToast("This is your own profile"); return; } let now=new Date(); let msg={localId:'m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), from:me.uid, to:viewingProfileUid, groupId:null, text:text, type:'text', read:false, createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name, senderPhoto:me.photoURL||''}; inp.value=''; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); saveChatToDisplay(viewingProfileUid, now); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db){ let fb={...msg}; delete fb.localId; db.collection("messages").add({...fb, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); } renderChats(''); renderContacts(''); showToast("✅ Sent to "+(allUsers.find(u=>u.uid===viewingProfileUid)?.name||'user')); document.getElementById('viewChatInfo').innerText='Last message: '+formatDate(now)+' • '+formatTime(now)+' — '+text; }
 function copyProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); navigator.clipboard.writeText(link).then(()=>showToast("✅ Link copied")).catch(()=>{ prompt("Copy link:", link); }); }
 function shareProfileLink(){ if(!viewingProfileUid) return; let link=getUserShareLink(viewingProfileUid); let u=allUsers.find(x=>x.uid===viewingProfileUid); if(navigator.share){ navigator.share({title:u.name+" on Easy Talkers", text:"Chat with "+u.name, url:link}).catch(()=>{}); } else { copyProfileLink(); } }
 function viewChatUserProfile(){ if(chattingGroup) viewGroupProfile(chattingGroup.id); else if(chattingWith) viewProfile(chattingWith.uid); }
@@ -469,20 +411,7 @@ function autoJoinGroup(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; if
 function joinGroupFromProfile(){ if(viewingGroupId) autoJoinGroup(viewingGroupId); }
 function copyGroupLink(){ if(!viewingGroupId) return; let link=getGroupJoinLink(viewingGroupId); let g=groups.find(x=>x.id===viewingGroupId); navigator.clipboard.writeText(link).then(()=>showToast("✅ "+(g?.name||'Group')+" join link copied")).catch(()=>prompt("Copy group link:", link)); }
 function shareGroupLink(){ if(!viewingGroupId) return; let g=groups.find(x=>x.id===viewingGroupId); let link=getGroupJoinLink(viewingGroupId); if(navigator.share){ navigator.share({title:"Join "+g.name+" on Easy Talkers", text:"Join "+g.name+" — "+(g.description||''), url:link}).catch(()=>{}); } else { copyGroupLink(); } }
-// ===== GROUP RULES - BEAUTIFIED, SMALL FONT =====
-function formatGroupRules(rules){
-  if(!rules) rules=['Be respectful to everyone','No spam or scam','No hate speech','Keep chats clean'];
-  if(typeof rules==='string') rules=rules.split('\n').map(s=>s.trim()).filter(Boolean);
-  let icons=['💚','🛡️','🤝','✨','🔥','⭐','💬','🚫'];
-  let html='';
-  rules.forEach((r,i)=>{
-    let clean=r.replace(/^\d+[\.\)]\s*/,'').trim();
-    if(!clean) return;
-    let icon=icons[i%icons.length];
-    html+=`<div class="ruleCard"><span class="ruleNum">${i+1}</span><span class="ruleIcon">${icon}</span><span class="ruleText">${clean}</span></div>`;
-  });
-  return html || '<div class="ruleCard"><span class="ruleNum">1</span><span class="ruleIcon">💚</span><span class="ruleText">Be respectful to everyone</span></div>';
-}
+function formatGroupRules(rules){ if(!rules) rules=['Be respectful to everyone','No spam or scam','No hate speech','Keep chats clean']; if(typeof rules==='string') rules=rules.split('\n').map(s=>s.trim()).filter(Boolean); let icons=['💚','🛡️','🤝','✨','🔥','⭐','💬','🚫']; let html=''; rules.forEach((r,i)=>{ let clean=r.replace(/^\d+[\.\)]\s*/,'').trim(); if(!clean) return; let icon=icons[i%icons.length]; html+=`<div class="ruleCard"><span class="ruleNum">${i+1}</span><span class="ruleIcon">${icon}</span><span class="ruleText">${clean}</span></div>`; }); return html || '<div class="ruleCard"><span class="ruleNum">1</span><span class="ruleIcon">💚</span><span class="ruleText">Be respectful to everyone</span></div>'; }
 function viewGroupProfile(gid){ viewingProfileUid=null; let g=groups.find(x=>x.id===gid); if(!g) return; viewingGroupId=gid; document.getElementById('groupViewAvatar').innerHTML='👥'; document.getElementById('groupViewName').innerText=g.name; let members=g.members||[]; document.getElementById('groupViewCount').innerText='👥 '+members.length+' member'+(members.length!==1?'s':'')+' • Tap to view members'; document.getElementById('groupViewMembersCount').innerText=members.length; document.getElementById('groupViewDesc').innerText=g.description||'No description yet.'; document.getElementById('groupViewBio').innerText='📝 Bio: '+(g.bio||'No bio yet.'); document.getElementById('groupViewWebsite').innerHTML=g.website?`<a href="${g.website}" target="_blank" style="color:#fff">${g.website}</a>`:'No website'; let admin=allUsers.find(u=>u.uid===g.createdBy) || allUsers.find(u=>u.uid===g.admin) || {name:'Admin'}; document.getElementById('groupViewAdmin').innerText='👑 '+(admin.name||'Admin')+' • '+(admin.email||''); document.getElementById('groupViewRules').innerHTML=formatGroupRules(g.rules); document.getElementById('groupViewLink').innerText=getGroupJoinLink(gid); let mHtml=''; members.forEach(uid=>{ let u=allUsers.find(x=>x.uid===uid) || (uid===me.uid?me:null); if(!u) return; let isAdmin=uid===g.createdBy; mHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;min-width:0"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><b style="font-size:13px">${u.name} ${isAdmin?'👑':''}</b><br><small style="color:#888">${u.bio||''}</small></div><button onclick="viewProfile('${uid}')" style="background:#f0f2f5;border:none;padding:5px 10px;border-radius:14px;font-size:11px;cursor:pointer;flex-shrink:0">View Profile</button></div>`; }); document.getElementById('groupViewMembers').innerHTML=mHtml||'No members yet'; let notIn=allUsers.filter(u=>u.uid!==me.uid && !members.includes(u.uid)); let addHtml=''; notIn.slice(0,20).forEach(u=>{ addHtml+=`<div style="display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;min-width:0"><div class="avatar small">${u.photoURL?`<img src="${u.photoURL}">`:u.name[0].toUpperCase()}</div><div style="flex:1;min-width:0"><b style="font-size:13px">${u.name}</b><br><small style="color:#888">${u.email||''}</small></div><button onclick="addMemberToGroup('${gid}','${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:700;cursor:pointer;font-size:11px;flex-shrink:0">+ Add</button></div>`; }); document.getElementById('groupAddMembers').innerHTML=addHtml||'Everyone is already in group'; document.getElementById('groupProfileModal').style.display='flex'; }
 function closeGroupProfile(){ document.getElementById('groupProfileModal').style.display='none'; }
 function chatFromGroupProfile(){ if(!viewingGroupId) return; closeGroupProfile(); openGroup(viewingGroupId); }
@@ -491,11 +420,106 @@ function openGroupEdit(gid){ let g=groups.find(x=>x.id===gid); if(!g) return; vi
 function closeGroupEdit(){ document.getElementById('groupEditModal').style.display='none'; }
 function saveGroupEdit(){ let g=groups.find(x=>x.id===viewingGroupId); if(!g) return; g.name=document.getElementById('editGroupName').value.trim()||g.name; g.description=document.getElementById('editGroupDesc').value.trim(); g.bio=document.getElementById('editGroupBio').value.trim(); g.website=document.getElementById('editGroupWebsite').value.trim(); let rulesText=document.getElementById('editGroupRules').value.trim(); g.rules=rulesText?rulesText.split('\n').map(s=>s.trim()).filter(Boolean):[]; let local=getLocalGroups(); let idx=local.findIndex(x=>x.id===g.id); if(idx>=0) local[idx]=g; else local.push(g); saveLocalGroups(local); if(db) db.collection("groups").doc(g.id).update({name:g.name, description:g.description, bio:g.bio, website:g.website, rules:g.rules}).catch(()=>{}); closeGroupEdit(); renderChats(''); renderGroups(); showToast("✅ Group updated"); if(chattingGroup && chattingGroup.id===g.id){ document.getElementById('chatHeader').innerText=g.name; updateHeader(); } }
 function addMemberToGroup(gid, uid){ let g=groups.find(x=>x.id===gid); if(!g) return; if(!g.members) g.members=[]; if(g.members.includes(uid)){ showToast("Already in group"); return; } g.members.push(uid); let local=getLocalGroups(); let idx=local.findIndex(x=>x.id===gid); if(idx>=0) local[idx]=g; else local.push(g); saveLocalGroups(local); if(db) db.collection("groups").doc(gid).update({members:firebase.firestore.FieldValue.arrayUnion(uid)}).catch(()=>{}); let u=allUsers.find(x=>x.uid===uid); showToast("✅ "+(u?.name||'User')+" added to "+g.name); viewGroupProfile(gid); renderChats(''); renderGroups(); }
-async function doRegister(){ const name=document.getElementById('name').value.trim(); const email=document.getElementById('email').value.trim().toLowerCase(); const phone=document.getElementById('phone').value.trim(); const pass=document.getElementById('pass').value; const bio=document.getElementById('bio').value.trim(); if(!name) return showMsg("Enter your Name"); if(!email) return showMsg("Enter your Email"); if(!pass) return showMsg("Enter Password"); if(pass.length<6) return showMsg("Password must be 6+ characters"); let users=getLocalUsers(); if(users.find(u=>u.email===email)) return showMsg("This email already exists. Go to Login."); let photoURL=window._signupPic||''; if(!photoURL){ const f=document.getElementById('picInput').files[0]; if(f) photoURL=await compressImage(f); } let newUser={name,email,phone,pass,bio,website:'',photoURL,uid:'local-'+Date.now(),isOnline:true}; users.push(newUser); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(newUser)); if(auth){ auth.createUserWithEmailAndPassword(email,pass).then(cred=>{ db.collection("users").doc(cred.user.uid).set({name,email,phone,bio,website:'',photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{}); }).catch(()=>{}); } showMsg("✅ Account created! Opening chats...","#00a884"); setTimeout(()=>{ loginSuccess(newUser); }, 300); }
-async function doLogin(){ const email=document.getElementById('loginEmail').value.trim().toLowerCase(); const pass=document.getElementById('loginPass').value; if(!email) return showLoginMsg("Enter your Email"); if(!pass) return showLoginMsg("Enter your Password"); showLoginMsg("Logging in...","#008069"); let users=getLocalUsers(); let found=users.find(u=>u.email===email); if(!found){ if(auth){ try{ let cred=await auth.signInWithEmailAndPassword(email,pass); let u={name:email.split('@')[0],email,phone:'',bio:'',website:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true}; users.push(u); saveLocalUsers(users); localStorage.setItem('et_current', JSON.stringify(u)); loginSuccess(u); return; }catch(e){} } return showLoginMsg("No account found for this email. Tap 'Create Account' below."); } if(found.pass!==pass) return showLoginMsg("Wrong password. Try again."); localStorage.setItem('et_current', JSON.stringify(found)); showLoginMsg("✅ Login successful! Opening chats...","#00a884"); setTimeout(()=>{ loginSuccess(found); }, 200); }
-function loginSuccess(user){ me=user; isSignedIn=true; allUsers=getLocalUsers(); showApp(); startGlobalListener(); if(db){ db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',bio:me.bio||'',website:me.website||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{}); db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); else { let ex=merged.find(m=>m.email===f.email); Object.assign(ex, f); } }); allUsers=merged; renderChats(''); renderContacts(''); renderStatusDots(); }, ()=>{}); db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); let local=getLocalGroups(); local.forEach(lg=>{ if(!groups.find(g=>g.id===lg.id)) groups.push(lg); }); renderGroups(); renderChats(''); }, ()=>{}); if(unsubStatus) unsubStatus(); unsubStatus=db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusDots(); }, ()=>{}); } try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); if(!statuses.length) statuses=ls; renderStatusDots(); }catch(e){} let lg=getLocalGroups(); lg.forEach(g=>{ if(!groups.find(x=>x.id===g.id)) groups.push(g); }); renderGroups(); renderChats(''); }
-window.addEventListener('load', ()=>{ let cur=localStorage.getItem('et_current'); if(cur){ try{ let u=JSON.parse(cur); loginSuccess(u); }catch(e){} } });
-async function doLogout(){ if(!confirm("Logout from Easy Talkers?")) return; localStorage.removeItem('et_current'); if(db && me) db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(auth) auth.signOut().catch(()=>{}); isSignedIn=false; if(unsubGlobal) unsubGlobal(); if(unsub) unsub(); location.reload(); }
+
+// ===== LOGIN / SIGNUP - FIXED, WORKS OFFLINE TOO =====
+async function doRegister(){
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim().toLowerCase();
+  const phone=document.getElementById('phone').value.trim();
+  const pass=document.getElementById('pass').value;
+  const bio=document.getElementById('bio').value.trim();
+  if(!name) return showMsg("Enter your Name");
+  if(!email) return showMsg("Enter your Email");
+  if(!email.includes('@')) return showMsg("Enter a valid Email");
+  if(!pass) return showMsg("Enter Password");
+  if(pass.length<6) return showMsg("Password must be 6+ characters");
+  let btn=document.getElementById('signupBtn'); btn.innerText="Creating... ⏳"; btn.disabled=true;
+  let users=getLocalUsers();
+  if(users.find(u=>u.email===email)){ btn.innerText="Create Account →"; btn.disabled=false; return showMsg("This email already exists. Go to Login."); }
+  let photoURL=window._signupPic||'';
+  if(!photoURL){ const f=document.getElementById('picInput').files[0]; if(f) photoURL=await compressImage(f); }
+  let newUser={name,email,phone,pass,bio,website:'',photoURL,uid:'local-'+Date.now(),isOnline:true};
+  users.push(newUser); saveLocalUsers(users);
+  localStorage.setItem('et_current', JSON.stringify(newUser));
+  // Try Firebase in background - do NOT wait for it, do NOT block login
+  if(auth && db){
+    auth.createUserWithEmailAndPassword(email,pass).then(cred=>{
+      db.collection("users").doc(cred.user.uid).set({name,email,phone,bio,website:'',photoURL,uid:cred.user.uid,isOnline:true}).catch(()=>{});
+      newUser.uid=cred.user.uid; localStorage.setItem('et_current', JSON.stringify(newUser));
+    }).catch(()=>{});
+  }
+  showMsg("✅ Account created! Opening chats...","#00a884");
+  btn.innerText="Create Account →"; btn.disabled=false;
+  loginSuccess(newUser);
+}
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  if(!email) return showLoginMsg("Enter your Email");
+  if(!pass) return showLoginMsg("Enter your Password");
+  let btn=document.getElementById('loginBtn'); btn.innerText="Logging in... ⏳"; btn.disabled=true;
+  showLoginMsg("Logging in...","#008069");
+  // 1) LOCAL FIRST - instant, works even if Firebase is down
+  let users=getLocalUsers();
+  let found=users.find(u=>u.email===email);
+  if(found){
+    if(found.pass && found.pass!==pass){ btn.innerText="Login →"; btn.disabled=false; return showLoginMsg("Wrong password. Try again."); }
+    // If local user has no pass stored (from Firebase), accept any pass and save it
+    if(!found.pass) { found.pass=pass; saveLocalUsers(users); }
+    localStorage.setItem('et_current', JSON.stringify(found));
+    showLoginMsg("✅ Login successful! Opening chats...","#00a884");
+    btn.innerText="Login →"; btn.disabled=false;
+    loginSuccess(found);
+    return;
+  }
+  // 2) FIREBASE FALLBACK - for accounts created on another phone
+  if(auth){
+    try{
+      let cred=await auth.signInWithEmailAndPassword(email,pass);
+      let u={name:email.split('@')[0],email,phone:'',bio:'',website:'',pass,photoURL:'',uid:cred.user.uid,isOnline:true};
+      // Try to get real profile from Firestore
+      if(db){ try{ let doc=await db.collection("users").doc(cred.user.uid).get(); if(doc.exists){ let d=doc.data(); u={...u, name:d.name||u.name, phone:d.phone||'', bio:d.bio||'', website:d.website||'', photoURL:d.photoURL||''}; } }catch(e){} }
+      users.push(u); saveLocalUsers(users);
+      localStorage.setItem('et_current', JSON.stringify(u));
+      showLoginMsg("✅ Login successful! Opening chats...","#00a884");
+      btn.innerText="Login →"; btn.disabled=false;
+      loginSuccess(u);
+      return;
+    }catch(e){
+      console.log("Firebase login failed:", e.code);
+      btn.innerText="Login →"; btn.disabled=false;
+      if(e.code==='auth/user-not-found') return showLoginMsg("No account found for this email. Tap 'Create Account' below.");
+      if(e.code==='auth/wrong-password' || e.code==='auth/invalid-credential') return showLoginMsg("Wrong password. Try again.");
+      if(e.code==='auth/invalid-email') return showLoginMsg("Enter a valid Email.");
+      return showLoginMsg("No account found for this email on this phone. Tap 'Create Account' below — or check email spelling.");
+    }
+  }
+  btn.innerText="Login →"; btn.disabled=false;
+  return showLoginMsg("No account found for this email. Tap 'Create Account' below.");
+}
+function loginSuccess(user){
+  me=user; isSignedIn=true; allUsers=getLocalUsers();
+  showApp(); startGlobalListener();
+  if(db){
+    db.collection("users").doc(me.uid).set({name:me.name,email:me.email,phone:me.phone||'',bio:me.bio||'',website:me.website||'',photoURL:me.photoURL||'',uid:me.uid,isOnline:true}, {merge:true}).catch(()=>{});
+    db.collection("users").onSnapshot(s=>{ let fb=s.docs.map(d=>d.data()); let merged=[...allUsers]; fb.forEach(f=>{ if(!merged.find(m=>m.email===f.email)) merged.push({...f, pass:''}); else { let ex=merged.find(m=>m.email===f.email); Object.assign(ex, f); } }); allUsers=merged; renderChats(''); renderContacts(''); renderStatusDots(); }, ()=>{});
+    db.collection("groups").onSnapshot(s=>{ groups=s.docs.map(d=>({id:d.id,...d.data()})); let local=getLocalGroups(); local.forEach(lg=>{ if(!groups.find(g=>g.id===lg.id)) groups.push(lg); }); renderGroups(); renderChats(''); }, ()=>{});
+    if(unsubStatus) unsubStatus();
+    unsubStatus=db.collection("statuses").orderBy("createdAt","desc").onSnapshot(s=>{ statuses=s.docs.map(d=>({id:d.id,...d.data()})); renderStatusDots(); }, ()=>{});
+  }
+  try{ let ls=JSON.parse(localStorage.getItem('et_statuses')||'[]'); if(!statuses.length) statuses=ls; renderStatusDots(); }catch(e){}
+  let lg=getLocalGroups(); lg.forEach(g=>{ if(!groups.find(x=>x.id===g.id)) groups.push(g); }); renderGroups(); renderChats('');
+}
+window.addEventListener('load', ()=>{
+  // Auto-login: if you were logged in before, open chats instantly - no need to login again
+  let cur=null;
+  try{ cur=localStorage.getItem('et_current'); }catch(e){}
+  if(cur){
+    try{ let u=JSON.parse(cur); if(u && u.email){ loginSuccess(u); return; } }catch(e){}
+  }
+  showLogin();
+});
+async function doLogout(){ if(!confirm("Logout from Easy Talkers?")) return; localStorage.removeItem('et_current'); if(db && me) db.collection("users").doc(me.uid).update({isOnline:false}).catch(()=>{}); if(auth) auth.signOut().catch(()=>{}); isSignedIn=false; me=null; if(unsubGlobal) unsubGlobal(); if(unsub) unsub(); location.reload(); }
 function avatarHTML(u, clickableUid){ let pic=u?.photoURL?`<img src="${u.photoURL}">`:(u?.name?u.name[0].toUpperCase():'👤'); if(clickableUid) return `<div class="avatar" onclick="event.stopPropagation(); viewProfile('${clickableUid}')" title="Tap pic to view ${u?.name||'profile'} — Everyone can view each other">${pic}</div>`; return `<div class="avatar">${pic}</div>`; }
 function parseTime(v){ if(!v) return new Date(0); if(v.toDate) return v.toDate(); return new Date(v); }
 function formatDate(d){ if(!d) return ''; const today=new Date(); const yesterday=new Date(); yesterday.setDate(today.getDate()-1); if(d.toDateString()===today.toDateString()) return 'Today'; if(d.toDateString()===yesterday.toDateString()) return 'Yesterday'; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
@@ -514,7 +538,6 @@ function getChatTime(uid){ let last=getLastMessageWith(uid); if(last) return par
 function getUnread(uid){ return unreadMap[uid]||0; }
 function updateTotalUnread(){ let total=Object.values(unreadMap).reduce((a,b)=>a+b,0); let el=document.getElementById('totalUnread'); if(total>0){ el.innerText=total; el.style.display='inline-block'; } else { el.style.display='none'; } updateInboxBanner(); }
 function renderChats(q=''){ if(!me) return; let chatIds=getChatUserIds(); let chatUsers=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && chatIds.has(u.uid) && u.name.toLowerCase().includes((q||'').toLowerCase())); chatIds.forEach(uid=>{ if(!allUsers.find(u=>u.uid===uid) && uid!==me.uid){ let m=getLocalMsgs().find(x=>x.from===uid || x.to===uid); let temp={uid:uid, name:m?.senderName||'New User', email:'', bio:'New user 👋 Tap to view profile', photoURL:'', isOnline:true}; if(!allUsers.find(u=>u.uid===uid)) allUsers.push(temp); if(temp.name.toLowerCase().includes((q||'').toLowerCase())) chatUsers.push(temp); } }); let myGroups=groups.filter(g=>{ let isMember=(g.members||[]).includes(me.uid) || g.createdBy===me.uid; return (isMember || (q && g.name.toLowerCase().includes(q.toLowerCase()))) && g.name.toLowerCase().includes((q||'').toLowerCase()); }); let combined=[]; chatUsers.forEach(u=>combined.push({type:'user', data:u, time:getChatTime(u.uid), unread:getUnread(u.uid)})); myGroups.forEach(g=>combined.push({type:'group', data:g, time:getGroupTime(g.id), unread:0})); combined.sort((a,b)=>{ if((b.unread>0)!==(a.unread>0)) return (b.unread>0?1:0)-(a.unread>0?1:0); return b.time.getTime()-a.time.getTime(); }); document.getElementById('chatCount').innerText=combined.length||''; updateTotalUnread(); let grouped={}; combined.forEach(item=>{ let lbl=item.unread>0?'📩 UNREAD — NEW MESSAGES':dateLabel(item.time); if(!grouped[lbl]) grouped[lbl]=[]; grouped[lbl].push(item); }); let html=''; Object.keys(grouped).forEach(lbl=>{ let isUnreadGroup=lbl.includes('UNREAD'); html+=`<div class="chatGroupLabel" style="${isUnreadGroup?'background:#ff3b30;color:#fff':''}">${lbl} • ${grouped[lbl].length}</div>`; grouped[lbl].forEach(item=>{ if(item.type==='user'){ let u=item.data; let last=getLastMessageWith(u.uid); let chatTime=item.time; let lastText=last?(last.type==='image'?'📷 Photo':last.type==='audio'?'🎤 Voice note':last.type==='file'?'📄 '+(last.fileName||'File'):last.text):'Tap to open chat • Tap pic to view profile'; let exactTime=formatExactChatTime(chatTime); let unread=item.unread; html+=`<div class="user ${unread?'unreadRow':''}" onclick="openChat('${u.uid}')">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="event.stopPropagation(); openChat('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?'• 📩 NEW':''}</b><br><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${u.bio||''}</small><small style="color:${unread?'#008069':'#667781'};font-weight:${unread?'700':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px;flex-shrink:0"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br>${unread?`<span class="unreadBadge">${unread}</span>`:'<span>💬</span>'}<br><small style="color:#008069;font-size:10px;cursor:pointer" onclick="event.stopPropagation(); viewProfile('${u.uid}')">👤 View Profile</small></div></div>`; } else { let g=item.data; let last=getGroupLastMsg(g.id); let chatTime=item.time; let lastText=last?(last.type==='image'?'📷 Photo':(allUsers.find(u=>u.uid===last.from)?.name||'Someone')+': '+(last.text||'')):(g.description||'Tap to open group'); let exactTime=formatExactChatTime(chatTime); let memberCount=(g.members||[]).length; html+=`<div class="user" onclick="openGroup('${g.id}')"><div class="avatar" onclick="event.stopPropagation(); viewGroupProfile('${g.id}')" title="View group profile">👥</div><div style="flex:1;min-width:0" onclick="event.stopPropagation(); openGroup('${g.id}')"><b style="font-size:14px">${g.name} <span class="groupBadge">GROUP • ${memberCount}</span></b><br><small style="color:#008069;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${g.description||g.bio||''}</small><small style="color:#667781;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${lastText}</small></div><div style="text-align:right;min-width:80px;flex-shrink:0"><small style="color:#00a884;font-size:12px;font-weight:700">${exactTime}</small><br><span>👥 ${memberCount}</span></div></div>`; } }); }); document.getElementById('chatsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No chats yet.<br>Go to <b>Contacts</b> → Tap someone → Send a message.<br>Or go to <b>Groups</b> → Create Group.<br>Groups will show here too.</div>'; let allContacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email); document.getElementById('contactCount').innerText=allContacts.length||''; document.getElementById('groupCount').innerText=myGroups.length||''; }
-// CONTACTS - NO USER LINK SHOWN
 function renderContacts(q=''){ if(!me) return; let contacts=allUsers.filter(u=>u.uid!==me.uid && u.email!==me.email && u.name.toLowerCase().includes((q||'').toLowerCase())); contacts.sort((a,b)=>{ let ua=getUnread(a.uid), ub=getUnread(b.uid); if((ub>0)!==(ua>0)) return (ub>0?1:0)-(ua>0?1:0); return a.name.localeCompare(b.name); }); document.getElementById('contactCount').innerText=contacts.length||''; let html=''; contacts.forEach(u=>{ let unread=getUnread(u.uid); html+=`<div class="user ${unread?'unreadRow':''}">${avatarHTML(u, u.uid)}<div style="flex:1;min-width:0" onclick="viewProfile('${u.uid}')"><b style="font-size:14px">${u.name} ${unread?`• <span style="color:#ff3b30">📩 ${unread} unread</span>`:''}</b><br><small style="color:#008069">${u.bio||''}</small><br><small style="color:#667781;word-break:break-word">${u.email||''} • ${u.phone||''}</small><br><small style="color:#008069;font-weight:700">👤 Tap to View ${u.name}'s Profile</small></div><div style="text-align:center;flex-shrink:0">${unread?`<span class="unreadBadge">${unread}</span><br>`:''}<button onclick="viewProfile('${u.uid}')" style="background:#e7f8f3;border:none;padding:8px 10px;border-radius:20px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👤 View</button><br><button onclick="openChat('${u.uid}')" style="background:#00a884;color:#fff;border:none;padding:8px 10px;border-radius:20px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">💬 Chat</button></div></div>`; }); document.getElementById('contactsList').innerHTML=html||'<div style="padding:20px;text-align:center;color:#667781;font-size:13px">No contacts yet.<br>Ask friends to Create Account.</div>'; }
 function renderGroups(){ let html=''; groups.forEach(g=>{ let memberCount=(g.members||[]).length; let isMember=(g.members||[]).includes(me.uid); html+=`<div class="user"><div class="avatar" onclick="viewGroupProfile('${g.id}')">👥</div><div style="flex:1;min-width:0" onclick="openGroup('${g.id}')"><b>${g.name} <span class="groupBadge">${memberCount} members</span></b><br><small style="color:#008069">${g.description||''}</small><br><small style="color:#667781;word-break:break-word">${g.bio||''} • ${g.website||''}</small><br><small style="color:#008069">🔗 Group link in Profile</small></div><div style="text-align:right;flex-shrink:0"><button onclick="viewGroupProfile('${g.id}')" style="background:#e7f8f3;border:none;padding:6px 10px;border-radius:14px;color:#008069;font-weight:700;cursor:pointer;font-size:11px">👥 Profile</button><br><button onclick="${isMember?`openGroup('${g.id}')`:`autoJoinGroup('${g.id}')`}" style="background:${isMember?'#00a884':'#111b21'};color:#fff;border:none;padding:6px 10px;border-radius:14px;font-weight:700;cursor:pointer;font-size:11px;margin-top:4px">${isMember?'💬 Open':'✅ Join'}</button></div></div>`; }); document.getElementById('groups').innerHTML=html||'<p style="color:#667781;font-size:13px">No groups yet. Create one above.</p>'; document.getElementById('groupCount').innerText=groups.filter(g=>(g.members||[]).includes(me.uid)).length||''; }
 async function createGroup(){ const name=document.getElementById('groupName').value.trim(); const desc=document.getElementById('groupDesc').value.trim(); const bio=document.getElementById('groupBio').value.trim(); const website=document.getElementById('groupWebsite').value.trim(); if(!name) return showToast("Enter group name"); let newGroup={name, description:desc, bio, website, members:[me.uid], createdBy:me.uid, admin:me.uid, createdAt:new Date().toISOString(), rules:['Be respectful to everyone','No spam or scam','No hate speech','Keep chats clean'], joinLink:''}; let gid='g'+Date.now(); newGroup.id=gid; newGroup.joinLink=getGroupJoinLink(gid); if(db){ try{ let ref=await db.collection("groups").add({name, description:desc, bio, website, members:[me.uid], createdBy:me.uid, admin:me.uid, createdAt:firebase.firestore.FieldValue.serverTimestamp(), rules:newGroup.rules}); newGroup.id=ref.id; newGroup.joinLink=getGroupJoinLink(ref.id); db.collection("groups").doc(ref.id).update({joinLink:newGroup.joinLink}).catch(()=>{}); groups.push(newGroup); }catch(e){ groups.push(newGroup); let lg=getLocalGroups(); lg.push(newGroup); saveLocalGroups(lg); } } else { groups.push(newGroup); let lg=getLocalGroups(); lg.push(newGroup); saveLocalGroups(lg); } document.getElementById('groupName').value=''; document.getElementById('groupDesc').value=''; document.getElementById('groupBio').value=''; document.getElementById('groupWebsite').value=''; renderGroups(); renderChats(''); showToast("✅ Group created — Share join link!"); setTimeout(()=>viewGroupProfile(newGroup.id), 400); }
@@ -551,8 +574,7 @@ async function sendMsg(){ const inp=document.getElementById('msgInput'); let tex
 window.addEventListener('storage', (e)=>{ if(e.key==='et_last_msg' && me){ try{ let data=JSON.parse(e.newValue); let m=data.msg; if(m.to===me.uid || m.groupId){ handleIncomingMessage({id:'storage_'+Date.now(), from:m.from,to:m.to,groupId:m.groupId,text:m.text,type:m.type,createdAt:m.createdAt, senderName:m.senderName}); } }catch(err){} } });
 async function sendFile(el){ const f=el.files[0]; if(!f) return; if(!chattingWith && !chattingGroup){ showToast("Select a chat first"); el.value=''; return; } let now=new Date(); let localId='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); let placeholder={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:'',type:f.type.startsWith('image/')?'image':'file',fileName:f.name,read:false,createdAt:now.toISOString(), timestamp:now.getTime(), _sending:true}; appendSingleMessage({...placeholder, text:''}); const b64=await compressImage(f).catch(()=>fileToBase64(f)); let type='file'; if(f.type.startsWith('image/')) type='image'; else if(f.type.startsWith('video/')) type='video'; let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type,fileName:f.name,read:false,createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name}; let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(chattingWith) saveChatToDisplay(chattingWith.uid, now); renderMessages(getCurrentChatMsgs()); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db) db.collection("messages").add({...msg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); el.value=''; showToast("Image sent"); renderChats(''); renderStatusDots(); }
 async function toggleVoice(){ if(!isRecording){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.start(); isRecording=true; let btn=document.getElementById('micBtn'); btn.classList.add('recording'); btn.innerText='🔴'; showToast("🎤 Recording... Tap 🔴 to stop & send"); }catch(e){ showToast("Mic permission needed"); } } else { mediaRecorder.onstop=async()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); const b64=await new Promise(r=>{ const rd=new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(blob); }); let now=new Date(); let localId='m_'+Date.now(); let msg={localId, from:me.uid,to:chattingWith?chattingWith.uid:null,groupId:chattingGroup?chattingGroup.id:null,text:b64,type:'audio',read:false,createdAt:now.toISOString(), timestamp:now.getTime(), senderName:me.name}; appendSingleMessage(msg); let all=getLocalMsgs(); all.push(msg); saveLocalMsgs(all); if(chattingWith) saveChatToDisplay(chattingWith.uid, now); try{ localStorage.setItem('et_last_msg', JSON.stringify({msg, at:Date.now()})); }catch(e){} if(db) db.collection("messages").add({...msg, createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{}); showToast("Voice note sent"); renderChats(''); renderStatusDots(); }; mediaRecorder.stop(); isRecording=false; let btn=document.getElementById('micBtn'); btn.classList.remove('recording'); btn.innerText='🎤'; } }
-function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); inChatView=false; if(window._pollTimer) clearInterval(window._pollTimer); if(unsubChat) unsubChat(); if(isSigned```js
-In) lockBack(); renderChats(''); renderContacts(''); renderStatusDots(); updateInboxBanner(); }
+function backToUsers(){ document.getElementById('app').classList.remove('show-chat'); inChatView=false; if(window._pollTimer) clearInterval(window._pollTimer); if(unsubChat) unsubChat(); if(isSignedIn) lockBack(); renderChats(''); renderContacts(''); renderStatusDots(); updateInboxBanner(); }
 </script>
 </body>
   </html>
