@@ -753,6 +753,14 @@ function backToUsers() {
   renderChatList();
 }
 
+function getHiddenMsgIds() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem("et_deleted_" + (me?.uid || "x")) || "[]"));
+  } catch (_) {
+    return new Set();
+  }
+}
+
 function renderMessages(serverMsgs) {
   const el = document.getElementById("msgs");
   if (!el) return;
@@ -762,11 +770,12 @@ function renderMessages(serverMsgs) {
     currentChatMessages = serverMsgs;
   }
 
+  // Hide messages deleted "for me"
+  const hidden = getHiddenMsgIds();
+
   // Merge server + pending optimistic messages
-  // Remove pending items that already appear on the server (matched by localId or text+from near time)
   const serverLocalIds = new Set(currentChatMessages.map(m => m.localId).filter(Boolean));
   const stillPending = pendingMessages.filter(p => !serverLocalIds.has(p.localId));
-  // Also drop pending if a server msg has same text from me within last 30s
   const filteredPending = stillPending.filter(p => {
     return !currentChatMessages.some(s =>
       s.from === p.from &&
@@ -776,7 +785,10 @@ function renderMessages(serverMsgs) {
   });
   pendingMessages = filteredPending;
 
-  const combined = [...currentChatMessages, ...pendingMessages];
+  const combined = [
+    ...currentChatMessages.filter(m => !hidden.has(m.fbId)),
+    ...pendingMessages
+  ];
 
   // Deduplicate within this batch
   const seenKeys = new Set();
@@ -810,19 +822,39 @@ function renderMessages(serverMsgs) {
       lastDay = day;
     }
 
+    const msgId = String(m.fbId || m.localId || "");
+    const deleted = m.deleted === true;
     let content = "";
-    if (m.type === "image" && m.image) {
-      content = `<img class="media" src="${escapeHtml(m.image)}" alt="photo" onclick="window.open(this.src)">`;
+    if (deleted) {
+      content = `<div class="text">🚫 This message was deleted</div>`;
+    } else if (m.type === "image" && m.image) {
+      content = `<img class="media" src="${escapeHtml(m.image)}" alt="photo" onclick="event.stopPropagation();window.open(this.src)">`;
     } else if (m.type === "audio" && m.audio) {
-      content = `<audio controls src="${escapeHtml(m.audio)}" style="max-width:240px"></audio>`;
+      content = `<audio controls src="${escapeHtml(m.audio)}" style="max-width:240px" onclick="event.stopPropagation()"></audio>`;
+    } else if (m.type === "document" && m.fileData) {
+      const sizeLabel = m.fileSize ? formatFileSize(m.fileSize) : "";
+      content = `<div class="doc-card" onclick="event.stopPropagation();downloadDoc('${escapeHtml(msgId)}')">
+        <div class="doc-icon">📄</div>
+        <div class="doc-info">
+          <b>${escapeHtml(m.fileName || "Document")}</b>
+          <span>${escapeHtml(sizeLabel || m.fileMime || "File")}</span>
+        </div>
+      </div>`;
     } else {
       content = `<div class="text">${escapeHtml(m.text || "")}</div>`;
     }
 
-    const ticks = isOut ? `<span class="ticks">${m.read ? "✓✓" : (m.pending ? "🕐" : "✓")}</span>` : "";
+    const ticks = isOut && !deleted ? `<span class="ticks">${m.read ? "✓✓" : (m.pending ? "🕐" : "✓")}</span>` : "";
     html += `
-      <div class="bubble ${isOut ? "out" : "in"}" data-id="${escapeHtml(String(m.fbId || m.localId || ""))}">
-        ${!isOut && chattingGroup ? `<div style="font-size:12px;color:#00a884;font-weight:600;margin-bottom:2px">${escapeHtml(m.fromName || "")}</div>` : ""}
+      <div class="bubble ${isOut ? "out" : "in"}${deleted ? " deleted" : ""}"
+           data-id="${escapeHtml(msgId)}"
+           data-from="${escapeHtml(m.from || "")}"
+           oncontextmenu="event.preventDefault();openMsgActions('${escapeHtml(msgId)}', '${escapeHtml(m.from || "")}');return false;"
+           ontouchstart="msgTouchStart(event, '${escapeHtml(msgId)}', '${escapeHtml(m.from || "")}')"
+           ontouchend="msgTouchEnd()"
+           ontouchmove="msgTouchEnd()"
+           onclick="openMsgActions('${escapeHtml(msgId)}', '${escapeHtml(m.from || "")}')">
+        ${!isOut && chattingGroup && !deleted ? `<div style="font-size:12px;color:#00a884;font-weight:600;margin-bottom:2px">${escapeHtml(m.fromName || "")}</div>` : ""}
         ${content}
         <div class="meta">${formatTime(m.createdAt) || "now"} ${ticks}</div>
       </div>`;
@@ -830,6 +862,13 @@ function renderMessages(serverMsgs) {
 
   el.innerHTML = html || `<div style="text-align:center;padding:40px;color:#667781">No messages yet. Say hi! 👋</div>`;
   el.scrollTop = el.scrollHeight;
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 /* ---------- Send message ---------- */
@@ -924,28 +963,77 @@ async function compressImage(file, maxW = 1200) {
   });
 }
 
+/* ---------- Attach menu ---------- */
+function toggleAttachMenu() {
+  const menu = document.getElementById("attachMenu");
+  if (!menu) return;
+  const open = menu.classList.contains("hidden");
+  // close emoji when opening attach
+  const ep = document.getElementById("emojiPanel");
+  if (ep) ep.classList.add("hidden");
+  if (open) menu.classList.remove("hidden");
+  else menu.classList.add("hidden");
+}
+function closeAttachMenu() {
+  const menu = document.getElementById("attachMenu");
+  if (menu) menu.classList.add("hidden");
+}
+function pickAttachment(kind) {
+  closeAttachMenu();
+  if (!chattingWith && !chattingGroup) {
+    showToast("Open a chat first");
+    return;
+  }
+  if (kind === "gallery") document.getElementById("fileInput").click();
+  else if (kind === "camera") document.getElementById("camInput").click();
+  else if (kind === "document") document.getElementById("docInput").click();
+}
+
 async function handleFile(input) {
   const file = input.files?.[0];
   if (!file) return;
   input.value = "";
   if (!chattingWith && !chattingGroup) { showToast("Open a chat first"); return; }
 
+  // Size limit ~4MB for Firestore (base64 expands ~33%)
+  const maxBytes = 3.5 * 1024 * 1024;
+  if (file.size > maxBytes) {
+    showToast("File too large (max ~3.5 MB). Compress or use a smaller file.");
+    return;
+  }
+
   showToast("Uploading…");
   try {
-    let payload = { from: me.uid, fromName: me.name, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    let payload = {
+      from: me.uid,
+      fromName: me.name,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
     if (file.type.startsWith("image/")) {
       const b64 = await compressImage(file);
       payload.type = "image";
       payload.image = b64;
       payload.text = "📷 Photo";
+    } else if (file.type.startsWith("video/")) {
+      const b64 = await fileToBase64(file);
+      payload.type = "image"; // show as media link style for simplicity
+      payload.image = b64;
+      payload.text = "🎬 Video";
     } else if (file.type.startsWith("audio/")) {
       const b64 = await fileToBase64(file);
       payload.type = "audio";
       payload.audio = b64;
       payload.text = "🎤 Audio";
     } else {
-      showToast("Unsupported file type");
-      return;
+      // Document (pdf, office, zip, txt, etc.)
+      const b64 = await fileToBase64(file);
+      payload.type = "document";
+      payload.fileData = b64;
+      payload.fileName = file.name || "Document";
+      payload.fileMime = file.type || "application/octet-stream";
+      payload.fileSize = file.size;
+      payload.text = "📄 " + (file.name || "Document");
     }
 
     if (chattingWith) {
@@ -957,12 +1045,120 @@ async function handleFile(input) {
       payload.chatId = "g_" + chattingGroup.id;
       payload.participants = chattingGroup.members || [];
     }
+
+    // optimistic
+    const localId = "local_file_" + Date.now();
+    pendingMessages.push({
+      ...payload,
+      localId,
+      fbId: localId,
+      createdAt: new Date(),
+      pending: true
+    });
+    renderMessages(currentChatMessages);
+
     await db.collection("messages").add(payload);
     showToast("Sent");
   } catch (e) {
     showToast("Upload failed");
     console.error(e);
   }
+}
+
+/* ---------- Delete message ---------- */
+let selectedMsgId = null;
+let selectedMsgFrom = null;
+let _msgLongPressTimer = null;
+
+function msgTouchStart(e, msgId, from) {
+  _msgLongPressTimer = setTimeout(() => {
+    openMsgActions(msgId, from);
+  }, 500);
+}
+function msgTouchEnd() {
+  if (_msgLongPressTimer) {
+    clearTimeout(_msgLongPressTimer);
+    _msgLongPressTimer = null;
+  }
+}
+
+function openMsgActions(msgId, from) {
+  if (!msgId || String(msgId).startsWith("local_")) {
+    showToast("Wait until the message is sent");
+    return;
+  }
+  selectedMsgId = msgId;
+  selectedMsgFrom = from;
+  const isMine = from === me?.uid;
+  const delEveryone = document.getElementById("msgActionDeleteEveryone");
+  if (delEveryone) delEveryone.style.display = isMine ? "flex" : "none";
+  document.getElementById("msgActionModal").classList.add("active");
+}
+
+function closeMsgActions() {
+  document.getElementById("msgActionModal").classList.remove("active");
+  selectedMsgId = null;
+  selectedMsgFrom = null;
+}
+
+async function deleteSelectedMessage(forEveryone) {
+  const msgId = selectedMsgId;
+  if (!msgId) return;
+  closeMsgActions();
+
+  try {
+    if (forEveryone && selectedMsgFrom === me.uid) {
+      // Soft-delete so everyone sees "This message was deleted"
+      await db.collection("messages").doc(msgId).update({
+        deleted: true,
+        text: "",
+        image: firebase.firestore.FieldValue.delete(),
+        audio: firebase.firestore.FieldValue.delete(),
+        fileData: firebase.firestore.FieldValue.delete()
+      });
+      showToast("Deleted for everyone");
+    } else {
+      // Delete for me only — hide locally
+      const key = "et_deleted_" + (me?.uid || "x");
+      let hidden = [];
+      try { hidden = JSON.parse(localStorage.getItem(key) || "[]"); } catch (_) {}
+      if (!hidden.includes(msgId)) hidden.push(msgId);
+      localStorage.setItem(key, JSON.stringify(hidden));
+      // Also try hard delete if I'm the author (optional cleanup)
+      if (selectedMsgFrom === me.uid) {
+        try {
+          await db.collection("messages").doc(msgId).update({
+            deleted: true,
+            text: "",
+            image: firebase.firestore.FieldValue.delete(),
+            audio: firebase.firestore.FieldValue.delete(),
+            fileData: firebase.firestore.FieldValue.delete()
+          });
+        } catch (_) {}
+      }
+      // Filter from current view
+      currentChatMessages = currentChatMessages.filter(m => m.fbId !== msgId);
+      renderMessages(currentChatMessages);
+      showToast("Deleted for you");
+    }
+  } catch (e) {
+    console.error(e);
+    showToast("Could not delete — check Firestore rules allow update");
+  }
+}
+
+function downloadDoc(msgId) {
+  const m = currentChatMessages.find(x => x.fbId === msgId);
+  if (!m || !m.fileData) {
+    showToast("File not available");
+    return;
+  }
+  const a = document.createElement("a");
+  a.href = m.fileData;
+  a.download = m.fileName || "document";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 /* ---------- Voice recording ---------- */
