@@ -136,18 +136,28 @@
 
         <div class="input-bar">
           <div class="input-actions">
-            <button title="Emoji" onclick="toggleEmoji()">😊</button>
-            <button title="Attach" onclick="document.getElementById('fileInput').click()">📎</button>
-            <button title="Camera" onclick="document.getElementById('camInput').click()">📷</button>
+            <button type="button" title="Emoji" id="emojiBtn" onclick="toggleEmoji()">😊</button>
+            <button type="button" title="Attach" onclick="document.getElementById('fileInput').click()">📎</button>
+            <button type="button" title="Camera" onclick="document.getElementById('camInput').click()">📷</button>
           </div>
           <textarea id="msgInput" rows="1" placeholder="Type a message" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
           <div class="recording-bar" id="recordingBar">
             <span>🔴 Recording...</span>
             <span id="recTime">0:00</span>
-            <button onclick="cancelRecording()" style="margin-left:auto;background:none;border:none;color:#ea0038;font-weight:700">Cancel</button>
+            <button type="button" onclick="cancelRecording()" style="margin-left:auto;background:none;border:none;color:#ea0038;font-weight:700;cursor:pointer">Cancel</button>
           </div>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
-          <button class="mic-btn" id="micBtn" onclick="toggleRecord()" style="display:none">🎤</button>
+          <button type="button" class="send-btn" id="sendBtn" onclick="sendMessage()" style="display:none">➤</button>
+          <button type="button" class="mic-btn" id="micBtn" onclick="toggleRecord()" title="Tap to record voice">🎤</button>
+        </div>
+        <!-- Emoji picker -->
+        <div id="emojiPanel" class="emoji-panel hidden">
+          <div class="emoji-tabs">
+            <button type="button" class="emoji-tab active" data-cat="smileys" onclick="showEmojiCat('smileys')">😊</button>
+            <button type="button" class="emoji-tab" data-cat="gestures" onclick="showEmojiCat('gestures')">👍</button>
+            <button type="button" class="emoji-tab" data-cat="hearts" onclick="showEmojiCat('hearts')">❤️</button>
+            <button type="button" class="emoji-tab" data-cat="objects" onclick="showEmojiCat('objects')">🎉</button>
+          </div>
+          <div class="emoji-grid" id="emojiGrid"></div>
         </div>
       </div>
     </div>
