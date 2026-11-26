@@ -640,6 +640,13 @@ function openChat(uid) {
   if (currentTab !== "chats") switchTab("chats");
   else renderChatList();
 
+  // ensure mic is visible when input empty
+  const msgInput = document.getElementById("msgInput");
+  if (msgInput) { msgInput.value = ""; autoResize(msgInput); }
+  // close emoji if open
+  const ep = document.getElementById("emojiPanel");
+  if (ep) ep.classList.add("hidden");
+
   // listen to messages — use chatId to avoid composite index issues
   const msgsEl = document.getElementById("msgs");
   msgsEl.innerHTML = `<div style="text-align:center;padding:20px;color:#667781">Loading messages…</div>`;
@@ -959,64 +966,158 @@ async function handleFile(input) {
 }
 
 /* ---------- Voice recording ---------- */
+function getSupportedMime() {
+  const types = [
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    "audio/ogg;codecs=opus",
+    "audio/mp4",
+    "audio/aac"
+  ];
+  for (const t of types) {
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return "";
+}
+
 async function toggleRecord() {
+  // Must be in a chat
+  if (!chattingWith && !chattingGroup) {
+    showToast("Open a chat first to send voice notes");
+    return;
+  }
   if (isRecording) {
     stopRecording();
     return;
   }
+
+  // Secure context check (HTTPS or localhost)
+  if (!window.isSecureContext && location.hostname !== "localhost") {
+    showToast("Voice notes need HTTPS. Open the site via https://");
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast("This browser does not support voice recording");
+    return;
+  }
+  if (typeof MediaRecorder === "undefined") {
+    showToast("MediaRecorder not supported on this browser");
+    return;
+  }
+
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true
+      }
+    });
+    const mime = getSupportedMime();
+    const options = mime ? { mimeType: mime } : undefined;
+    mediaRecorder = options ? new MediaRecorder(stream, options) : new MediaRecorder(stream);
     audioChunks = [];
-    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    const usedMime = mediaRecorder.mimeType || mime || "audio/webm";
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onerror = e => {
+      console.error("MediaRecorder error", e);
+      showToast("Recording error");
+      cancelRecording();
+    };
+
     mediaRecorder.onstop = async () => {
       stream.getTracks().forEach(t => t.stop());
-      const blob = new Blob(audioChunks, { type: "audio/webm" });
-      const b64 = await fileToBase64(blob);
-      if (!chattingWith && !chattingGroup) return;
-      const payload = {
-        from: me.uid,
-        fromName: me.name,
-        type: "audio",
-        audio: b64,
-        text: "🎤 Voice message",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      if (chattingWith) {
-        payload.to = chattingWith.uid;
-        payload.chatId = [me.uid, chattingWith.uid].sort().join("_");
-        payload.participants = [me.uid, chattingWith.uid].sort();
-      } else {
-        payload.groupId = chattingGroup.id;
-        payload.chatId = "g_" + chattingGroup.id;
-        payload.participants = chattingGroup.members || [];
+      if (!audioChunks.length) {
+        showToast("No audio captured — try again");
+        return;
       }
-      await db.collection("messages").add(payload);
+      const blob = new Blob(audioChunks, { type: usedMime });
+      if (blob.size < 100) {
+        showToast("Recording too short");
+        return;
+      }
+      showToast("Sending voice note…");
+      try {
+        const b64 = await fileToBase64(blob);
+        if (!chattingWith && !chattingGroup) return;
+        const payload = {
+          from: me.uid,
+          fromName: me.name,
+          type: "audio",
+          audio: b64,
+          text: "🎤 Voice message",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (chattingWith) {
+          payload.to = chattingWith.uid;
+          payload.chatId = [me.uid, chattingWith.uid].sort().join("_");
+          payload.participants = [me.uid, chattingWith.uid].sort();
+        } else {
+          payload.groupId = chattingGroup.id;
+          payload.chatId = "g_" + chattingGroup.id;
+          payload.participants = chattingGroup.members || [];
+        }
+        // optimistic
+        const localId = "local_audio_" + Date.now();
+        pendingMessages.push({
+          ...payload,
+          localId,
+          fbId: localId,
+          createdAt: new Date(),
+          pending: true
+        });
+        renderMessages(currentChatMessages);
+        await db.collection("messages").add(payload);
+        showToast("Voice note sent");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to send voice note");
+      }
     };
-    mediaRecorder.start();
+
+    mediaRecorder.start(250); // timeslice helps some mobile browsers
     isRecording = true;
     recStart = Date.now();
     document.getElementById("recordingBar").style.display = "flex";
     document.getElementById("msgInput").style.display = "none";
     document.getElementById("sendBtn").style.display = "none";
-    document.getElementById("micBtn").innerText = "⏹";
+    const mic = document.getElementById("micBtn");
+    mic.innerText = "⏹";
+    mic.classList.add("recording");
+    // hide emoji while recording
+    const ep = document.getElementById("emojiPanel");
+    if (ep) ep.classList.add("hidden");
     recTimer = setInterval(() => {
       const s = Math.floor((Date.now() - recStart) / 1000);
-      document.getElementById("recTime").innerText = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
-    }, 500);
+      document.getElementById("recTime").innerText =
+        Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    }, 250);
   } catch (e) {
-    showToast("Microphone access denied");
+    console.error(e);
+    const name = e.name || "";
+    if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+      showToast("Microphone permission denied — allow mic in browser settings");
+    } else if (name === "NotFoundError") {
+      showToast("No microphone found");
+    } else {
+      showToast("Could not start recording: " + (e.message || name || "error"));
+    }
   }
 }
 
 function stopRecording() {
   if (mediaRecorder && isRecording) {
-    mediaRecorder.stop();
+    try { mediaRecorder.stop(); } catch (_) {}
     isRecording = false;
     clearInterval(recTimer);
     document.getElementById("recordingBar").style.display = "none";
     document.getElementById("msgInput").style.display = "block";
-    document.getElementById("micBtn").innerText = "🎤";
+    const mic = document.getElementById("micBtn");
+    mic.innerText = "🎤";
+    mic.classList.remove("recording");
     autoResize(document.getElementById("msgInput"));
   }
 }
@@ -1024,12 +1125,19 @@ function stopRecording() {
 function cancelRecording() {
   if (mediaRecorder && isRecording) {
     mediaRecorder.onstop = null;
-    mediaRecorder.stop();
+    try { mediaRecorder.stop(); } catch (_) {}
+    if (mediaRecorder.stream) {
+      mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    }
     isRecording = false;
     clearInterval(recTimer);
     document.getElementById("recordingBar").style.display = "none";
     document.getElementById("msgInput").style.display = "block";
-    document.getElementById("micBtn").innerText = "🎤";
+    const mic = document.getElementById("micBtn");
+    mic.innerText = "🎤";
+    mic.classList.remove("recording");
+    autoResize(document.getElementById("msgInput"));
+    showToast("Recording cancelled");
   }
 }
 
@@ -1473,8 +1581,50 @@ function clearLocalData() {
   closeSettings();
 }
 
+/* ---------- Emoji picker ---------- */
+const EMOJI_CATS = {
+  smileys: ["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","🤐","🤨","😐","😑","😶","😏","😒","🙄","😬","😮‍💨","😌","😔","😪","🤤","😴","😷","🤒","🤕","🤢","🤮","🥵","🥶","🥴","😵","🤯","🤠","🥳","😎","🤓","🧐","😕","😟","🙁","☹️","😮","😯","😲","😳","🥺","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬"],
+  gestures: ["👍","👎","👊","✊","🤛","🤜","👏","🙌","👐","🤲","🤝","🙏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","✋","🤚","🖐","🖖","👋","💪","🦾","🖕","✍️","🤳","💅","🦵","🦶"],
+  hearts: ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","♥️","😍","🥰","😘","😻","💑","👩‍❤️‍👨","👨‍❤️‍👨","👩‍❤️‍👩","💋","💌"],
+  objects: ["🎉","🎊","🎈","🎁","🏆","🥇","🥈","🥉","⚽","🏀","🏈","⚾","🎾","🏐","🎱","🏓","🏸","🥅","🎯","🎮","🕹️","🎲","🧩","🎭","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🎷","🎺","🎸","🪕","🔥","⭐","🌟","✨","💫","⚡","💥","💢","💦","💨","🌈","☀️","🌙","⭐","🌍","🍕","🍔","🍟","🌮","🍣","🍩","🍪","🎂","☕","🍺","🍻","🥂","🍷"]
+};
+
 function toggleEmoji() {
-  showToast("Emoji picker – type emoji directly or use system keyboard 😊");
+  const panel = document.getElementById("emojiPanel");
+  if (!panel) return;
+  const isHidden = panel.classList.contains("hidden");
+  if (isHidden) {
+    panel.classList.remove("hidden");
+    showEmojiCat("smileys");
+  } else {
+    panel.classList.add("hidden");
+  }
+}
+
+function showEmojiCat(cat) {
+  document.querySelectorAll(".emoji-tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.cat === cat);
+  });
+  const grid = document.getElementById("emojiGrid");
+  if (!grid) return;
+  const list = EMOJI_CATS[cat] || EMOJI_CATS.smileys;
+  grid.innerHTML = list.map(e =>
+    `<button type="button" onclick="insertEmoji('${e}')">${e}</button>`
+  ).join("");
+}
+
+function insertEmoji(emoji) {
+  const input = document.getElementById("msgInput");
+  if (!input) return;
+  const start = input.selectionStart || input.value.length;
+  const end = input.selectionEnd || input.value.length;
+  const before = input.value.slice(0, start);
+  const after = input.value.slice(end);
+  input.value = before + emoji + after;
+  const pos = start + emoji.length;
+  input.focus();
+  input.setSelectionRange(pos, pos);
+  autoResize(input);
 }
 
 /* ---------- Auth state ---------- */
