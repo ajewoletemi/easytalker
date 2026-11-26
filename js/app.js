@@ -42,6 +42,8 @@ let chatFilter = "all";            // all | unread | favorites | groups
 let recentChats = {};              // uid or "g_xxx" -> { lastText, lastAt, count }
 let favorites = new Set();
 let statusBgColor = "#00a884";
+let pendingMessages = [];          // optimistic messages waiting for server confirm
+let currentChatMessages = [];      // last rendered server messages
 
 try { unreadMap = JSON.parse(localStorage.getItem("et_unread") || "{}"); } catch (_) {}
 try { viewedStatuses = new Set(JSON.parse(localStorage.getItem("viewedStatus") || "[]")); } catch (_) {}
@@ -604,6 +606,8 @@ function openChat(uid) {
   chattingGroup = null;
   if (unsubChat) unsubChat();
   _seen.clear();
+  pendingMessages = [];
+  currentChatMessages = [];
 
   document.getElementById("emptyState").classList.add("hidden");
   const cv = document.getElementById("chatView");
@@ -685,6 +689,8 @@ function openGroupChat(gid) {
   chattingWith = null;
   if (unsubChat) unsubChat();
   _seen.clear();
+  pendingMessages = [];
+  currentChatMessages = [];
 
   document.getElementById("emptyState").classList.add("hidden");
   const cv = document.getElementById("chatView");
@@ -737,16 +743,58 @@ function backToUsers() {
   renderChatList();
 }
 
-function renderMessages(msgs) {
+function renderMessages(serverMsgs) {
   const el = document.getElementById("msgs");
   if (!el) return;
+
+  // Keep last server list
+  if (Array.isArray(serverMsgs)) {
+    currentChatMessages = serverMsgs;
+  }
+
+  // Merge server + pending optimistic messages
+  // Remove pending items that already appear on the server (matched by localId or text+from near time)
+  const serverLocalIds = new Set(currentChatMessages.map(m => m.localId).filter(Boolean));
+  const stillPending = pendingMessages.filter(p => !serverLocalIds.has(p.localId));
+  // Also drop pending if a server msg has same text from me within last 30s
+  const filteredPending = stillPending.filter(p => {
+    return !currentChatMessages.some(s =>
+      s.from === p.from &&
+      s.text === p.text &&
+      Math.abs((s.createdAt?.toMillis?.() || Date.now()) - (p.createdAt?.getTime?.() || p.createdAt || 0)) < 30000
+    );
+  });
+  pendingMessages = filteredPending;
+
+  const combined = [...currentChatMessages, ...pendingMessages];
+
+  // Deduplicate within this batch
+  const seenKeys = new Set();
+  const unique = [];
+  combined.forEach(m => {
+    const k = msgKey(m);
+    if (seenKeys.has(k)) return;
+    seenKeys.add(k);
+    unique.push(m);
+  });
+
+  // Sort by time
+  unique.sort((a, b) => {
+    const ta = a.createdAt?.toMillis?.() || a.createdAt?.getTime?.() || a.createdAt || 0;
+    const tb = b.createdAt?.toMillis?.() || b.createdAt?.getTime?.() || b.createdAt || 0;
+    return ta - tb;
+  });
+
   let html = "";
   let lastDay = "";
 
-  msgs.forEach(m => {
-    if (isDup(m)) return;
+  unique.forEach(m => {
     const isOut = m.from === me.uid;
-    const day = m.createdAt?.toDate ? m.createdAt.toDate().toDateString() : "";
+    let day = "";
+    try {
+      day = m.createdAt?.toDate ? m.createdAt.toDate().toDateString()
+        : (m.createdAt instanceof Date ? m.createdAt.toDateString() : "");
+    } catch (_) {}
     if (day && day !== lastDay) {
       html += `<div class="msg-day">${day === new Date().toDateString() ? "Today" : timeAgo(m.createdAt)}</div>`;
       lastDay = day;
@@ -761,12 +809,12 @@ function renderMessages(msgs) {
       content = `<div class="text">${escapeHtml(m.text || "")}</div>`;
     }
 
-    const ticks = isOut ? `<span class="ticks">${m.read ? "✓✓" : "✓"}</span>` : "";
+    const ticks = isOut ? `<span class="ticks">${m.read ? "✓✓" : (m.pending ? "🕐" : "✓")}</span>` : "";
     html += `
-      <div class="bubble ${isOut ? "out" : "in"}">
+      <div class="bubble ${isOut ? "out" : "in"}" data-id="${escapeHtml(String(m.fbId || m.localId || ""))}">
         ${!isOut && chattingGroup ? `<div style="font-size:12px;color:#00a884;font-weight:600;margin-bottom:2px">${escapeHtml(m.fromName || "")}</div>` : ""}
         ${content}
-        <div class="meta">${formatTime(m.createdAt)} ${ticks}</div>
+        <div class="meta">${formatTime(m.createdAt) || "now"} ${ticks}</div>
       </div>`;
   });
 
@@ -794,17 +842,16 @@ async function sendMessage() {
     localId
   };
 
-  // Optimistic UI
-  const optimistic = { ...base, createdAt: new Date(), fbId: localId };
-  const el = document.getElementById("msgs");
-  // append quickly
-  const isOut = true;
-  el.insertAdjacentHTML("beforeend", `
-    <div class="bubble out" data-local="${localId}">
-      <div class="text">${escapeHtml(text)}</div>
-      <div class="meta">sending…</div>
-    </div>`);
-  el.scrollTop = el.scrollHeight;
+  // Optimistic UI — show immediately, stays until server confirms
+  const optimistic = {
+    ...base,
+    createdAt: new Date(),
+    fbId: localId,
+    localId,
+    pending: true
+  };
+  pendingMessages.push(optimistic);
+  renderMessages(currentChatMessages); // re-render with pending included
 
   try {
     if (chattingWith) {
@@ -832,7 +879,11 @@ async function sendMessage() {
     localStorage.setItem("et_unread", JSON.stringify(unreadMap));
     localStorage.setItem("et_recent", JSON.stringify(recentChats));
     renderChatList();
+    // Snapshot will arrive shortly and replace pending with real message
   } catch (e) {
+    // Remove failed optimistic message
+    pendingMessages = pendingMessages.filter(p => p.localId !== localId);
+    renderMessages(currentChatMessages);
     showToast("Failed to send");
     console.error(e);
   }
