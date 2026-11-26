@@ -219,6 +219,59 @@ html, body {
   background: transparent;
 }
 
+/* ========== TABS (Chats / Contacts) ========== */
+.tabs-bar {
+  display: flex;
+  background: #fff;
+  border-bottom: 1px solid var(--wa-border);
+  flex-shrink: 0;
+  padding: 0 8px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wa-text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color .2s;
+}
+
+.tab-btn:hover { color: var(--wa-text); }
+
+.tab-btn.active {
+  color: var(--wa-green);
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+  height: 3px;
+  background: var(--wa-green);
+  border-radius: 3px 3px 0 0;
+}
+
+.tab-btn .tab-count {
+  display: inline-block;
+  background: var(--wa-green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 9px;
+  margin-left: 6px;
+  padding: 0 5px;
+}
+
 /* ========== STATUS BAR ========== */
 .status-section {
   padding: 12px 0 8px;
