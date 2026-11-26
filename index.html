@@ -134,11 +134,26 @@
 
         <div id="msgs"></div>
 
+        <!-- Attach menu (Photos / Camera / Document) -->
+        <div id="attachMenu" class="attach-menu hidden">
+          <button type="button" class="attach-option" onclick="pickAttachment('gallery')">
+            <span class="attach-icon" style="background:#7c4dff">🖼</span>
+            <span>Gallery</span>
+          </button>
+          <button type="button" class="attach-option" onclick="pickAttachment('camera')">
+            <span class="attach-icon" style="background:#00a884">📷</span>
+            <span>Camera</span>
+          </button>
+          <button type="button" class="attach-option" onclick="pickAttachment('document')">
+            <span class="attach-icon" style="background:#34b7f1">📄</span>
+            <span>Document</span>
+          </button>
+        </div>
+
         <div class="input-bar">
           <div class="input-actions">
-            <button type="button" title="Emoji" id="emojiBtn" onclick="toggleEmoji()">😊</button>
-            <button type="button" title="Attach" onclick="document.getElementById('fileInput').click()">📎</button>
-            <button type="button" title="Camera" onclick="document.getElementById('camInput').click()">📷</button>
+            <button type="button" title="Emoji" id="emojiBtn" onclick="toggleEmoji();closeAttachMenu()">😊</button>
+            <button type="button" title="Attach" id="attachBtn" onclick="toggleAttachMenu()">📎</button>
           </div>
           <textarea id="msgInput" rows="1" placeholder="Type a message" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
           <div class="recording-bar" id="recordingBar">
@@ -164,10 +179,32 @@
   </div>
 
   <!-- Hidden inputs -->
-  <input type="file" id="fileInput" accept="image/*,video/*,audio/*" style="display:none" onchange="handleFile(this)">
+  <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFile(this)">
   <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none" onchange="handleFile(this)">
+  <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.csv,.json" style="display:none" onchange="handleFile(this)">
   <input type="file" id="statusPicInput" accept="image/*" style="display:none" onchange="uploadStatus(this)">
   <input type="file" id="profilePicInput" accept="image/*" style="display:none" onchange="changeProfilePic(this)">
+
+  <!-- Message actions (long-press / click) -->
+  <div class="modal" id="msgActionModal">
+    <div class="modal-content" style="max-height:40vh">
+      <div class="modal-header">
+        <span>Message</span>
+        <button type="button" onclick="closeMsgActions()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer">✕</button>
+      </div>
+      <div class="modal-body" style="padding:8px 0">
+        <div class="menu-item" id="msgActionDelete" onclick="deleteSelectedMessage()" style="color:#ea0038">
+          <span class="icon">🗑</span> Delete for me
+        </div>
+        <div class="menu-item" id="msgActionDeleteEveryone" onclick="deleteSelectedMessage(true)" style="color:#ea0038;display:none">
+          <span class="icon">🗑</span> Delete for everyone
+        </div>
+        <div class="menu-item" onclick="closeMsgActions()">
+          <span class="icon">↩️</span> Cancel
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Side Menu -->
   <div id="sideMenu">
