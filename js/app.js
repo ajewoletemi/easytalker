@@ -30,16 +30,19 @@ let groups = [];
 let statuses = [];
 let chattingWith = null;   // user object
 let chattingGroup = null;  // group object
-let unsubUsers = null, unsubGroups = null, unsubStatus = null, unsubChat = null;
+let unsubUsers = null, unsubGroups = null, unsubStatus = null, unsubChat = null, unsubInbox = null;
 let mediaRecorder = null, audioChunks = [], isRecording = false, recStart = 0, recTimer = null;
 let unreadMap = {};
 let viewedStatuses = new Set();
 let currentStatusQueue = [], currentStatusIdx = 0, statusTimer = null, statusProgress = 0;
 let _seen = new Set();
 let lastRenderKey = "";
+let currentTab = "chats";          // "chats" | "contacts"
+let recentChats = {};              // uid or "g_xxx" -> { lastText, lastAt, count }
 
 try { unreadMap = JSON.parse(localStorage.getItem("et_unread") || "{}"); } catch (_) {}
 try { viewedStatuses = new Set(JSON.parse(localStorage.getItem("viewedStatus") || "[]")); } catch (_) {}
+try { recentChats = JSON.parse(localStorage.getItem("et_recent") || "{}"); } catch (_) {}
 
 /* ---------- Helpers ---------- */
 function showToast(m) {
@@ -175,6 +178,7 @@ function logout() {
   if (unsubGroups) unsubGroups();
   if (unsubStatus) unsubStatus();
   if (unsubChat) unsubChat();
+  if (unsubInbox) unsubInbox();
   auth.signOut();
   closeMenu();
 }
@@ -214,7 +218,7 @@ function startListeners() {
     allUsers = [];
     snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
     me = allUsers.find(u => u.uid === auth.currentUser?.uid) || me;
-    renderChatList();
+    renderCurrentTab();
     renderStatusBar();
     updateMenuProfile();
   }, err => console.error(err));
@@ -225,7 +229,7 @@ function startListeners() {
     .onSnapshot(snap => {
       groups = [];
       snap.forEach(d => groups.push({ id: d.id, ...d.data() }));
-      renderChatList();
+      renderCurrentTab();
     }, err => console.error(err));
 
   // Statuses (last 24h)
@@ -238,54 +242,147 @@ function startListeners() {
       snap.forEach(d => statuses.push({ id: d.id, ...d.data() }));
       renderStatusBar();
     }, err => console.error(err));
+
+  // Inbox: listen to recent messages to build "old chats" list
+  unsubInbox = db.collection("messages")
+    .where("participants", "array-contains", auth.currentUser.uid)
+    .orderBy("createdAt", "desc")
+    .limit(80)
+    .onSnapshot(snap => {
+      snap.forEach(d => {
+        const m = d.data();
+        let key = null;
+        if (m.groupId) {
+          key = "g_" + m.groupId;
+        } else {
+          // the other person
+          key = m.from === me.uid ? m.to : m.from;
+        }
+        if (!key) return;
+        const at = m.createdAt?.toMillis?.() || Date.now();
+        const existing = recentChats[key];
+        if (!existing || at >= (existing.lastAt || 0)) {
+          recentChats[key] = {
+            lastText: m.text || (m.type === "image" ? "📷 Photo" : m.type === "audio" ? "🎤 Voice" : ""),
+            lastAt: at,
+            count: existing?.count || 0
+          };
+          // also keep unreadMap in sync for badge
+          if (!unreadMap[key]) unreadMap[key] = { count: 0 };
+          unreadMap[key].lastText = recentChats[key].lastText;
+          unreadMap[key].lastAt = at;
+        }
+      });
+      localStorage.setItem("et_recent", JSON.stringify(recentChats));
+      localStorage.setItem("et_unread", JSON.stringify(unreadMap));
+      if (currentTab === "chats") renderChatList();
+    }, err => console.error("inbox", err));
 }
 
-/* ---------- Render chat list ---------- */
+/* ---------- Tabs ---------- */
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById("tabChats").classList.toggle("active", tab === "chats");
+  document.getElementById("tabContacts").classList.toggle("active", tab === "contacts");
+
+  const statusSec = document.getElementById("statusSection");
+  const chatList = document.getElementById("chatList");
+  const contactsList = document.getElementById("contactsListMain");
+  const search = document.getElementById("searchInput");
+
+  if (tab === "chats") {
+    statusSec.style.display = "";
+    chatList.classList.remove("hidden");
+    contactsList.classList.add("hidden");
+    search.placeholder = "Search chats…";
+  } else {
+    statusSec.style.display = "none";
+    chatList.classList.add("hidden");
+    contactsList.classList.remove("hidden");
+    search.placeholder = "Search contacts…";
+  }
+  search.value = "";
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if (currentTab === "chats") renderChatList();
+  else renderContactsList();
+}
+
+function onSearch() {
+  renderCurrentTab();
+}
+
+/* ---------- Chats tab = only conversations that already exist (old + recent) ---------- */
 function renderChatList() {
   const list = document.getElementById("chatList");
   if (!list) return;
   const q = (document.getElementById("searchInput")?.value || "").toLowerCase();
 
-  // Build combined list of conversations
   const items = [];
 
-  // Direct chats – show users that have ever messaged or all for simplicity
-  allUsers.filter(u => u.uid !== me?.uid).forEach(u => {
+  // Direct chats that appear in recentChats or unreadMap
+  const chatKeys = new Set([
+    ...Object.keys(recentChats),
+    ...Object.keys(unreadMap)
+  ]);
+
+  chatKeys.forEach(key => {
+    if (key.startsWith("g_")) return; // groups handled below
+    const u = allUsers.find(x => x.uid === key);
+    if (!u || u.uid === me?.uid) return;
     if (q && !u.name?.toLowerCase().includes(q) && !u.email?.toLowerCase().includes(q)) return;
+
+    const meta = recentChats[key] || unreadMap[key] || {};
     items.push({
       type: "user",
       id: u.uid,
       name: u.name || "User",
       photoURL: u.photoURL,
-      lastMsg: unreadMap[u.uid]?.lastText || "",
-      time: unreadMap[u.uid]?.lastAt || 0,
-      unread: unreadMap[u.uid]?.count || 0,
+      lastMsg: meta.lastText || "",
+      time: meta.lastAt || 0,
+      unread: unreadMap[key]?.count || 0,
       online: u.online,
       data: u
     });
   });
 
+  // Groups
   groups.forEach(g => {
+    const key = "g_" + g.id;
     if (q && !g.name?.toLowerCase().includes(q)) return;
+    const meta = recentChats[key] || unreadMap[key] || {};
     items.push({
       type: "group",
       id: g.id,
       name: g.name || "Group",
       photoURL: g.photoURL,
-      lastMsg: unreadMap["g_" + g.id]?.lastText || "Group chat",
-      time: unreadMap["g_" + g.id]?.lastAt || g.createdAt?.toMillis?.() || 0,
-      unread: unreadMap["g_" + g.id]?.count || 0,
+      lastMsg: meta.lastText || "Group chat",
+      time: meta.lastAt || g.createdAt?.toMillis?.() || 0,
+      unread: unreadMap[key]?.count || 0,
       data: g
     });
   });
 
-  // Sort by recent activity
+  // Sort by most recent activity (old chats still appear, just lower)
   items.sort((a, b) => (b.time || 0) - (a.time || 0));
 
+  // Update tab badge
+  const totalUnread = items.reduce((s, it) => s + (it.unread || 0), 0);
+  const tabChats = document.getElementById("tabChats");
+  if (tabChats) {
+    tabChats.innerHTML = totalUnread > 0
+      ? `Chats <span class="tab-count">${totalUnread > 99 ? "99+" : totalUnread}</span>`
+      : "Chats";
+  }
+
   if (!items.length) {
-    list.innerHTML = `<div style="padding:40px 20px;text-align:center;color:#667781">
-      <p>No chats yet</p>
-      <button class="btn btn-green" style="margin-top:12px;width:auto;padding:10px 20px" onclick="openNewChat()">Start a chat</button>
+    list.innerHTML = `<div style="padding:48px 24px;text-align:center;color:#667781">
+      <div style="font-size:40px;margin-bottom:12px">💬</div>
+      <p style="font-weight:600;color:#111b21;margin-bottom:6px">No chats yet</p>
+      <p style="font-size:13px;margin-bottom:16px">Start a conversation from the Contacts tab</p>
+      <button class="btn btn-green" style="width:auto;padding:10px 22px" onclick="switchTab('contacts')">Go to Contacts</button>
     </div>`;
     return;
   }
@@ -299,6 +396,7 @@ function renderChatList() {
       : initial;
     const online = it.online ? `<span class="online-dot"></span>` : "";
     const badge = it.unread > 0 ? `<span class="unread-badge">${it.unread > 99 ? "99+" : it.unread}</span>` : "";
+    const lastPreview = it.lastMsg || (it.time ? " " : "Tap to open");
     return `
       <div class="${it.type === "group" ? "group-item" : "user"} ${isActive ? "active" : ""}"
            onclick="${it.type === "user" ? `openChat('${it.id}')` : `openGroupChat('${it.id}')`}">
@@ -309,7 +407,7 @@ function renderChatList() {
             <span class="user-time">${it.time ? timeAgo(it.time) : ""}</span>
           </div>
           <div class="user-last">
-            <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${escapeHtml(it.lastMsg || " ")}</span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${escapeHtml(lastPreview)}</span>
             ${badge}
           </div>
         </div>
@@ -317,7 +415,58 @@ function renderChatList() {
   }).join("");
 }
 
-function filterChats() { renderChatList(); }
+/* ---------- Contacts tab = all users (not just people you've chatted with) ---------- */
+function renderContactsList() {
+  const list = document.getElementById("contactsListMain");
+  if (!list) return;
+  const q = (document.getElementById("searchInput")?.value || "").toLowerCase();
+
+  const users = allUsers
+    .filter(u => u.uid !== me?.uid)
+    .filter(u => !q || u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q))
+    .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+  // tab label
+  const tabContacts = document.getElementById("tabContacts");
+  if (tabContacts) {
+    tabContacts.innerHTML = users.length
+      ? `Contacts <span class="tab-count" style="background:#667781">${users.length}</span>`
+      : "Contacts";
+  }
+
+  if (!users.length) {
+    list.innerHTML = `<div style="padding:48px 24px;text-align:center;color:#667781">
+      <div style="font-size:40px;margin-bottom:12px">👤</div>
+      <p style="font-weight:600;color:#111b21;margin-bottom:6px">No contacts found</p>
+      <p style="font-size:13px">Other users will appear here when they sign up</p>
+    </div>`;
+    return;
+  }
+
+  // Group by first letter for nicer contacts feel
+  let html = "";
+  let lastLetter = "";
+  users.forEach(u => {
+    const letter = (u.name || "U")[0].toUpperCase();
+    if (letter !== lastLetter) {
+      html += `<div style="padding:8px 16px 4px;font-size:13px;font-weight:700;color:var(--wa-green);background:#f7f8fa">${letter}</div>`;
+      lastLetter = letter;
+    }
+    const hasChat = !!(recentChats[u.uid] || unreadMap[u.uid]);
+    html += `
+      <div class="user" onclick="openChat('${u.uid}');switchTab('chats')">
+        <div class="avatar">${u.photoURL ? `<img src="${escapeHtml(u.photoURL)}">` : (u.name || "U")[0].toUpperCase()}${u.online ? '<span class="online-dot"></span>' : ""}</div>
+        <div class="user-info">
+          <div class="user-name-row">
+            <span class="user-name">${escapeHtml(u.name || "User")}</span>
+            ${hasChat ? '<span style="font-size:11px;color:#00a884">Chat exists</span>' : ""}
+          </div>
+          <div class="user-last">${escapeHtml(u.about || u.email || "Hey there! I am using Easy Talkers")}</div>
+        </div>
+      </div>`;
+  });
+  list.innerHTML = html;
+}
 
 /* ---------- Status bar ---------- */
 function getStatusesByUser() {
@@ -400,12 +549,18 @@ function openChat(uid) {
     document.getElementById("leftPanel").classList.add("hidden-mobile");
   }
 
+  // Ensure this chat appears in Chats tab (even if first time)
+  if (!recentChats[uid]) {
+    recentChats[uid] = { lastText: "", lastAt: Date.now(), count: 0 };
+    localStorage.setItem("et_recent", JSON.stringify(recentChats));
+  }
   // clear unread
   if (unreadMap[uid]) {
     unreadMap[uid].count = 0;
     localStorage.setItem("et_unread", JSON.stringify(unreadMap));
   }
-  renderChatList();
+  if (currentTab !== "chats") switchTab("chats");
+  else renderChatList();
 
   // listen to messages between me and this user
   const msgsEl = document.getElementById("msgs");
@@ -559,17 +714,21 @@ async function sendMessage() {
         to: chattingWith.uid,
         participants: [me.uid, chattingWith.uid].sort()
       });
-      // update unread for recipient side is handled by their listener; we update local preview
-      unreadMap[chattingWith.uid] = { lastText: text, lastAt: Date.now(), count: 0 };
+      const key = chattingWith.uid;
+      unreadMap[key] = { lastText: text, lastAt: Date.now(), count: 0 };
+      recentChats[key] = { lastText: text, lastAt: Date.now(), count: 0 };
     } else if (chattingGroup) {
       await db.collection("messages").add({
         ...base,
         groupId: chattingGroup.id,
         participants: chattingGroup.members || []
       });
-      unreadMap["g_" + chattingGroup.id] = { lastText: text, lastAt: Date.now(), count: 0 };
+      const key = "g_" + chattingGroup.id;
+      unreadMap[key] = { lastText: text, lastAt: Date.now(), count: 0 };
+      recentChats[key] = { lastText: text, lastAt: Date.now(), count: 0 };
     }
     localStorage.setItem("et_unread", JSON.stringify(unreadMap));
+    localStorage.setItem("et_recent", JSON.stringify(recentChats));
     renderChatList();
   } catch (e) {
     showToast("Failed to send");
@@ -1006,26 +1165,18 @@ async function createGroup() {
   }
 }
 
-/* ---------- New chat ---------- */
+/* ---------- New chat → just open Contacts tab ---------- */
 function openNewChat() {
-  filterContacts();
-  document.getElementById("newChatModal").classList.add("active");
+  switchTab("contacts");
+  showToast("Pick a contact to start chatting");
 }
 function closeNewChat() {
-  document.getElementById("newChatModal").classList.remove("active");
+  const m = document.getElementById("newChatModal");
+  if (m) m.classList.remove("active");
 }
 function filterContacts() {
-  const q = (document.getElementById("contactSearch")?.value || "").toLowerCase();
-  const list = document.getElementById("contactsList");
-  const users = allUsers.filter(u => u.uid !== me?.uid && (!q || u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)));
-  list.innerHTML = users.map(u => `
-    <div class="user" onclick="openChat('${u.uid}');closeNewChat()">
-      <div class="avatar">${u.photoURL ? `<img src="${escapeHtml(u.photoURL)}">` : (u.name || "U")[0]}</div>
-      <div class="user-info">
-        <div class="user-name">${escapeHtml(u.name)}</div>
-        <div class="user-last">${escapeHtml(u.about || u.email || "")}</div>
-      </div>
-    </div>`).join("") || `<p class="muted p-16 text-center">No contacts found</p>`;
+  // kept for modal compatibility; main contacts use renderContactsList()
+  renderContactsList();
 }
 
 /* ---------- Settings ---------- */
@@ -1037,10 +1188,13 @@ function closeSettings() {
 }
 function clearLocalData() {
   localStorage.removeItem("et_unread");
+  localStorage.removeItem("et_recent");
   localStorage.removeItem("viewedStatus");
   unreadMap = {};
+  recentChats = {};
   viewedStatuses = new Set();
   showToast("Local cache cleared");
+  renderCurrentTab();
   closeSettings();
 }
 
@@ -1066,6 +1220,7 @@ auth.onAuthStateChanged(async user => {
     if (unsubGroups) unsubGroups();
     if (unsubStatus) unsubStatus();
     if (unsubChat) unsubChat();
+    if (unsubInbox) unsubInbox();
   }
 });
 
