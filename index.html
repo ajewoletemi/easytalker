@@ -74,17 +74,6 @@
           <div class="chat-list" id="chatList" style="flex:1"></div>
         </div>
 
-        <!-- CALLS VIEW -->
-        <div id="viewCalls" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0">
-          <div class="chat-list" id="callsList" style="flex:1">
-            <div style="padding:48px 24px;text-align:center;color:#667781">
-              <div style="font-size:40px;margin-bottom:12px">📞</div>
-              <p style="font-weight:600;color:#111b21;margin-bottom:6px">No calls yet</p>
-              <p style="font-size:13px">Voice & video calls coming soon</p>
-            </div>
-          </div>
-        </div>
-
         <!-- STATUS VIEW -->
         <div id="viewStatus" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0;overflow-y:auto">
           <div class="status-full-section" id="statusFullSection">
@@ -92,24 +81,29 @@
           </div>
         </div>
 
+        <!-- CALLS VIEW -->
+        <div id="viewCalls" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0">
+          <div class="chat-list" id="callsList" style="flex:1"></div>
+        </div>
+
         <!-- CONTACTS VIEW (accessible from new chat) -->
         <div id="viewContacts" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0">
           <div class="chat-list" id="contactsListMain" style="flex:1"></div>
         </div>
 
-        <!-- Bottom navigation -->
+        <!-- Bottom navigation: Chats · Status · Calls -->
         <div class="bottom-nav" id="bottomNav">
           <button class="nav-item active" id="navChats" onclick="switchBottomNav('chats')">
             <span class="nav-icon">💬</span>
             <span class="nav-label">Chats</span>
           </button>
-          <button class="nav-item" id="navCalls" onclick="switchBottomNav('calls')">
-            <span class="nav-icon">📞</span>
-            <span class="nav-label">Calls</span>
-          </button>
           <button class="nav-item" id="navStatus" onclick="switchBottomNav('status')">
             <span class="nav-icon">◯</span>
             <span class="nav-label">Status</span>
+          </button>
+          <button class="nav-item" id="navCalls" onclick="switchBottomNav('calls')">
+            <span class="nav-icon">📞</span>
+            <span class="nav-label">Calls</span>
           </button>
         </div>
       </div>
@@ -133,6 +127,8 @@
             <b id="chatName">User</b>
             <span id="chatStatus">tap for info</span>
           </div>
+          <button class="icon-btn" id="btnVoiceCall" title="Voice call" style="color:#667781;background:transparent;font-size:18px" onclick="startCall(false)">📞</button>
+          <button class="icon-btn" id="btnVideoCall" title="Video call" style="color:#667781;background:transparent;font-size:18px" onclick="startCall(true)">📹</button>
           <button class="icon-btn" style="color:#667781;background:transparent" onclick="viewCurrentProfile()">⋮</button>
         </div>
 
@@ -325,6 +321,27 @@
         <div class="menu-item" style="padding-left:0" onclick="clearLocalData()"><span class="icon">🗑</span> Clear local cache</div>
         <div class="menu-item" style="padding-left:0;color:#ea0038" onclick="logout()"><span class="icon">🚪</span> Log out</div>
         <p style="margin-top:24px;font-size:12px;color:#999;text-align:center">v2.1 • Chats · Calls · Status</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CALL OVERLAY ========== -->
+  <div id="callOverlay" class="call-overlay hidden">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <div class="call-ui">
+      <div class="call-avatar" id="callAvatar">U</div>
+      <div class="call-name" id="callName">User</div>
+      <div class="call-status" id="callStatusText">Calling…</div>
+      <div class="call-timer" id="callTimer" style="display:none">00:00</div>
+      <div class="call-actions" id="callActions">
+        <button class="call-btn mute" id="btnMute" onclick="toggleMute()" title="Mute">🔇</button>
+        <button class="call-btn end" onclick="endCall()" title="End call">📵</button>
+        <button class="call-btn cam" id="btnCamToggle" onclick="toggleCamera()" title="Camera">📷</button>
+      </div>
+      <div class="call-actions" id="incomingActions" style="display:none">
+        <button class="call-btn end" onclick="rejectCall()" title="Decline">📵</button>
+        <button class="call-btn accept" onclick="acceptCall()" title="Accept">📞</button>
       </div>
     </div>
   </div>
