@@ -185,6 +185,8 @@ function logout() {
   if (unsubStatus) unsubStatus();
   if (unsubChat) unsubChat();
   if (unsubInbox) unsubInbox();
+  if (unsubIncoming) { try { unsubIncoming(); } catch (_) {} unsubIncoming = null; }
+  if (currentCallId) endCall();
   auth.signOut();
   closeMenu();
 }
@@ -288,15 +290,16 @@ function startListeners() {
 /* ---------- Bottom nav: Chats / Calls / Status ---------- */
 function switchBottomNav(tab) {
   currentTab = tab;
-  ["chats", "calls", "status"].forEach(t => {
+  // Order: Chats · Status · Calls
+  ["chats", "status", "calls"].forEach(t => {
     const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
     if (nav) nav.classList.toggle("active", t === tab);
   });
 
   const views = {
     chats: document.getElementById("viewChats"),
-    calls: document.getElementById("viewCalls"),
     status: document.getElementById("viewStatus"),
+    calls: document.getElementById("viewCalls"),
     contacts: document.getElementById("viewContacts")
   };
   Object.keys(views).forEach(k => {
@@ -310,11 +313,11 @@ function switchBottomNav(tab) {
   if (filterBar) filterBar.style.display = tab === "chats" ? "flex" : "none";
 
   const title = document.getElementById("headerTitle");
-  if (title) title.innerText = tab === "chats" ? "Easy Talkers" : tab === "calls" ? "Calls" : tab === "status" ? "Status" : "Contacts";
+  if (title) title.innerText = tab === "chats" ? "Easy Talkers" : tab === "status" ? "Status" : tab === "calls" ? "Calls" : "Contacts";
 
   const search = document.getElementById("searchInput");
   if (search) {
-    search.placeholder = tab === "chats" ? "Search chats…" : tab === "status" ? "Search status…" : tab === "contacts" ? "Search contacts…" : "Search…";
+    search.placeholder = tab === "chats" ? "Search chats…" : tab === "status" ? "Search status…" : tab === "calls" ? "Search calls…" : tab === "contacts" ? "Search contacts…" : "Search…";
     search.value = "";
   }
 
@@ -353,8 +356,8 @@ function setChatFilter(f) {
 function renderCurrentTab() {
   if (currentTab === "chats") renderChatList();
   else if (currentTab === "status") renderStatusPage();
+  else if (currentTab === "calls") renderCallsList();
   else if (currentTab === "contacts") renderContactsList();
-  // calls is static for now
 }
 
 function onSearch() {
@@ -1506,3 +1509,475 @@ window.addEventListener("popstate", () => {
     history.pushState(null, "", location.href);
   }
 });
+
+/* ============================================================
+   WEBRTC CALLING (voice + video) via Firestore signaling
+   ============================================================ */
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" }
+  ]
+};
+
+let pc = null;                 // RTCPeerConnection
+let localStream = null;
+let remoteStream = null;
+let currentCallId = null;
+let currentCallPeer = null;    // other user uid
+let isVideoCall = false;
+let isCaller = false;
+let callMuted = false;
+let callCamOff = false;
+let callTimerInterval = null;
+let callSeconds = 0;
+let unsubCall = null;
+let unsubIncoming = null;
+let callHistory = [];
+
+try { callHistory = JSON.parse(localStorage.getItem("et_calls") || "[]"); } catch (_) {}
+
+function saveCallHistory() {
+  // keep last 50
+  callHistory = callHistory.slice(0, 50);
+  localStorage.setItem("et_calls", JSON.stringify(callHistory));
+}
+
+function addCallHistory(entry) {
+  callHistory.unshift(entry);
+  saveCallHistory();
+  if (currentTab === "calls") renderCallsList();
+}
+
+function renderCallsList() {
+  const list = document.getElementById("callsList");
+  if (!list) return;
+  const q = (document.getElementById("searchInput")?.value || "").toLowerCase();
+
+  // Also show contacts for quick call
+  let html = "";
+
+  // Recent calls
+  const filtered = callHistory.filter(c => {
+    if (!q) return true;
+    const u = allUsers.find(x => x.uid === c.peerUid);
+    return (c.peerName || u?.name || "").toLowerCase().includes(q);
+  });
+
+  if (filtered.length) {
+    html += `<div class="status-section-title">Recent</div>`;
+    filtered.forEach(c => {
+      const u = allUsers.find(x => x.uid === c.peerUid);
+      const name = c.peerName || u?.name || "User";
+      const pic = u?.photoURL || c.photoURL || "";
+      const dirClass = c.missed ? "missed" : (c.outgoing ? "out" : "in");
+      const dirIcon = c.missed ? "📵" : (c.outgoing ? "↗" : "↙");
+      const typeIcon = c.video ? "📹" : "📞";
+      const when = timeAgo(c.at);
+      html += `
+        <div class="call-item">
+          <div class="avatar" onclick="openChat('${c.peerUid}')">${pic ? `<img src="${escapeHtml(pic)}">` : name[0].toUpperCase()}</div>
+          <div class="call-meta" onclick="openChat('${c.peerUid}')">
+            <b>${escapeHtml(name)}</b>
+            <span><span class="call-dir ${dirClass}">${dirIcon}</span> ${typeIcon} ${when}${c.duration ? " · " + formatDuration(c.duration) : ""}</span>
+          </div>
+          <button class="call-again" title="Call again" onclick="startCallTo('${c.peerUid}', ${!!c.video})">${c.video ? "📹" : "📞"}</button>
+        </div>`;
+    });
+  }
+
+  // Quick dial contacts
+  html += `<div class="status-section-title">Contacts</div>`;
+  const contacts = allUsers.filter(u => u.uid !== me?.uid)
+    .filter(u => !q || (u.name || "").toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q))
+    .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+  if (!contacts.length && !filtered.length) {
+    html = `<div style="padding:48px 24px;text-align:center;color:#667781">
+      <div style="font-size:40px;margin-bottom:12px">📞</div>
+      <p style="font-weight:600;color:#111b21;margin-bottom:6px">No calls yet</p>
+      <p style="font-size:13px">Start a voice or video call from a chat or contact</p>
+    </div>`;
+  } else {
+    contacts.forEach(u => {
+      html += `
+        <div class="call-item">
+          <div class="avatar">${u.photoURL ? `<img src="${escapeHtml(u.photoURL)}">` : (u.name || "U")[0].toUpperCase()}${u.online ? '<span class="online-dot"></span>' : ""}</div>
+          <div class="call-meta">
+            <b>${escapeHtml(u.name || "User")}</b>
+            <span>${u.online ? "Online" : "last seen " + timeAgo(u.lastSeen)}</span>
+          </div>
+          <button class="call-again" title="Voice call" onclick="startCallTo('${u.uid}', false)">📞</button>
+          <button class="call-again" title="Video call" onclick="startCallTo('${u.uid}', true)">📹</button>
+        </div>`;
+    });
+  }
+
+  list.innerHTML = html;
+}
+
+function formatDuration(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+/* ----- Start outgoing call ----- */
+async function startCall(video) {
+  if (!chattingWith) {
+    showToast("Open a chat with someone first");
+    return;
+  }
+  if (chattingGroup) {
+    showToast("Group calls not supported yet — call someone from Contacts");
+    return;
+  }
+  await startCallTo(chattingWith.uid, video);
+}
+
+async function startCallTo(peerUid, video) {
+  if (currentCallId) {
+    showToast("Already in a call");
+    return;
+  }
+  const peer = allUsers.find(u => u.uid === peerUid);
+  if (!peer) { showToast("User not found"); return; }
+
+  isVideoCall = !!video;
+  isCaller = true;
+  currentCallPeer = peerUid;
+  callMuted = false;
+  callCamOff = false;
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: isVideoCall
+    });
+  } catch (e) {
+    showToast("Microphone/camera permission denied");
+    console.error(e);
+    return;
+  }
+
+  // Create call doc
+  const callRef = db.collection("calls").doc();
+  currentCallId = callRef.id;
+  await callRef.set({
+    id: currentCallId,
+    from: me.uid,
+    fromName: me.name,
+    fromPhoto: me.photoURL || "",
+    to: peerUid,
+    toName: peer.name || "User",
+    video: isVideoCall,
+    status: "ringing",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  showCallUI(peer, "Calling…", false);
+  setupPeerConnection();
+  localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+  attachLocalVideo();
+
+  // Create offer
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  await callRef.update({ offer: { type: offer.type, sdp: offer.sdp } });
+
+  // Listen for answer + remote ICE
+  unsubCall = callRef.onSnapshot(async snap => {
+    const data = snap.data();
+    if (!data) return;
+    if (data.status === "ended" || data.status === "rejected") {
+      cleanupCall(data.status === "rejected" ? "Call declined" : "Call ended");
+      return;
+    }
+    if (data.answer && pc && !pc.currentRemoteDescription) {
+      await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      document.getElementById("callStatusText").innerText = "Connected";
+      startCallTimer();
+    }
+  });
+
+  // ICE candidates from callee
+  callRef.collection("calleeCandidates").onSnapshot(snap => {
+    snap.docChanges().forEach(async change => {
+      if (change.type === "added" && pc) {
+        try { await pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); } catch (_) {}
+      }
+    });
+  });
+
+  // Timeout if no answer in 45s
+  setTimeout(() => {
+    if (currentCallId === callRef.id && document.getElementById("callStatusText")?.innerText === "Calling…") {
+      endCall(true);
+      showToast("No answer");
+    }
+  }, 45000);
+
+  addCallHistory({
+    peerUid,
+    peerName: peer.name,
+    photoURL: peer.photoURL || "",
+    outgoing: true,
+    video: isVideoCall,
+    missed: false,
+    at: Date.now(),
+    duration: 0
+  });
+}
+
+/* ----- Incoming call listener ----- */
+function listenForIncomingCalls() {
+  if (!me || unsubIncoming) return;
+  unsubIncoming = db.collection("calls")
+    .where("to", "==", me.uid)
+    .where("status", "==", "ringing")
+    .onSnapshot(snap => {
+      snap.docChanges().forEach(change => {
+        if (change.type !== "added") return;
+        const data = change.doc.data();
+        if (currentCallId) return; // already in a call
+        // show incoming
+        currentCallId = change.doc.id;
+        currentCallPeer = data.from;
+        isVideoCall = !!data.video;
+        isCaller = false;
+        const peer = allUsers.find(u => u.uid === data.from) || {
+          uid: data.from,
+          name: data.fromName || "User",
+          photoURL: data.fromPhoto || ""
+        };
+        showCallUI(peer, "Incoming " + (isVideoCall ? "video" : "voice") + " call…", true);
+        // ring sound could go here
+      });
+    }, err => console.error("incoming calls", err));
+}
+
+/* ----- Accept incoming ----- */
+async function acceptCall() {
+  if (!currentCallId || isCaller) return;
+  const callRef = db.collection("calls").doc(currentCallId);
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: isVideoCall
+    });
+  } catch (e) {
+    showToast("Permission denied");
+    rejectCall();
+    return;
+  }
+
+  document.getElementById("incomingActions").style.display = "none";
+  document.getElementById("callActions").style.display = "flex";
+  document.getElementById("callStatusText").innerText = "Connecting…";
+
+  setupPeerConnection();
+  localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+  attachLocalVideo();
+
+  const snap = await callRef.get();
+  const data = snap.data();
+  if (!data?.offer) {
+    cleanupCall("Call expired");
+    return;
+  }
+
+  await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  await callRef.update({
+    answer: { type: answer.type, sdp: answer.sdp },
+    status: "active"
+  });
+
+  // ICE from caller
+  callRef.collection("callerCandidates").onSnapshot(s => {
+    s.docChanges().forEach(async change => {
+      if (change.type === "added" && pc) {
+        try { await pc.addIceCandidate(new RTCIceCandidate(change.doc.data())); } catch (_) {}
+      }
+    });
+  });
+
+  unsubCall = callRef.onSnapshot(s => {
+    const d = s.data();
+    if (d && (d.status === "ended" || d.status === "rejected")) {
+      cleanupCall("Call ended");
+    }
+  });
+
+  document.getElementById("callStatusText").innerText = "Connected";
+  startCallTimer();
+
+  const peer = allUsers.find(u => u.uid === currentCallPeer);
+  addCallHistory({
+    peerUid: currentCallPeer,
+    peerName: peer?.name || data.fromName,
+    photoURL: peer?.photoURL || data.fromPhoto || "",
+    outgoing: false,
+    video: isVideoCall,
+    missed: false,
+    at: Date.now(),
+    duration: 0
+  });
+}
+
+async function rejectCall() {
+  if (!currentCallId) return;
+  try {
+    await db.collection("calls").doc(currentCallId).update({ status: "rejected" });
+  } catch (_) {}
+  const peer = allUsers.find(u => u.uid === currentCallPeer);
+  addCallHistory({
+    peerUid: currentCallPeer,
+    peerName: peer?.name || "User",
+    photoURL: peer?.photoURL || "",
+    outgoing: false,
+    video: isVideoCall,
+    missed: true,
+    at: Date.now(),
+    duration: 0
+  });
+  cleanupCall("Call declined");
+}
+
+async function endCall(missed) {
+  if (!currentCallId) {
+    cleanupCall();
+    return;
+  }
+  try {
+    await db.collection("calls").doc(currentCallId).update({ status: "ended" });
+  } catch (_) {}
+  // update last history duration
+  if (callHistory[0] && callHistory[0].peerUid === currentCallPeer) {
+    callHistory[0].duration = callSeconds;
+    if (missed) callHistory[0].missed = true;
+    saveCallHistory();
+  }
+  cleanupCall("Call ended");
+}
+
+function cleanupCall(msg) {
+  if (unsubCall) { try { unsubCall(); } catch (_) {} unsubCall = null; }
+  if (pc) { try { pc.close(); } catch (_) {} pc = null; }
+  if (localStream) {
+    localStream.getTracks().forEach(t => t.stop());
+    localStream = null;
+  }
+  remoteStream = null;
+  const rv = document.getElementById("remoteVideo");
+  const lv = document.getElementById("localVideo");
+  if (rv) rv.srcObject = null;
+  if (lv) lv.srcObject = null;
+  stopCallTimer();
+  currentCallId = null;
+  currentCallPeer = null;
+  isCaller = false;
+  document.getElementById("callOverlay").classList.add("hidden");
+  if (msg) showToast(msg);
+}
+
+function setupPeerConnection() {
+  pc = new RTCPeerConnection(ICE_SERVERS);
+  remoteStream = new MediaStream();
+  document.getElementById("remoteVideo").srcObject = remoteStream;
+
+  pc.ontrack = (event) => {
+    event.streams[0].getTracks().forEach(t => remoteStream.addTrack(t));
+  };
+
+  pc.onicecandidate = (event) => {
+    if (!event.candidate || !currentCallId) return;
+    const col = isCaller ? "callerCandidates" : "calleeCandidates";
+    db.collection("calls").doc(currentCallId).collection(col).add(event.candidate.toJSON()).catch(() => {});
+  };
+
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === "connected") {
+      document.getElementById("callStatusText").innerText = "Connected";
+      startCallTimer();
+    } else if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
+      // allow brief disconnect; end if failed
+      if (pc.connectionState === "failed") endCall();
+    }
+  };
+}
+
+function attachLocalVideo() {
+  const lv = document.getElementById("localVideo");
+  if (!lv) return;
+  lv.srcObject = localStream;
+  if (isVideoCall) {
+    lv.classList.remove("audio-only");
+  } else {
+    lv.classList.add("audio-only");
+  }
+}
+
+function showCallUI(peer, statusText, incoming) {
+  const overlay = document.getElementById("callOverlay");
+  overlay.classList.remove("hidden");
+  document.getElementById("callName").innerText = peer.name || "User";
+  document.getElementById("callStatusText").innerText = statusText;
+  document.getElementById("callAvatar").innerHTML = peer.photoURL
+    ? `<img src="${escapeHtml(peer.photoURL)}">`
+    : (peer.name || "U")[0].toUpperCase();
+  document.getElementById("callTimer").style.display = "none";
+  document.getElementById("callActions").style.display = incoming ? "none" : "flex";
+  document.getElementById("incomingActions").style.display = incoming ? "flex" : "none";
+  document.getElementById("btnCamToggle").style.display = isVideoCall ? "flex" : "none";
+  // hide remote video bg for audio
+  document.getElementById("remoteVideo").style.opacity = isVideoCall ? "1" : "0";
+}
+
+function toggleMute() {
+  if (!localStream) return;
+  callMuted = !callMuted;
+  localStream.getAudioTracks().forEach(t => { t.enabled = !callMuted; });
+  const btn = document.getElementById("btnMute");
+  btn.classList.toggle("active", callMuted);
+  btn.innerText = callMuted ? "🔈" : "🔇";
+}
+
+function toggleCamera() {
+  if (!localStream || !isVideoCall) return;
+  callCamOff = !callCamOff;
+  localStream.getVideoTracks().forEach(t => { t.enabled = !callCamOff; });
+  const btn = document.getElementById("btnCamToggle");
+  btn.classList.toggle("active", callCamOff);
+}
+
+function startCallTimer() {
+  if (callTimerInterval) return;
+  callSeconds = 0;
+  const el = document.getElementById("callTimer");
+  el.style.display = "block";
+  el.innerText = "00:00";
+  callTimerInterval = setInterval(() => {
+    callSeconds++;
+    el.innerText = formatDuration(callSeconds);
+  }, 1000);
+}
+
+function stopCallTimer() {
+  if (callTimerInterval) {
+    clearInterval(callTimerInterval);
+    callTimerInterval = null;
+  }
+  callSeconds = 0;
+}
+
+// Hook incoming listener when user signs in
+const _origAuthHandler = auth.onAuthStateChanged;
+// We already have onAuthStateChanged — patch listen into startListeners
+const _origStartListeners = startListeners;
+startListeners = function () {
+  _origStartListeners();
+  listenForIncomingCalls();
+};
