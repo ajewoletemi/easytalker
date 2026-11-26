@@ -45,42 +45,72 @@
         <div class="header-green">
           <div class="title">
             <button class="menuBtn" onclick="openMenu()">☰</button>
-            <span>Easy Talkers</span>
+            <span id="headerTitle">Easy Talkers</span>
           </div>
           <div style="display:flex;gap:6px">
             <button class="icon-btn" title="New group" onclick="openCreateGroup()">👥</button>
             <button class="icon-btn" title="New chat" onclick="openNewChat()">✏️</button>
+            <button class="icon-btn" title="Log out" onclick="logout()">🚪</button>
           </div>
         </div>
 
         <div class="search-wrap">
           <div class="search-box">
             <span style="color:#667781">🔍</span>
-            <input id="searchInput" placeholder="Search chats or contacts" oninput="onSearch()">
+            <input id="searchInput" placeholder="Search…" oninput="onSearch()">
           </div>
         </div>
 
-        <!-- Tabs: Chats | Contacts -->
-        <div class="tabs-bar" id="tabsBar">
-          <button class="tab-btn active" id="tabChats" onclick="switchTab('chats')">Chats</button>
-          <button class="tab-btn" id="tabContacts" onclick="switchTab('contacts')">Contacts</button>
+        <!-- Top filters (only on Chats view) -->
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-chip active" data-filter="all" onclick="setChatFilter('all')">All</button>
+          <button class="filter-chip" data-filter="unread" onclick="setChatFilter('unread')">Unread</button>
+          <button class="filter-chip" data-filter="favorites" onclick="setChatFilter('favorites')">Favorites</button>
+          <button class="filter-chip" data-filter="groups" onclick="setChatFilter('groups')">Groups</button>
         </div>
 
-        <!-- Status row (only on Chats tab) -->
-        <div class="status-section" id="statusSection">
-          <div class="status-scroll" id="statusLine">
-            <!-- filled by JS -->
+        <!-- CHATS VIEW -->
+        <div id="viewChats" class="view-panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+          <div class="chat-list" id="chatList" style="flex:1"></div>
+        </div>
+
+        <!-- CALLS VIEW -->
+        <div id="viewCalls" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0">
+          <div class="chat-list" id="callsList" style="flex:1">
+            <div style="padding:48px 24px;text-align:center;color:#667781">
+              <div style="font-size:40px;margin-bottom:12px">📞</div>
+              <p style="font-weight:600;color:#111b21;margin-bottom:6px">No calls yet</p>
+              <p style="font-size:13px">Voice & video calls coming soon</p>
+            </div>
           </div>
         </div>
 
-        <!-- Chats list (recent / old conversations) -->
-        <div class="chat-list" id="chatList">
-          <!-- recent chats & groups rendered here -->
+        <!-- STATUS VIEW -->
+        <div id="viewStatus" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0;overflow-y:auto">
+          <div class="status-full-section" id="statusFullSection">
+            <!-- My status + others rendered by JS -->
+          </div>
         </div>
 
-        <!-- Contacts list (all users) -->
-        <div class="chat-list hidden" id="contactsListMain">
-          <!-- all contacts rendered here -->
+        <!-- CONTACTS VIEW (accessible from new chat) -->
+        <div id="viewContacts" class="view-panel hidden" style="flex:1;display:none;flex-direction:column;min-height:0">
+          <div class="chat-list" id="contactsListMain" style="flex:1"></div>
+        </div>
+
+        <!-- Bottom navigation -->
+        <div class="bottom-nav" id="bottomNav">
+          <button class="nav-item active" id="navChats" onclick="switchBottomNav('chats')">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">Chats</span>
+          </button>
+          <button class="nav-item" id="navCalls" onclick="switchBottomNav('calls')">
+            <span class="nav-icon">📞</span>
+            <span class="nav-label">Calls</span>
+          </button>
+          <button class="nav-item" id="navStatus" onclick="switchBottomNav('status')">
+            <span class="nav-icon">◯</span>
+            <span class="nav-label">Status</span>
+          </button>
         </div>
       </div>
     </div>
@@ -145,7 +175,8 @@
       <div style="flex:1;overflow-y:auto;padding:8px 0">
         <div class="menu-item" onclick="openEditProfile();closeMenu()"><span class="icon">👤</span> Profile</div>
         <div class="menu-item" onclick="openCreateGroup();closeMenu()"><span class="icon">👥</span> New Group</div>
-        <div class="menu-item" onclick="document.getElementById('statusPicInput').click();closeMenu()"><span class="icon">📷</span> Add Status</div>
+        <div class="menu-item" onclick="openTextStatus();closeMenu()"><span class="icon">✏️</span> Text Status</div>
+        <div class="menu-item" onclick="document.getElementById('statusPicInput').click();closeMenu()"><span class="icon">📷</span> Photo Status</div>
         <div class="menu-item" onclick="openSettings();closeMenu()"><span class="icon">⚙️</span> Settings</div>
         <div class="menu-item" onclick="logout()"><span class="icon">🚪</span> Log out</div>
       </div>
@@ -253,6 +284,33 @@
     </div>
   </div>
 
+  <!-- Text Status -->
+  <div class="modal" id="textStatusModal">
+    <div class="modal-content" style="max-height:70vh">
+      <div class="modal-header">
+        <span>Text Status</span>
+        <button onclick="closeTextStatus()" style="background:#f0f2f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer">✕</button>
+      </div>
+      <div class="modal-body p-16">
+        <div id="textStatusPreview" style="min-height:160px;border-radius:12px;background:#00a884;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;font-size:22px;text-align:center;margin-bottom:16px;font-weight:600;line-height:1.35">
+          Type your status…
+        </div>
+        <textarea class="field" id="textStatusInput" rows="3" placeholder="What's on your mind?" style="resize:vertical;min-height:80px" oninput="previewTextStatus()"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="color-swatch" style="background:#00a884" onclick="setStatusBg('#00a884')"></button>
+          <button class="color-swatch" style="background:#128c7e" onclick="setStatusBg('#128c7e')"></button>
+          <button class="color-swatch" style="background:#075e54" onclick="setStatusBg('#075e54')"></button>
+          <button class="color-swatch" style="background:#34b7f1" onclick="setStatusBg('#34b7f1')"></button>
+          <button class="color-swatch" style="background:#7c4dff" onclick="setStatusBg('#7c4dff')"></button>
+          <button class="color-swatch" style="background:#e91e63" onclick="setStatusBg('#e91e63')"></button>
+          <button class="color-swatch" style="background:#ff9800" onclick="setStatusBg('#ff9800')"></button>
+          <button class="color-swatch" style="background:#111b21" onclick="setStatusBg('#111b21')"></button>
+        </div>
+        <button class="btn btn-green" style="margin-top:16px" onclick="postTextStatus()">Post Status</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
@@ -265,7 +323,8 @@
         <div class="menu-item" style="padding-left:0" onclick="openEditProfile();closeSettings()"><span class="icon">👤</span> Account</div>
         <div class="menu-item" style="padding-left:0"><span class="icon">🔔</span> Notifications (browser)</div>
         <div class="menu-item" style="padding-left:0" onclick="clearLocalData()"><span class="icon">🗑</span> Clear local cache</div>
-        <p style="margin-top:24px;font-size:12px;color:#999;text-align:center">v2.0 • Faster • WhatsApp-style</p>
+        <div class="menu-item" style="padding-left:0;color:#ea0038" onclick="logout()"><span class="icon">🚪</span> Log out</div>
+        <p style="margin-top:24px;font-size:12px;color:#999;text-align:center">v2.1 • Chats · Calls · Status</p>
       </div>
     </div>
   </div>
