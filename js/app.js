@@ -37,12 +37,16 @@ let viewedStatuses = new Set();
 let currentStatusQueue = [], currentStatusIdx = 0, statusTimer = null, statusProgress = 0;
 let _seen = new Set();
 let lastRenderKey = "";
-let currentTab = "chats";          // "chats" | "contacts"
+let currentTab = "chats";          // bottom nav: chats | calls | status | contacts
+let chatFilter = "all";            // all | unread | favorites | groups
 let recentChats = {};              // uid or "g_xxx" -> { lastText, lastAt, count }
+let favorites = new Set();
+let statusBgColor = "#00a884";
 
 try { unreadMap = JSON.parse(localStorage.getItem("et_unread") || "{}"); } catch (_) {}
 try { viewedStatuses = new Set(JSON.parse(localStorage.getItem("viewedStatus") || "[]")); } catch (_) {}
 try { recentChats = JSON.parse(localStorage.getItem("et_recent") || "{}"); } catch (_) {}
+try { favorites = new Set(JSON.parse(localStorage.getItem("et_favorites") || "[]")); } catch (_) {}
 
 /* ---------- Helpers ---------- */
 function showToast(m) {
@@ -232,22 +236,23 @@ function startListeners() {
       renderCurrentTab();
     }, err => console.error(err));
 
-  // Statuses (last 24h)
-  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  // Statuses (last 24h) — client-side filter to avoid index errors
   unsubStatus = db.collection("statuses")
-    .where("createdAt", ">", dayAgo)
-    .orderBy("createdAt", "desc")
     .onSnapshot(snap => {
+      const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
       statuses = [];
-      snap.forEach(d => statuses.push({ id: d.id, ...d.data() }));
+      snap.forEach(d => {
+        const data = { id: d.id, ...d.data() };
+        const t = data.createdAt?.toMillis?.() || 0;
+        if (t >= dayAgo || !data.createdAt) statuses.push(data);
+      });
       renderStatusBar();
+      if (currentTab === "status") renderStatusPage();
     }, err => console.error(err));
 
-  // Inbox: listen to recent messages to build "old chats" list
+  // Inbox: build old/recent chats list (no orderBy to avoid index errors)
   unsubInbox = db.collection("messages")
     .where("participants", "array-contains", auth.currentUser.uid)
-    .orderBy("createdAt", "desc")
-    .limit(80)
     .onSnapshot(snap => {
       snap.forEach(d => {
         const m = d.data();
@@ -255,7 +260,6 @@ function startListeners() {
         if (m.groupId) {
           key = "g_" + m.groupId;
         } else {
-          // the other person
           key = m.from === me.uid ? m.to : m.from;
         }
         if (!key) return;
@@ -267,7 +271,6 @@ function startListeners() {
             lastAt: at,
             count: existing?.count || 0
           };
-          // also keep unreadMap in sync for badge
           if (!unreadMap[key]) unreadMap[key] = { count: 0 };
           unreadMap[key].lastText = recentChats[key].lastText;
           unreadMap[key].lastAt = at;
@@ -280,38 +283,88 @@ function startListeners() {
 }
 
 /* ---------- Tabs ---------- */
-function switchTab(tab) {
+/* ---------- Bottom nav: Chats / Calls / Status ---------- */
+function switchBottomNav(tab) {
   currentTab = tab;
-  document.getElementById("tabChats").classList.toggle("active", tab === "chats");
-  document.getElementById("tabContacts").classList.toggle("active", tab === "contacts");
+  ["chats", "calls", "status"].forEach(t => {
+    const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
+    if (nav) nav.classList.toggle("active", t === tab);
+  });
 
-  const statusSec = document.getElementById("statusSection");
-  const chatList = document.getElementById("chatList");
-  const contactsList = document.getElementById("contactsListMain");
+  const views = {
+    chats: document.getElementById("viewChats"),
+    calls: document.getElementById("viewCalls"),
+    status: document.getElementById("viewStatus"),
+    contacts: document.getElementById("viewContacts")
+  };
+  Object.keys(views).forEach(k => {
+    if (!views[k]) return;
+    const show = k === tab;
+    views[k].classList.toggle("hidden", !show);
+    views[k].style.display = show ? "flex" : "none";
+  });
+
+  const filterBar = document.getElementById("filterBar");
+  if (filterBar) filterBar.style.display = tab === "chats" ? "flex" : "none";
+
+  const title = document.getElementById("headerTitle");
+  if (title) title.innerText = tab === "chats" ? "Easy Talkers" : tab === "calls" ? "Calls" : tab === "status" ? "Status" : "Contacts";
+
   const search = document.getElementById("searchInput");
-
-  if (tab === "chats") {
-    statusSec.style.display = "";
-    chatList.classList.remove("hidden");
-    contactsList.classList.add("hidden");
-    search.placeholder = "Search chats…";
-  } else {
-    statusSec.style.display = "none";
-    chatList.classList.add("hidden");
-    contactsList.classList.remove("hidden");
-    search.placeholder = "Search contacts…";
+  if (search) {
+    search.placeholder = tab === "chats" ? "Search chats…" : tab === "status" ? "Search status…" : tab === "contacts" ? "Search contacts…" : "Search…";
+    search.value = "";
   }
-  search.value = "";
+
   renderCurrentTab();
+}
+
+function switchTab(tab) {
+  // compatibility: map old "contacts" calls to bottom nav
+  if (tab === "contacts") {
+    currentTab = "contacts";
+    switchBottomNav("contacts");
+    // force show contacts view
+    ["viewChats","viewCalls","viewStatus"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.add("hidden"); el.style.display = "none"; }
+    });
+    const vc = document.getElementById("viewContacts");
+    if (vc) { vc.classList.remove("hidden"); vc.style.display = "flex"; }
+    const filterBar = document.getElementById("filterBar");
+    if (filterBar) filterBar.style.display = "none";
+    document.getElementById("headerTitle").innerText = "Contacts";
+    renderContactsList();
+    return;
+  }
+  switchBottomNav(tab);
+}
+
+function setChatFilter(f) {
+  chatFilter = f;
+  document.querySelectorAll(".filter-chip").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === f);
+  });
+  renderChatList();
 }
 
 function renderCurrentTab() {
   if (currentTab === "chats") renderChatList();
-  else renderContactsList();
+  else if (currentTab === "status") renderStatusPage();
+  else if (currentTab === "contacts") renderContactsList();
+  // calls is static for now
 }
 
 function onSearch() {
   renderCurrentTab();
+}
+
+function toggleFavorite(key) {
+  if (favorites.has(key)) favorites.delete(key);
+  else favorites.add(key);
+  localStorage.setItem("et_favorites", JSON.stringify([...favorites]));
+  renderChatList();
+  showToast(favorites.has(key) ? "Added to favorites" : "Removed from favorites");
 }
 
 /* ---------- Chats tab = only conversations that already exist (old + recent) ---------- */
@@ -365,29 +418,46 @@ function renderChatList() {
     });
   });
 
-  // Sort by most recent activity (old chats still appear, just lower)
-  items.sort((a, b) => (b.time || 0) - (a.time || 0));
-
-  // Update tab badge
-  const totalUnread = items.reduce((s, it) => s + (it.unread || 0), 0);
-  const tabChats = document.getElementById("tabChats");
-  if (tabChats) {
-    tabChats.innerHTML = totalUnread > 0
-      ? `Chats <span class="tab-count">${totalUnread > 99 ? "99+" : totalUnread}</span>`
-      : "Chats";
+  // Apply top filter: All / Unread / Favorites / Groups
+  let filtered = items;
+  if (chatFilter === "unread") {
+    filtered = items.filter(it => (it.unread || 0) > 0);
+  } else if (chatFilter === "favorites") {
+    filtered = items.filter(it => {
+      const key = it.type === "group" ? "g_" + it.id : it.id;
+      return favorites.has(key);
+    });
+  } else if (chatFilter === "groups") {
+    filtered = items.filter(it => it.type === "group");
   }
 
-  if (!items.length) {
+  // Sort by most recent activity (old chats still appear)
+  filtered.sort((a, b) => (b.time || 0) - (a.time || 0));
+
+  // Bottom nav badge for unread
+  const totalUnread = items.reduce((s, it) => s + (it.unread || 0), 0);
+  const navChats = document.getElementById("navChats");
+  if (navChats && totalUnread > 0) {
+    navChats.querySelector(".nav-label").innerHTML = `Chats <span style="background:#00a884;color:#fff;border-radius:8px;padding:0 5px;font-size:10px">${totalUnread > 99 ? "99+" : totalUnread}</span>`;
+  } else if (navChats) {
+    navChats.querySelector(".nav-label").innerText = "Chats";
+  }
+
+  if (!filtered.length) {
+    const emptyMsg = chatFilter === "unread" ? "No unread chats" :
+      chatFilter === "favorites" ? "No favorite chats yet" :
+      chatFilter === "groups" ? "No groups yet" : "No chats yet";
     list.innerHTML = `<div style="padding:48px 24px;text-align:center;color:#667781">
       <div style="font-size:40px;margin-bottom:12px">💬</div>
-      <p style="font-weight:600;color:#111b21;margin-bottom:6px">No chats yet</p>
-      <p style="font-size:13px;margin-bottom:16px">Start a conversation from the Contacts tab</p>
+      <p style="font-weight:600;color:#111b21;margin-bottom:6px">${emptyMsg}</p>
+      <p style="font-size:13px;margin-bottom:16px">Start a conversation from Contacts</p>
       <button class="btn btn-green" style="width:auto;padding:10px 22px" onclick="switchTab('contacts')">Go to Contacts</button>
     </div>`;
     return;
   }
 
-  list.innerHTML = items.map(it => {
+  list.innerHTML = filtered.map(it => {
+    const key = it.type === "group" ? "g_" + it.id : it.id;
     const isActive = (it.type === "user" && chattingWith?.uid === it.id) ||
                      (it.type === "group" && chattingGroup?.id === it.id);
     const initial = (it.name || "U")[0].toUpperCase();
@@ -396,6 +466,7 @@ function renderChatList() {
       : initial;
     const online = it.online ? `<span class="online-dot"></span>` : "";
     const badge = it.unread > 0 ? `<span class="unread-badge">${it.unread > 99 ? "99+" : it.unread}</span>` : "";
+    const star = favorites.has(key) ? "⭐" : "";
     const lastPreview = it.lastMsg || (it.time ? " " : "Tap to open");
     return `
       <div class="${it.type === "group" ? "group-item" : "user"} ${isActive ? "active" : ""}"
@@ -403,7 +474,7 @@ function renderChatList() {
         <div class="avatar">${avatar}${online}</div>
         <div class="user-info">
           <div class="user-name-row">
-            <span class="user-name">${escapeHtml(it.name)}${it.type === "group" ? " 👥" : ""}</span>
+            <span class="user-name">${star}${escapeHtml(it.name)}${it.type === "group" ? " 👥" : ""}</span>
             <span class="user-time">${it.time ? timeAgo(it.time) : ""}</span>
           </div>
           <div class="user-last">
@@ -562,26 +633,48 @@ function openChat(uid) {
   if (currentTab !== "chats") switchTab("chats");
   else renderChatList();
 
-  // listen to messages between me and this user
+  // listen to messages — use chatId to avoid composite index issues
   const msgsEl = document.getElementById("msgs");
   msgsEl.innerHTML = `<div style="text-align:center;padding:20px;color:#667781">Loading messages…</div>`;
 
+  const chatId = [me.uid, uid].sort().join("_");
   unsubChat = db.collection("messages")
-    .where("participants", "array-contains", me.uid)
-    .orderBy("createdAt", "asc")
-    .limitToLast(100)
+    .where("chatId", "==", chatId)
     .onSnapshot(snap => {
       const relevant = [];
-      snap.forEach(d => {
-        const m = { fbId: d.id, ...d.data() };
-        if ((m.from === me.uid && m.to === uid) || (m.from === uid && m.to === me.uid)) {
-          relevant.push(m);
-        }
+      snap.forEach(d => relevant.push({ fbId: d.id, ...d.data() }));
+      // sort client-side so we don't need orderBy index
+      relevant.sort((a, b) => {
+        const ta = a.createdAt?.toMillis?.() || a.createdAt || 0;
+        const tb = b.createdAt?.toMillis?.() || b.createdAt || 0;
+        return ta - tb;
       });
-      renderMessages(relevant);
+      // keep only last 150
+      const trimmed = relevant.slice(-150);
+      renderMessages(trimmed);
     }, err => {
-      console.error(err);
-      msgsEl.innerHTML = `<div style="text-align:center;padding:20px;color:#ea0038">Could not load messages</div>`;
+      console.error("chat load", err);
+      // fallback: try participants query without orderBy
+      unsubChat = db.collection("messages")
+        .where("participants", "array-contains", me.uid)
+        .onSnapshot(snap2 => {
+          const relevant = [];
+          snap2.forEach(d => {
+            const m = { fbId: d.id, ...d.data() };
+            if ((m.from === me.uid && m.to === uid) || (m.from === uid && m.to === me.uid)) {
+              relevant.push(m);
+            }
+          });
+          relevant.sort((a, b) => {
+            const ta = a.createdAt?.toMillis?.() || 0;
+            const tb = b.createdAt?.toMillis?.() || 0;
+            return ta - tb;
+          });
+          renderMessages(relevant.slice(-150));
+        }, err2 => {
+          console.error(err2);
+          msgsEl.innerHTML = `<div style="text-align:center;padding:20px;color:#ea0038">Could not load messages. Check Firestore rules/indexes.</div>`;
+        });
     });
 }
 
@@ -618,12 +711,18 @@ function openGroupChat(gid) {
 
   unsubChat = db.collection("messages")
     .where("groupId", "==", gid)
-    .orderBy("createdAt", "asc")
-    .limitToLast(100)
     .onSnapshot(snap => {
       const relevant = [];
       snap.forEach(d => relevant.push({ fbId: d.id, ...d.data() }));
-      renderMessages(relevant);
+      relevant.sort((a, b) => {
+        const ta = a.createdAt?.toMillis?.() || 0;
+        const tb = b.createdAt?.toMillis?.() || 0;
+        return ta - tb;
+      });
+      renderMessages(relevant.slice(-150));
+    }, err => {
+      console.error(err);
+      msgsEl.innerHTML = `<div style="text-align:center;padding:20px;color:#ea0038">Could not load group messages</div>`;
     });
 }
 
@@ -709,9 +808,11 @@ async function sendMessage() {
 
   try {
     if (chattingWith) {
+      const chatId = [me.uid, chattingWith.uid].sort().join("_");
       await db.collection("messages").add({
         ...base,
         to: chattingWith.uid,
+        chatId,
         participants: [me.uid, chattingWith.uid].sort()
       });
       const key = chattingWith.uid;
@@ -721,6 +822,7 @@ async function sendMessage() {
       await db.collection("messages").add({
         ...base,
         groupId: chattingGroup.id,
+        chatId: "g_" + chattingGroup.id,
         participants: chattingGroup.members || []
       });
       const key = "g_" + chattingGroup.id;
@@ -787,9 +889,11 @@ async function handleFile(input) {
 
     if (chattingWith) {
       payload.to = chattingWith.uid;
+      payload.chatId = [me.uid, chattingWith.uid].sort().join("_");
       payload.participants = [me.uid, chattingWith.uid].sort();
     } else {
       payload.groupId = chattingGroup.id;
+      payload.chatId = "g_" + chattingGroup.id;
       payload.participants = chattingGroup.members || [];
     }
     await db.collection("messages").add(payload);
@@ -826,9 +930,11 @@ async function toggleRecord() {
       };
       if (chattingWith) {
         payload.to = chattingWith.uid;
+        payload.chatId = [me.uid, chattingWith.uid].sort().join("_");
         payload.participants = [me.uid, chattingWith.uid].sort();
       } else {
         payload.groupId = chattingGroup.id;
+        payload.chatId = "g_" + chattingGroup.id;
         payload.participants = chattingGroup.members || [];
       }
       await db.collection("messages").add(payload);
@@ -890,10 +996,122 @@ async function uploadStatus(input) {
       viewers: []
     });
     showToast("Status posted");
+    if (currentTab === "status") renderStatusPage();
   } catch (e) {
     showToast("Failed to post status");
     console.error(e);
   }
+}
+
+/* ---------- Text Status ---------- */
+function openTextStatus() {
+  statusBgColor = "#00a884";
+  document.getElementById("textStatusInput").value = "";
+  document.getElementById("textStatusPreview").style.background = statusBgColor;
+  document.getElementById("textStatusPreview").innerText = "Type your status…";
+  document.getElementById("textStatusModal").classList.add("active");
+}
+function closeTextStatus() {
+  document.getElementById("textStatusModal").classList.remove("active");
+}
+function setStatusBg(color) {
+  statusBgColor = color;
+  document.getElementById("textStatusPreview").style.background = color;
+}
+function previewTextStatus() {
+  const t = document.getElementById("textStatusInput").value.trim();
+  document.getElementById("textStatusPreview").innerText = t || "Type your status…";
+}
+async function postTextStatus() {
+  const text = document.getElementById("textStatusInput").value.trim();
+  if (!text) { showToast("Write something first"); return; }
+  try {
+    await db.collection("statuses").add({
+      from: me.uid,
+      fromName: me.name,
+      photoURL: me.photoURL || "",
+      text,
+      bgColor: statusBgColor,
+      type: "text",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      viewers: []
+    });
+    showToast("Status posted");
+    closeTextStatus();
+    if (currentTab === "status") renderStatusPage();
+  } catch (e) {
+    showToast("Failed to post");
+    console.error(e);
+  }
+}
+
+/* ---------- Full Status page (bottom tab) ---------- */
+function renderStatusPage() {
+  const el = document.getElementById("statusFullSection");
+  if (!el || !me) return;
+  const byUser = getStatusesByUser();
+  const myStatuses = byUser.get(me.uid) || [];
+  const others = [...byUser.entries()].filter(([uid]) => uid !== me.uid);
+
+  let html = `<div class="status-section-title">My status</div>`;
+  if (myStatuses.length) {
+    const last = myStatuses[myStatuses.length - 1];
+    const viewed = myStatuses.every(s => viewedStatuses.has(s.id));
+    const preview = last.image
+      ? `<img src="${escapeHtml(last.image)}">`
+      : last.text
+        ? `<span style="font-size:14px;padding:4px">${escapeHtml(last.text.slice(0, 20))}</span>`
+        : (me.name || "Y")[0];
+    html += `
+      <div class="status-row" onclick="openStatusViewer('${me.uid}')">
+        <div class="statusDot has-status ${viewed ? "viewed" : ""}">${preview}</div>
+        <div class="status-row-info">
+          <b>My status</b>
+          <span>${myStatuses.length} update${myStatuses.length > 1 ? "s" : ""} · ${timeAgo(last.createdAt)}</span>
+        </div>
+      </div>`;
+  } else {
+    html += `
+      <div class="status-row" onclick="openTextStatus()">
+        <div class="statusDot" style="background:#fff;color:#00a884;border:2.5px dashed #00a884;font-size:26px">+</div>
+        <div class="status-row-info">
+          <b>My status</b>
+          <span>Tap to add status update</span>
+        </div>
+      </div>`;
+  }
+
+  html += `
+    <div style="display:flex;gap:10px;padding:8px 16px 16px">
+      <button class="btn btn-green" style="flex:1;padding:10px" onclick="openTextStatus()">✏️ Text</button>
+      <button class="btn btn-dark" style="flex:1;padding:10px" onclick="document.getElementById('statusPicInput').click()">📷 Photo</button>
+    </div>`;
+
+  html += `<div class="status-section-title">Recent updates</div>`;
+  if (!others.length) {
+    html += `<div style="padding:24px;text-align:center;color:#888;font-size:14px">No status from contacts yet</div>`;
+  } else {
+    others.forEach(([uid, arr]) => {
+      const last = arr[arr.length - 1];
+      const u = allUsers.find(x => x.uid === uid);
+      const name = last.fromName || u?.name || "User";
+      const allViewed = arr.every(s => viewedStatuses.has(s.id));
+      const preview = last.image
+        ? `<img src="${escapeHtml(last.image)}">`
+        : last.text
+          ? `<span style="font-size:12px;padding:2px">${escapeHtml(last.text.slice(0, 12))}</span>`
+          : name[0].toUpperCase();
+      html += `
+        <div class="status-row" onclick="openStatusViewer('${uid}')">
+          <div class="statusDot has-status ${allViewed ? "viewed" : ""}">${preview}</div>
+          <div class="status-row-info">
+            <b>${escapeHtml(name)}</b>
+            <span>${timeAgo(last.createdAt)}</span>
+          </div>
+        </div>`;
+    });
+  }
+  el.innerHTML = html;
 }
 
 function openStatusViewer(uid) {
@@ -926,9 +1144,12 @@ function showCurrentStatus() {
 
   const content = document.getElementById("viewerContent");
   if (s.image) {
+    content.style.background = "#111";
     content.innerHTML = `<img src="${escapeHtml(s.image)}" alt="status">`;
   } else {
-    content.innerHTML = `<div class="status-text">${escapeHtml(s.text || "")}</div>`;
+    const bg = s.bgColor || "#00a884";
+    content.style.background = bg;
+    content.innerHTML = `<div class="status-text" style="color:#fff;font-size:24px;font-weight:600;padding:40px;text-align:center;line-height:1.4">${escapeHtml(s.text || "")}</div>`;
   }
 
   // mark viewed
